@@ -1,0 +1,10 @@
+filter_chain:
+- type: LaserMedianFilter
+  name: laser_median_test_5_from_file
+  params: 
+    internal_filter:
+      - name: median_test_5_from_file
+        type: MultiChannelMedianFilterFloat 
+        params:
+          number_of_observations: 5
+          unused: 10

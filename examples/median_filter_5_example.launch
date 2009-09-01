@@ -1,0 +1,6 @@
+<launch>
+<node pkg="laser_filters" type="generic_laser_filter_node" output="screen" name="laser_filter">
+      <remap from="scan_in" to="base_scan" />
+      <rosparam command="load" file="$(find laser_filters)/examples/median_filter_5_example.yaml" />
+</node>
+</launch>

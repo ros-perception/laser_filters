@@ -1,0 +1,21 @@
+<package>
+<description brief='Filters for processing laser scans'>
+
+Assorted filters designed to operate on 2D planar laser scanners,
+which use the sensor_msgs/LaserScan type.
+
+</description>
+<author>Tully Foote</author>
+<license>BSD</license>
+<review status="API cleared" notes=""/>
+<url>http://ros.org/wiki/laser_filters</url>
+<depend package="sensor_msgs"/>
+<depend package="roscpp"/>
+<depend package="tf"/>
+<depend package="filters"/>
+<depend package="message_filters"/>
+<depend package="laser_geometry"/>
+<export>
+<filters plugin="${prefix}/laser_filters_plugins.xml"/>
+</export>
+</package>

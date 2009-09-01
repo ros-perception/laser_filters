@@ -1,0 +1,24 @@
+/**
+\mainpage
+This package is designed to provide filters for working with laser scans.
+
+\section filters Laser Scan Filters 
+
+There are a number of filters that this class provides. 
+There is also a factory class to provide easy creation and chaining of laser scan filter
+as a input to any process.
+\todo implement and document (they're currently basically standalone nodes)
+
+\subsection median Median Filter
+laser_scan::LaserMedianFilter applies a median filter to scans both in range and intensity.  
+
+\subsection mean Mean Filter
+\todo Document
+
+\subsection shadows Scan Shadows Filter
+\todo document
+
+\subsection intensity Intensity Filter
+\todo document
+
+*/

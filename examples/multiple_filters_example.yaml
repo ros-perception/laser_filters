@@ -1,0 +1,29 @@
+filter_chain:
+- type: LaserMedianFilter
+  name: laser_median_test_5_from_file
+  params: 
+    internal_filter:
+      - name: median_test_5_from_file
+        type: MultiChannelMedianFilterFloat 
+        params:
+          number_of_observations: 5
+          unused: 10
+- name: intensity
+  type: LaserScanIntensityFilter
+  params:
+    lower_threshold: 8000
+    upper_threshold: 100000
+    disp_histogram: 0
+- name: shadows
+  type: ScanShadowsFilter
+  params:
+    min_angle: 10
+    max_angle: 170
+    neighbors: 20
+    window: 0
+- name: dark_shadows
+  type: LaserScanIntensityFilter
+  params: 
+    lower_threshold: 100
+    upper_threshold: 10000
+    disp_histogram: 0

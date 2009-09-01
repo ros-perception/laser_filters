@@ -1,0 +1,39 @@
+<class_libraries>
+  <library path="lib/liblaser_scan_filters">
+    <class name="LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	THis is a median filter which filters sensor_msgs::LaserScan messages.  
+      </description>
+    </class>
+    <class name="LaserScanIntensityFilter" type="laser_filters::LaserScanIntensityFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	THis is a median filter which filters sensor_msgs::LaserScan messages based 
+on intensity  
+      </description>
+    </class>
+    <class name="LaserScanFootprintFilter" type="laser_filters::LaserScanFootprintFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	THis is a median filter which filters points out of a laser scan which are 
+inside the inscribed radius.  
+      </description>
+    </class>
+    <class name="ScanShadowsFilter" type="laser_filters::ScanShadowsFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	THis is a median filter which filters points from a laser scan that look like
+the veiling effect.  
+      </description>
+    </class>
+  </library>
+  <library path="lib/libpointcloud_filters">
+    <class name="PointCloudFootprintFilter" type="laser_filters::PointCloudFootprintFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::PointCloud>">
+      <description>
+	Remove points from the pointcloud inside the robot base. 
+      </description>
+    </class>
+  </library>
+</class_libraries>
