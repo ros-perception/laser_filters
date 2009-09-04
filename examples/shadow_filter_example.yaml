@@ -12,3 +12,5 @@ filter_chain:
     lower_threshold: 100
     upper_threshold: 10000
     disp_histogram: 0
+#- name: interpolation
+#  type: InterpolationFilter

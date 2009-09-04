@@ -27,6 +27,12 @@ inside the inscribed radius.
 the veiling effect.  
       </description>
     </class>
+    <class name="InterpolationFilter" type="laser_filters::InterpolationFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+      This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
+      </description>
+    </class>
   </library>
   <library path="lib/libpointcloud_filters">
     <class name="PointCloudFootprintFilter" type="laser_filters::PointCloudFootprintFilter" 
