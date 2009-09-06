@@ -6,7 +6,6 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 rospack_add_boost_directories()
 
-rosbuild_add_boost_directories()
 rospack_add_library(pointcloud_filters src/pointcloud_filters.cpp)
 
 rospack_add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_filter.cpp)
