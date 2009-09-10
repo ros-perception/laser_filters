@@ -31,6 +31,7 @@
 #include "laser_filters/intensity_filter.h"
 #include "laser_filters/scan_shadows_filter.h"
 #include "laser_filters/footprint_filter.h"
+#include "laser_filters/interpolation_filter.h"
 #include "sensor_msgs/LaserScan.h"
 #include "filters/filter_base.h"
 
@@ -41,3 +42,4 @@ PLUGINLIB_REGISTER_CLASS(LaserMedianFilter, laser_filters::LaserMedianFilter, fi
 PLUGINLIB_REGISTER_CLASS(LaserScanIntensityFilter, laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_REGISTER_CLASS(LaserScanFootprintFilter, laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_REGISTER_CLASS(ScanShadowsFilter, laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_REGISTER_CLASS(InterpolationFilter, laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)
