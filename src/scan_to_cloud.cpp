@@ -34,7 +34,7 @@
 
  */
 
-#include <ros/node.h>
+#include <ros/ros.h>
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/LaserScan.h>
 
@@ -74,27 +74,33 @@ class ScanToCloud
     double tf_tolerance_;
     filters::FilterChain<sensor_msgs::PointCloud> cloud_filter_chain_;
     filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
+    ros::Publisher cloud_pub_;
 
     ////////////////////////////////////////////////////////////////////////////////
   ScanToCloud () : laser_max_range_ (DBL_MAX), notifier_(NULL), cloud_filter_chain_("sensor_msgs::PointCloud"), scan_filter_chain_("sensor_msgs::LaserScan")
     {
       tf_ = new tf::TransformListener() ;
 
-      ros::Node::instance()->param ("~filter_window", window_, 2);
+      {
+	ros::NodeHandle nh("~");
+	nh.param ("filter_window", window_, 2);
+	
+	nh.param("high_fidelity", high_fidelity_, false);
+	nh.param("target_frame", target_frame_, std::string ("base_link"));
+	nh.param("preservative", preservative_, false);
+	nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
+	nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
+	nh.param("laser_max_range", laser_max_range_, DBL_MAX);
+	nh.param("notifier_tolerance", tf_tolerance_, 0.03);
+      }
 
-      ros::Node::instance()->param ("~high_fidelity", high_fidelity_, false);
-      ros::Node::instance()->param ("~target_frame", target_frame_, std::string ("base_link"));
-      ros::Node::instance()->param ("~preservative", preservative_, false);
-      ros::Node::instance()->param ("~scan_topic", scan_topic_, std::string("tilt_scan"));
-      ros::Node::instance()->param ("~cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
-      ros::Node::instance()->param ("~laser_max_range", laser_max_range_, DBL_MAX);
-      ros::Node::instance()->param ("~notifier_tolerance", tf_tolerance_, 0.03);
+      ros::NodeHandle nh;
 
-      notifier_ = new tf::MessageNotifier<sensor_msgs::LaserScan>(tf_, ros::Node::instance(), 
-          boost::bind(&ScanToCloud::scanCallback, this, _1), scan_topic_, "base_link", 50);
+      notifier_ = new tf::MessageNotifier<sensor_msgs::LaserScan>(*tf_, boost::bind(&ScanToCloud::scanCallback, this, _1), 
+								  scan_topic_, "base_link", 50);
       notifier_->setTolerance(ros::Duration(tf_tolerance_));
 
-      ros::Node::instance()->advertise<sensor_msgs::PointCloud> (cloud_topic_, 10);
+      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> (cloud_topic_, 10);
 
       std::string cloud_filter_xml;
       cloud_filter_chain_.configure("~cloud_filters");
@@ -220,7 +226,7 @@ class ScanToCloud
       cloud_filter_chain_.update (filtered_cloud, clear_footprint_cloud);
 
       // Set timestamp/frameid and publish
-      ros::Node::instance()->publish (cloud_topic_, clear_footprint_cloud);
+      cloud_pub_.publish(clear_footprint_cloud);
     }
 
 } ;
@@ -229,10 +235,11 @@ class ScanToCloud
 int
   main (int argc, char** argv)
 {
-  ros::init (argc, argv);
-  ros::Node n("scan_to_cloud");
+  ros::init (argc, argv, "scan_to_cloud");
+  ros::NodeHandle nh;
   ScanToCloud f;
-  n.spin ();
+
+  ros::spin();
 
   return (0);
 }
