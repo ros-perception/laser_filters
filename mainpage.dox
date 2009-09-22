@@ -1,5 +1,7 @@
 /**
 \mainpage
+\htmlinclude manifest.html
+
 This package is designed to provide filters for working with laser scans.
 
 \section filters Laser Scan Filters 

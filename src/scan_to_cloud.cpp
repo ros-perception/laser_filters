@@ -87,11 +87,14 @@ class ScanToCloud
 	
 	nh.param("high_fidelity", high_fidelity_, false);
 	nh.param("target_frame", target_frame_, std::string ("base_link"));
-	nh.param("preservative", preservative_, false);
 	nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
 	nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
 	nh.param("laser_max_range", laser_max_range_, DBL_MAX);
 	nh.param("notifier_tolerance", tf_tolerance_, 0.03);
+
+        // DEPRECATED
+	nh.param("preservative", preservative_, false);
+
       }
 
       ros::NodeHandle nh;
@@ -227,6 +230,9 @@ class ScanToCloud
 
       // Set timestamp/frameid and publish
       cloud_pub_.publish(clear_footprint_cloud);
+
+      if (preservative_)
+        ROS_WARN("Use of preservative in scan_to_cloud_filter_chain has been deprecated.");
     }
 
 } ;
