@@ -1,0 +1,5 @@
+filters:
+- name: footprint_filter
+  type: LaserScanFootprintFilter
+  params:
+    inscribed_radius: 0.325
