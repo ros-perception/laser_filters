@@ -55,7 +55,10 @@ namespace laser_filters
 class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 {
 public:
-  LaserScanFootprintFilter(){}
+  LaserScanFootprintFilter()
+  {
+    ROS_WARN("LaserScanFootprintFilter has been deprecated.  Please use PR2LaserScanFootprintFilter instead.\n");
+  }
 
   bool configure()
   {
@@ -78,7 +81,7 @@ public:
     sensor_msgs::PointCloud laser_cloud;
 
     try{
-    projector_.transformLaserScanToPointCloud("base_link", laser_cloud, input_scan, tf_);
+    projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, tf_);
     }
     catch(tf::TransformException& ex){
       ROS_ERROR("Transform unavailable %s", ex.what());

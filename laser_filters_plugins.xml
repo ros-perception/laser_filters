@@ -3,28 +3,19 @@
     <class name="LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
-	THis is a median filter which filters sensor_msgs::LaserScan messages.  
+	This is a median filter which filters sensor_msgs::LaserScan messages.  
       </description>
     </class>
     <class name="LaserScanIntensityFilter" type="laser_filters::LaserScanIntensityFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
-	THis is a median filter which filters sensor_msgs::LaserScan messages based 
-on intensity  
-      </description>
-    </class>
-    <class name="LaserScanFootprintFilter" type="laser_filters::LaserScanFootprintFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
-      <description>
-	THis is a median filter which filters points out of a laser scan which are 
-inside the inscribed radius.  
+	This is a filter which filters sensor_msgs::LaserScan messages based on intensity
       </description>
     </class>
     <class name="ScanShadowsFilter" type="laser_filters::ScanShadowsFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
-	THis is a median filter which filters points from a laser scan that look like
-the veiling effect.  
+	This is a filter which filters points from a laser scan that look like the veiling effect.
       </description>
     </class>
     <class name="InterpolationFilter" type="laser_filters::InterpolationFilter" 
@@ -33,12 +24,18 @@ the veiling effect.
       This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
       </description>
     </class>
+    <class name="LaserScanFootprintFilter" type="laser_filters::LaserScanFootprintFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	DEPRECATED: This is a filter which filters points out of a laser scan which are inside the inscribed radius.
+      </description>
+    </class>
   </library>
   <library path="lib/libpointcloud_filters">
     <class name="PointCloudFootprintFilter" type="laser_filters::PointCloudFootprintFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::PointCloud>">
       <description>
-	Remove points from the pointcloud inside the robot base. 
+	DEPRECATED: Remove points from the pointcloud inside the robot base. 
       </description>
     </class>
   </library>

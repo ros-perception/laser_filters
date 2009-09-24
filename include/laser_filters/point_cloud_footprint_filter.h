@@ -53,13 +53,15 @@ namespace laser_filters
 class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::PointCloud>
 {
 public:
-  PointCloudFootprintFilter() {}
+  PointCloudFootprintFilter() {
+    ROS_WARN("PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
+  }
 
   bool configure()
   {
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
-      ROS_ERROR("LaserScanFootprintFilter needs inscribed_radius to be set");
+      ROS_ERROR("PointCloudFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
