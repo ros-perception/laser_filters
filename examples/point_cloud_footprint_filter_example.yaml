@@ -1,4 +1,4 @@
-filter_chain:
+cloud_filter_chain:
 - type: PointCloudFootprintFilter
   name: footprint_filter
   params:

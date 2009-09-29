@@ -1,4 +1,4 @@
-filter_chain:
+scan_filter_chain:
 - type: LaserArrayFilter
   name: laser_median_filter
   params: 

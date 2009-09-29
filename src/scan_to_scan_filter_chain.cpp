@@ -55,6 +55,10 @@ protected:
   sensor_msgs::LaserScan msg_;
   ros::Publisher output_pub_;
 
+  // Deprecation helpers
+  ros::Timer deprecation_timer_;
+  bool  using_filter_chain_deprecated_;
+
 public:
   // Constructor
   ScanToScanFilterChain() :
@@ -64,7 +68,13 @@ public:
     filter_chain_("sensor_msgs::LaserScan")
   {
     // Configure filter chain
-    filter_chain_.configure("filter_chain", private_nh_);
+    
+    using_filter_chain_deprecated_ = private_nh_.hasParam("filter_chain");
+
+    if (using_filter_chain_deprecated_)
+      filter_chain_.configure("filter_chain", private_nh_);
+    else
+      filter_chain_.configure("scan_filter_chain", private_nh_);
     
     std::string tf_message_filter_target_frame;
 
@@ -87,8 +97,18 @@ public:
     
     // Advertise output
     output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
+
+    // Set up deprecation printout
+    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, _1));
   }
   
+  // Deprecation warning callback
+  void deprecation_warn(const ros::TimerEvent& e)
+  {
+    if (using_filter_chain_deprecated_)
+      ROS_WARN("Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
+  }
+
   // Callback
   void callback(const sensor_msgs::LaserScan::ConstPtr& msg_in)
   {
