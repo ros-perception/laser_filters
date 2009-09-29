@@ -93,6 +93,8 @@ public:
   bool  using_filter_window_deprecated_;
   bool  using_scan_filters_deprecated_;
   bool  using_cloud_filters_deprecated_;
+  bool  using_scan_filters_wrong_deprecated_;
+  bool  using_cloud_filters_wrong_deprecated_;
 
   ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
@@ -113,6 +115,8 @@ public:
     using_filter_window_deprecated_ = private_nh.hasParam("filter_window");
     using_cloud_filters_deprecated_ = private_nh.hasParam("cloud_filters/filter_chain");
     using_scan_filters_deprecated_ = private_nh.hasParam("scan_filters/filter_chain");
+    using_cloud_filters_wrong_deprecated_ = private_nh.hasParam("cloud_filters/cloud_filter_chain");
+    using_scan_filters_wrong_deprecated_ = private_nh.hasParam("scan_filters/scan_filter_chain");
 
 
     private_nh.param("filter_window", window_, 2);
@@ -142,11 +146,15 @@ public:
 
     if (using_cloud_filters_deprecated_)
       cloud_filter_chain_.configure("cloud_filters/filter_chain", private_nh);
+    else if (using_cloud_filters_wrong_deprecated_)
+      cloud_filter_chain_.configure("cloud_filters/cloud_filter_chain", private_nh);
     else
       cloud_filter_chain_.configure("cloud_filter_chain", private_nh);
 
     if (using_scan_filters_deprecated_)
       scan_filter_chain_.configure("scan_filter/filter_chain", private_nh);
+    else if (using_scan_filters_wrong_deprecated_)
+      scan_filter_chain_.configure("scan_filters/scan_filter_chain", private_nh);
     else
       scan_filter_chain_.configure("scan_filter_chain", private_nh);
 
@@ -179,6 +187,13 @@ public:
 
     if (using_scan_filters_deprecated_)
       ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+
+    if (using_cloud_filters_wrong_deprecated_)
+      ROS_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+
+    if (using_scan_filters_wrong_deprecated_)
+      ROS_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+
   }
 
 
