@@ -1,0 +1,1138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="node_organization.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="326.08497"
+     inkscape:cy="372.90058"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1448"
+     inkscape:window-height="1028"
+     inkscape:window-x="1220"
+     inkscape:window-y="329" />
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path4172"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lend"
+       style="overflow:visible;">
+      <path
+         id="path4175"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none;"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <marker
+       viewBox="0 0 10 10"
+       refY="5"
+       refX="10"
+       orient="auto"
+       markerWidth="4"
+       markerUnits="strokeWidth"
+       markerHeight="3"
+       id="ArrowStart">
+      <path
+         id="path3586"
+         d="M 10 0 L 0 5 L 10 10 z" />
+    </marker>
+    <marker
+       viewBox="0 0 10 10"
+       refY="5"
+       refX="0"
+       orient="auto"
+       markerWidth="4"
+       markerUnits="strokeWidth"
+       markerHeight="3"
+       id="ArrowEnd">
+      <path
+         id="path3583"
+         d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+    <inkscape:perspective
+       id="perspective7140"
+       inkscape:persp3d-origin="215.661 : 120.203 : 1"
+       inkscape:vp_z="431.32199 : 180.3045 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 180.3045 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <marker
+       inkscape:stockid="Arrow1Lendi"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lendi"
+       style="overflow:visible;">
+      <path
+         id="path2611"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="marker-start:none;stroke:#a2a2a2;stroke-width:1.0pt;fill:#a2a2a2;fill-rule:evenodd"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1LendiJ"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1LendiJ"
+       style="overflow:visible;">
+      <path
+         id="path3867"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;marker-start:none;stroke:#808080;stroke-width:1.0pt;fill:#808080"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1LendiJ2"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1LendiJ2"
+       style="overflow:visible;">
+      <path
+         id="path4871"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="marker-start:none;stroke:#c0c0c0;stroke-width:1.0pt;fill:#c0c0c0;fill-rule:evenodd"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1LendiJ2C"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1LendiJ2C"
+       style="overflow:visible;">
+      <path
+         id="path5334"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;marker-start:none;stroke:#8c8c8c;stroke-width:1.0pt;fill:#8c8c8c"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1LendH"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1LendH"
+       style="overflow:visible;">
+      <path
+         id="path5801"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="marker-start:none;stroke:#8c8c8c;stroke-width:1.0pt;fill:#8c8c8c;fill-rule:evenodd"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1LendV"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1LendV"
+       style="overflow:visible;">
+      <path
+         id="path6365"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="marker-start:none;stroke:#8c8c8c;stroke-width:1.0pt;fill:#8c8c8c;fill-rule:evenodd"
+         transform="scale(0.8) rotate(180) translate(12.5,0)" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       ry="0.094667137"
+       rx="0.41487131"
+       y="62.615711"
+       x="102.0151"
+       height="160.46841"
+       width="467.30087"
+       id="rect2606"
+       style="opacity:1;fill:#d5e9fa;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5112"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"><flowRegion
+         id="flowRegion5114"><rect
+           id="rect5116"
+           width="168"
+           height="51"
+           x="147"
+           y="472.36218" /></flowRegion><flowPara
+         id="flowPara5118">LaserSca</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5120"
+       style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:Bitstream Vera Sans;font-style:normal;font-weight:normal;font-size:16"><flowRegion
+         id="flowRegion5122"><rect
+           id="rect5124"
+           width="282"
+           height="82"
+           x="76"
+           y="440.36218"
+           style="font-size:16" /></flowRegion><flowPara
+         id="flowPara5126" /></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="32.975616"
+       y="141.28397"
+       id="text5128"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan5130"
+         x="32.975616"
+         y="141.28397">scan</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="101.25381"
+       y="52.829468"
+       id="text6689"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan6691"
+         x="101.25381"
+         y="52.829468"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans Bold">scan_to_scan_filter_chain</tspan></text>
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.87862456;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 69.011602,137.28397 L 128.93962,137.28397"
+       id="path5030" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#8c8c8c;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="25.215851"
+       y="201.1611"
+       id="text7164"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan7166"
+         x="25.215851"
+         y="201.1611">tf data</tspan></text>
+    <rect
+       ry="0.15627673"
+       rx="0.34393859"
+       y="84.358505"
+       x="280.99634"
+       height="86.007355"
+       width="264.00735"
+       id="rect2610"
+       style="opacity:1;fill:#b3b3b3;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.99264622;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="289.36502"
+       y="103.75778"
+       id="text2629"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan2631"
+         x="289.36502"
+         y="103.75778">filter_chain&lt;sensor_msgs::LaserScan&gt;</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect2627"
+       width="66.218414"
+       height="40.416122"
+       x="290.76755"
+       y="117.07609"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text3440"
+       y="142.36218"
+       x="303"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="142.36218"
+         x="303"
+         id="tspan3442"
+         sodipodi:role="line">filter 1</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3461"
+       width="66.218414"
+       height="40.416122"
+       x="466.89081"
+       y="117.15412"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text3463"
+       y="142.44022"
+       x="479.12323"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="142.44022"
+         x="479.12323"
+         id="tspan3465"
+         sodipodi:role="line">filter N</tspan></text>
+    <path
+       inkscape:connector-type="polyline"
+       id="path3467"
+       d="M 357.99591,137.3144 L 386.88086,137.33176"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-type="polyline"
+       id="path4040"
+       d="M 431.17316,137.36218 L 465.82687,137.36218"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="625.37061"
+       y="141.36218"
+       id="text4605"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         id="tspan4611"
+         sodipodi:role="line"
+         x="625.37061"
+         y="141.36218">scan_filtered</tspan></text>
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 532.48444,137.36218 L 616.25676,137.36218"
+       id="path4609" />
+    <g
+       transform="translate(-18,29)"
+       id="g4643"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/u/vpradeep/ros/pkgs/laser_pipeline/laser_assembler/doc/point_cloud_assembler.png"
+         ry="0.10180182"
+         rx="0.27528837"
+         y="79.981789"
+         x="147.89349"
+         height="55.085735"
+         width="113.21298"
+         id="rect4615"
+         style="fill:#bababa;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.91426229;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/u/vpradeep/ros/pkgs/laser_pipeline/laser_assembler/doc/laser_assembler.png"
+         id="text4617"
+         y="110.50574"
+         x="155.43945"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="110.50574"
+           x="155.43945"
+           sodipodi:role="line"
+           id="tspan4621">tf::MessageFilter</tspan></text>
+    </g>
+    <path
+       inkscape:connection-end="#rect2627"
+       inkscape:connection-start="#g4643"
+       inkscape:connector-type="polyline"
+       id="path4648"
+       d="M 244.06361,136.8429 L 289.85043,137.09603"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path5213"
+       d="M 77,197.36218 C 191.11518,196.36921 180.50824,203.38073 181,164.36218"
+       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow1LendV);stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="402"
+       y="139.36218"
+       id="text6794"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan6796"
+         x="402"
+         y="139.36218"
+         style="font-size:14px">...</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect8669"
+       width="151.09151"
+       height="144.09151"
+       x="100.95425"
+       y="261.31641"
+       rx="1.1631178"
+       ry="0.34872583"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot8671"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       transform="translate(9,12)"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><flowRegion
+         id="flowRegion8673"><rect
+           id="rect8675"
+           width="219"
+           height="175"
+           x="110"
+           y="270.36218"
+           style="stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
+         id="flowPara8691"
+         style="font-size:10px">- name: filter1</flowPara><flowPara
+         id="flowPara8727"
+         style="font-size:10px">  type: ScanFilterType1</flowPara><flowPara
+         id="flowPara8699"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara8739"
+         style="font-size:10px">    foo: 123</flowPara><flowPara
+         id="flowPara8741"
+         style="font-size:10px">...</flowPara><flowPara
+         id="flowPara8703"
+         style="font-size:10px">- name: filterN</flowPara><flowPara
+         id="flowPara8749"
+         style="font-size:10px">  type: ScanFilterTypeN</flowPara><flowPara
+         id="flowPara8751"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara8753"
+         style="font-size:10px">    bar: abc</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="104"
+       y="275.36218"
+       id="text8757"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="104"
+         y="275.36218"
+         id="tspan8761"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">~scan_filter_chain</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker-end:none;stroke-miterlimit:4;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 237.58137,364.14869 C 408.67996,364.14869 499.26157,342.5833 499.26157,247.07948 C 499.26157,151.57567 499.26157,151.57567 499.26157,151.57567"
+       id="path8763"
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker-end:none;stroke-miterlimit:4;stroke-dasharray:4, 4;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 240.77649,300.95686 C 293.99875,300.95686 322.17522,285.77097 322.17522,218.51923 C 322.17522,151.2675 322.17522,151.2675 322.17522,151.2675"
+       id="path7384"
+       sodipodi:nodetypes="csc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="100.45068"
+       y="255.02966"
+       id="text8835"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8837"
+         x="100.45068"
+         y="255.02966"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans Bold">Parameter Server</tspan></text>
+    <rect
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       ry="0"
+       rx="0.41935045"
+       y="500.15494"
+       x="89.022011"
+       height="261.51361"
+       width="470.34607"
+       id="rect8839"
+       style="opacity:1;fill:#d5e9fa;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.95479417;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="19.505142"
+       y="578.34583"
+       id="text8841"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8843"
+         x="19.505142"
+         y="578.34583">scan</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="87.783333"
+       y="489.89136"
+       id="text8845"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8847"
+         x="87.783333"
+         y="489.89136"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans Bold">scan_to_cloud_filter_chain</tspan></text>
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.87862456;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 55.54113,574.34582 L 115.46915,574.34582"
+       id="path8849" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#8c8c8c;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="12.745377"
+       y="641.22296"
+       id="text8851"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8853"
+         x="12.745377"
+         y="641.22296">tf data</tspan></text>
+    <rect
+       ry="0.15627673"
+       rx="0.34393859"
+       y="521.42035"
+       x="267.52588"
+       height="86.007355"
+       width="264.00735"
+       id="rect8855"
+       style="opacity:1;fill:#b3b3b3;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.99264622;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="275.89453"
+       y="540.81964"
+       id="text8857"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8859"
+         x="275.89453"
+         y="540.81964">filter_chain&lt;sensor_msgs::LaserScan&gt;</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect8861"
+       width="66.218414"
+       height="40.416122"
+       x="277.29706"
+       y="554.13794"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text8863"
+       y="570.42401"
+       x="288.52954"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="570.42401"
+         x="288.52954"
+         id="tspan8865"
+         sodipodi:role="line">scan</tspan><tspan
+         y="585.42401"
+         x="288.52954"
+         sodipodi:role="line"
+         id="tspan9712">filter 1</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect8867"
+       width="66.218414"
+       height="40.416122"
+       x="453.42035"
+       y="554.21594"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text8869"
+       y="568.50208"
+       x="467.65277"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="568.50208"
+         x="467.65277"
+         id="tspan8871"
+         sodipodi:role="line">scan</tspan><tspan
+         y="583.50208"
+         x="467.65277"
+         sodipodi:role="line"
+         id="tspan9714">filter N</tspan></text>
+    <path
+       inkscape:connector-type="polyline"
+       id="path8873"
+       d="M 344.52544,574.37625 L 373.41039,574.39361"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-type="polyline"
+       id="path8875"
+       d="M 417.70269,574.42403 L 452.3564,574.42403"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="611.90015"
+       y="713.42401"
+       id="text8877"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         id="tspan8879"
+         sodipodi:role="line"
+         x="611.90015"
+         y="713.42401">cloud_filtered</tspan></text>
+    <g
+       transform="translate(-31.470474,466.06185)"
+       id="g8883"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/u/vpradeep/ros/pkgs/laser_pipeline/laser_assembler/doc/point_cloud_assembler.png"
+         ry="0.10180182"
+         rx="0.27528837"
+         y="79.981789"
+         x="147.89349"
+         height="55.085735"
+         width="113.21298"
+         id="rect8885"
+         style="fill:#bababa;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.91426229;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/u/vpradeep/ros/pkgs/laser_pipeline/laser_assembler/doc/laser_assembler.png"
+         id="text8887"
+         y="110.50574"
+         x="155.43945"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="110.50574"
+           x="155.43945"
+           sodipodi:role="line"
+           id="tspan8889">tf::MessageFilter</tspan></text>
+    </g>
+    <path
+       inkscape:connector-type="polyline"
+       id="path8891"
+       d="M 230.59314,573.90475 L 276.37996,574.15788"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path8893"
+       d="M 63.52953,634.42403 C 177.64471,633.43106 167.03777,640.44258 167.52953,601.42403"
+       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow1LendV);stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="388.52954"
+       y="576.42401"
+       id="text8895"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8897"
+         x="388.52954"
+         y="576.42401"
+         style="font-size:14px">...</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect8899"
+       width="299.09149"
+       height="149.09151"
+       x="89.483765"
+       y="804.37817"
+       rx="1.1631178"
+       ry="0.34872583"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot8901"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       transform="translate(-2.47047,555.06185)"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><flowRegion
+         id="flowRegion8903"><rect
+           id="rect8905"
+           width="219"
+           height="175"
+           x="110"
+           y="270.36218"
+           style="stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
+         id="flowPara8907"
+         style="font-size:10px">- name: scan filter 1</flowPara><flowPara
+         id="flowPara8909"
+         style="font-size:10px">  type: ScanFilterType1</flowPara><flowPara
+         id="flowPara8911"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara8913"
+         style="font-size:10px">    foo: 123</flowPara><flowPara
+         id="flowPara8915"
+         style="font-size:10px">...</flowPara><flowPara
+         id="flowPara8917"
+         style="font-size:10px">- name: scan filter N</flowPara><flowPara
+         id="flowPara8919"
+         style="font-size:10px">  type: ScanFilterTypeN</flowPara><flowPara
+         id="flowPara8921"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara8923"
+         style="font-size:10px">    bar: abc</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="92.529541"
+       y="818.42407"
+       id="text8925"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="92.529541"
+         y="818.42407"
+         id="tspan8927"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">~scan_filter_chain</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="88.980225"
+       y="798.09149"
+       id="text8933"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan8935"
+         x="88.980225"
+         y="798.09149"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans Bold">Parameter Server</tspan></text>
+    <rect
+       ry="0.15627673"
+       rx="0.34393859"
+       y="655.35852"
+       x="265.61798"
+       height="86.007355"
+       width="264.00735"
+       id="rect9096"
+       style="opacity:1;fill:#b3b3b3;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.99264622;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="273.98663"
+       y="674.75781"
+       id="text9098"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan9100"
+         x="273.98663"
+         y="674.75781">filter_chain&lt;sensor_msgs::PointCloud&gt;</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect9102"
+       width="66.218414"
+       height="40.416122"
+       x="275.38916"
+       y="688.07611"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text9104"
+       y="704.36218"
+       x="288.12164"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="704.36218"
+         x="288.12164"
+         id="tspan9106"
+         sodipodi:role="line">cloud</tspan><tspan
+         y="719.36218"
+         x="288.12164"
+         sodipodi:role="line"
+         id="tspan9710">filter 1</tspan></text>
+    <rect
+       style="fill:#e6e6e6;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.83422947;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect9108"
+       width="66.218414"
+       height="40.416122"
+       x="451.51245"
+       y="688.15411"
+       rx="0.16101648"
+       ry="0.074691474"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       id="text9110"
+       y="704.44025"
+       x="463.74487"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         y="704.44025"
+         x="463.74487"
+         id="tspan9112"
+         sodipodi:role="line">cloud</tspan><tspan
+         y="719.44025"
+         x="463.74487"
+         sodipodi:role="line"
+         id="tspan9708">filter N</tspan></text>
+    <path
+       inkscape:connector-type="polyline"
+       id="path9114"
+       d="M 342.61752,708.31441 L 371.50247,708.33177"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-type="polyline"
+       id="path9116"
+       d="M 415.79477,708.36219 L 450.44848,708.36219"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 517.10605,709.36219 L 600.87837,709.36219"
+       id="path9118" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="386.62164"
+       y="710.36218"
+       id="text9120"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan9122"
+         x="386.62164"
+         y="710.36218"
+         style="font-size:14px">...</tspan></text>
+    <rect
+       style="fill:#bababa;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.91426229;stroke-linecap:round;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect9126"
+       width="113.21298"
+       height="55.085735"
+       x="113.39351"
+       y="681.81934"
+       rx="0.27528837"
+       ry="0.10180182"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="123.93947"
+       y="713.34326"
+       id="text9128"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         id="tspan9130"
+         sodipodi:role="line"
+         x="123.93947"
+         y="713.34326">LaserProjection</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M 485,594.36218 C 481,638.36218 449,632.36218 326,634.36218 C 185.01652,638.4602 185.98655,630.5487 185,679.36218"
+       id="path9135"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path9706"
+       d="M 63.170734,633.94454 C 177.11184,635.29364 166.52109,625.76747 167.0121,678.77982"
+       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1.16471994px;stroke-linecap:butt;stroke-linejoin:miter;marker-mid:none;marker-end:url(#Arrow1LendV);stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-type="polyline"
+       id="path9716"
+       d="M 228.10659,711.18645 L 273.89341,711.43958"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot9720"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       transform="translate(149.50001,555.00011)"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><flowRegion
+         id="flowRegion9722"><rect
+           id="rect9724"
+           width="219"
+           height="175"
+           x="110"
+           y="270.36218"
+           style="stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" /></flowRegion><flowPara
+         id="flowPara9726"
+         style="font-size:10px">- name: cloud filter 1</flowPara><flowPara
+         id="flowPara9728"
+         style="font-size:10px">  type: CloudFilterType1</flowPara><flowPara
+         id="flowPara9730"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara9732"
+         style="font-size:10px">    foo: 123</flowPara><flowPara
+         id="flowPara9734"
+         style="font-size:10px">...</flowPara><flowPara
+         id="flowPara9736"
+         style="font-size:10px">- name: cloud filter N</flowPara><flowPara
+         id="flowPara9738"
+         style="font-size:10px">  type: CloudFilterTypeN</flowPara><flowPara
+         id="flowPara9740"
+         style="font-size:10px">  params:</flowPara><flowPara
+         id="flowPara9742"
+         style="font-size:10px">    bar: abc</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="244.50003"
+       y="818.3623"
+       id="text9744"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="244.50003"
+         y="818.3623"
+         id="tspan9746"
+         style="font-weight:normal;-inkscape-font-specification:Bitstream Vera Sans">~cloud_filter_chain</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:none;stroke-miterlimit:4;stroke-dasharray:4, 4;stroke-dashoffset:0"
+       d="M 221,843.36218 C 236.16702,840.57893 222.11265,670.89164 255.6066,636.99822 C 288.64925,606.22765 298.04003,620.40128 307.23223,589.83705"
+       id="path11463"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:none;stroke-miterlimit:4;stroke-dasharray:4,4;stroke-dashoffset:0"
+       d="M 224.52513,911.07969 C 248.6261,823.78065 230.15092,676.10375 264.58579,646.4939 C 300.96852,618.54361 377.65935,619.40607 418.89901,618.86925 C 446.34998,618.01958 450.77017,615.04637 464.53553,593.25127"
+       id="path11465"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 464.95423,593.18724 C 467.37822,586.9323 467.37822,586.9323 467.37822,586.9323"
+       id="path15452"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 306.73332,593.16221 C 309.15731,586.90727 309.15731,586.90727 309.15731,586.90727"
+       id="path16592"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 499.58556,156.20774 C 499.63391,149.49971 499.63391,149.49971 499.63391,149.49971"
+       id="path17732"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 322.55256,156.55598 C 322.60091,149.84795 322.60091,149.84795 322.60091,149.84795"
+       id="path17734"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_scan_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:4,4;stroke-dashoffset:0"
+       d="M 383,843.36218 C 429.00179,828.32562 418.41005,774.89848 339,776.36218 C 302.96327,776.3965 305,728.36218 305,728.36218"
+       id="path17736"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:4,4;stroke-dashoffset:0"
+       d="M 384,905.36218 C 464.83461,881.89214 483,797.85477 483,726.36218"
+       id="path17738"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 483.05256,731.05598 C 483.10091,724.34795 483.10091,724.34795 483.10091,724.34795"
+       id="path17740"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
+       d="M 306.05256,729.55598 C 306.10091,722.84795 306.10091,722.84795 306.10091,722.84795"
+       id="path17742"
+       inkscape:export-filename="/wg/avl/leibs/ros/ros-pkg/laser_pipeline/laser_filters/doc/scan_to_cloud_filter_chain.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+</svg>
