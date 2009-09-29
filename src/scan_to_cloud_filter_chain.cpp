@@ -91,6 +91,8 @@ public:
   bool  using_default_target_frame_deprecated_;
   bool  using_laser_max_range_deprecated_;
   bool  using_filter_window_deprecated_;
+  bool  using_scan_filters_deprecated_;
+  bool  using_cloud_filters_deprecated_;
 
   ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
@@ -109,6 +111,8 @@ public:
     using_cloud_topic_deprecated_ = private_nh.hasParam("cloud_topic");
     using_laser_max_range_deprecated_ = private_nh.hasParam("laser_max_range");
     using_filter_window_deprecated_ = private_nh.hasParam("filter_window");
+    using_cloud_filters_deprecated_ = private_nh.hasParam("cloud_filters/filter_chain");
+    using_scan_filters_deprecated_ = private_nh.hasParam("scan_filters/filter_chain");
 
 
     private_nh.param("filter_window", window_, 2);
@@ -118,20 +122,33 @@ public:
     private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
 
 
-
     filter_.setTargetFrame(target_frame_);
     filter_.registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
     filter_.setTolerance(ros::Duration(tf_tolerance_));
 
-    sub_.subscribe(nh, scan_topic_, 50);
+    if (using_scan_topic_deprecated_)
+      sub_.subscribe(nh, scan_topic_, 50);
+    else
+      sub_.subscribe(nh, "scan", 50);
+
     filter_.connectInput(sub_);
 
-    cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> (cloud_topic_, 10);
+    if (using_cloud_topic_deprecated_)
+      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> (cloud_topic_, 10);
+    else
+      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> ("cloud_filtered", 10);
 
     std::string cloud_filter_xml;
-    cloud_filter_chain_.configure("~cloud_filters");
 
-    scan_filter_chain_.configure("~scan_filters");
+    if (using_cloud_filters_deprecated_)
+      cloud_filter_chain_.configure("cloud_filters/filter_chain", private_nh);
+    else
+      cloud_filter_chain_.configure("cloud_filter_chain", private_nh);
+
+    if (using_scan_filters_deprecated_)
+      scan_filter_chain_.configure("scan_filter/filter_chain", private_nh);
+    else
+      scan_filter_chain_.configure("scan_filter_chain", private_nh);
 
     deprecation_timer_ = nh.createTimer(ros::Duration(5.0), boost::bind(&ScanToCloudFilterChain::deprecation_warn, this, _1));
   }
@@ -140,22 +157,28 @@ public:
   void deprecation_warn(const ros::TimerEvent& e)
   {
     if (using_preservative_deprecated_)
-      ROS_WARN("Use of 'preservative' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      ROS_WARN("Use of '~preservative' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_scan_topic_deprecated_)
-      ROS_WARN("Use of 'scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_cloud_topic_deprecated_)
-      ROS_WARN("Use of 'cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      ROS_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_laser_max_range_deprecated_)
-      ROS_WARN("Use of 'laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      ROS_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_filter_window_deprecated_)
-      ROS_WARN("Use of 'filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      ROS_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_default_target_frame_deprecated_)
-      ROS_WARN("Use of default 'target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+      ROS_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+
+    if (using_cloud_filters_deprecated_)
+      ROS_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+
+    if (using_scan_filters_deprecated_)
+      ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
   }
 
 
