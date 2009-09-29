@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2009, Willow Garage, Inc.
+ * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,21 +27,63 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "laser_filters/median_filter.h"
-#include "laser_filters/array_filter.h"
-#include "laser_filters/intensity_filter.h"
-#include "laser_filters/scan_shadows_filter.h"
-#include "laser_filters/footprint_filter.h"
-#include "laser_filters/interpolation_filter.h"
+#ifndef LASER_SCAN_ARRAY_FILTER_H
+#define LASER_SCAN_ARRAY_FILTER_H
+
+#include <map>
+#include <iostream>
+#include <sstream>
+
+#include "boost/thread/mutex.hpp"
+#include "boost/scoped_ptr.hpp"
 #include "sensor_msgs/LaserScan.h"
-#include "filters/filter_base.h"
 
-#include "pluginlib/class_list_macros.h"
+#include "filters/median.h"
+#include "filters/mean.h"
+#include "filters/filter_chain.h"
+#include "boost/thread/mutex.hpp"
+
+namespace laser_filters{
+
+/** \brief A class to provide median filtering of laser scans in time*/
+class LaserArrayFilter : public filters::FilterBase<sensor_msgs::LaserScan> 
+{
+public:
+  /** \brief Constructor
+   * \param averaging_length How many scans to average over.
+   */
+  LaserArrayFilter();
+  ~LaserArrayFilter();
+
+  bool configure();
+
+  /** \brief Update the filter and get the response
+   * \param scan_in The new scan to filter
+   * \param scan_out The filtered scan
+   */
+  bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
 
 
-PLUGINLIB_REGISTER_CLASS(LaserMedianFilter, laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserArrayFilter, laser_filters::LaserArrayFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserScanIntensityFilter, laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserScanFootprintFilter, laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(ScanShadowsFilter, laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(InterpolationFilter, laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+private:
+  unsigned int filter_length_; ///How many scans to average over
+  unsigned int num_ranges_; /// How many data point are in each row
+
+  XmlRpc::XmlRpcValue range_config_;
+  XmlRpc::XmlRpcValue intensity_config_;
+
+  boost::mutex data_lock; /// Protection from multi threaded programs
+  sensor_msgs::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
+  
+  filters::MultiChannelFilterChain<float> * range_filter_;
+  filters::MultiChannelFilterChain<float> * intensity_filter_;
+  
+};
+
+
+
+
+
+}
+
+
+#endif //LASER_SCAN_UTILS_LASERSCAN_H

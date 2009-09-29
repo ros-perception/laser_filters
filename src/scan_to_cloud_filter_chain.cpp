@@ -54,7 +54,7 @@
 
 /** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
  */
-class ScanToCloud
+class ScanToCloudFilterChain
 {
 public:
 
@@ -83,28 +83,44 @@ public:
   filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
   ros::Publisher cloud_pub_;
 
-  //*tf_, boost::bind(&ScanToCloud::scanCallback, this, _1), scan_topic_, "base_link", 50
+  // Timer for displaying deprecation warnings
+  ros::Timer deprecation_timer_;
+  bool  using_preservative_deprecated_;
+  bool  using_scan_topic_deprecated_;
+  bool  using_cloud_topic_deprecated_;
+  bool  using_default_target_frame_deprecated_;
+  bool  using_laser_max_range_deprecated_;
+  bool  using_filter_window_deprecated_;
 
   ////////////////////////////////////////////////////////////////////////////////
-  ScanToCloud () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
+  ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
                    cloud_filter_chain_("sensor_msgs::PointCloud"), scan_filter_chain_("sensor_msgs::LaserScan")
   {
-    private_nh.param ("filter_window", window_, 2);
-	
     private_nh.param("high_fidelity", high_fidelity_, false);
-    private_nh.param("target_frame", target_frame_, std::string ("base_link"));
-    private_nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
-    private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
-    private_nh.param("laser_max_range", laser_max_range_, DBL_MAX);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
+    private_nh.param("target_frame", target_frame_, std::string ("base_link"));
+
+    // DEPRECATED with default value
+    using_default_target_frame_deprecated_ = !private_nh.hasParam("target_frame");
 
     // DEPRECATED
+    using_preservative_deprecated_ = private_nh.hasParam("preservative");
+    using_scan_topic_deprecated_ = private_nh.hasParam("scan_topic");
+    using_cloud_topic_deprecated_ = private_nh.hasParam("cloud_topic");
+    using_laser_max_range_deprecated_ = private_nh.hasParam("laser_max_range");
+    using_filter_window_deprecated_ = private_nh.hasParam("filter_window");
+
+
+    private_nh.param("filter_window", window_, 2);
+    private_nh.param("laser_max_range", laser_max_range_, DBL_MAX);
     private_nh.param("preservative", preservative_, false);
-    if (private_nh.hasParam("preservative"))
-      ROS_WARN("Use of preservative in scan_to_cloud_filter_chain has been deprecated.");
+    private_nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
+    private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
+
+
 
     filter_.setTargetFrame(target_frame_);
-    filter_.registerCallback(boost::bind(&ScanToCloud::scanCallback, this, _1));
+    filter_.registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
     filter_.setTolerance(ros::Duration(tf_tolerance_));
 
     sub_.subscribe(nh, scan_topic_, 50);
@@ -116,7 +132,32 @@ public:
     cloud_filter_chain_.configure("~cloud_filters");
 
     scan_filter_chain_.configure("~scan_filters");
+
+    deprecation_timer_ = nh.createTimer(ros::Duration(5.0), boost::bind(&ScanToCloudFilterChain::deprecation_warn, this, _1));
   }
+
+  // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
+  void deprecation_warn(const ros::TimerEvent& e)
+  {
+    if (using_preservative_deprecated_)
+      ROS_WARN("Use of 'preservative' parameter in scan_to_cloud_filter_chain has been deprecated.");
+
+    if (using_scan_topic_deprecated_)
+      ROS_WARN("Use of 'scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+
+    if (using_cloud_topic_deprecated_)
+      ROS_WARN("Use of 'cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+
+    if (using_laser_max_range_deprecated_)
+      ROS_WARN("Use of 'laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+
+    if (using_filter_window_deprecated_)
+      ROS_WARN("Use of 'filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+
+    if (using_default_target_frame_deprecated_)
+      ROS_WARN("Use of default 'target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////////
   /** \brief Given a PointCloud representing a single laser scan (usually obtained
@@ -166,6 +207,7 @@ public:
     scan_filter_chain_.update (*scan_msg, filtered_scan);
 
     // Project laser into point cloud
+    sensor_msgs::PointCloud tmp_cloud;
     sensor_msgs::PointCloud scan_cloud;
     int n_scan = filtered_scan.ranges.size ();      // Save the number of measurements
 
@@ -192,13 +234,15 @@ public:
       }
       catch (tf::TransformException &ex)
       {
-        ROS_WARN ("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
-        projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
+        ROS_WARN("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
+        return;
+        //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
       }
     }
     else
     {
-      projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
+      projector_.projectLaser (filtered_scan, tmp_cloud, laser_max_range_, preservative_, mask);
+      tf_.transformPointCloud(target_frame_,  tmp_cloud, scan_cloud);
     }
       
 
@@ -247,9 +291,9 @@ public:
 int
 main (int argc, char** argv)
 {
-  ros::init (argc, argv, "scan_to_cloud");
+  ros::init (argc, argv, "scan_to_cloud_filter_chain");
   ros::NodeHandle nh;
-  ScanToCloud f;
+  ScanToCloudFilterChain f;
 
   ros::spin();
 

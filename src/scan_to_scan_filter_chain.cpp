@@ -35,15 +35,17 @@
 #include "tf/transform_listener.h"
 #include "filters/filter_chain.h"
 
-class GenericLaserScanFilterNode
+class ScanToScanFilterChain
 {
 protected:
   // Our NodeHandle
   ros::NodeHandle nh_;
+  ros::NodeHandle private_nh_;
 
   // Components for tf::MessageFilter
   tf::TransformListener tf_;
   message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub_;
+  message_filters::Subscriber<sensor_msgs::LaserScan> no_sub_;
   tf::MessageFilter<sensor_msgs::LaserScan> tf_filter_;
 
   // Filter Chain
@@ -53,33 +55,40 @@ protected:
   sensor_msgs::LaserScan msg_;
   ros::Publisher output_pub_;
 
-  ros::Timer deprecation_timer_;
-
 public:
   // Constructor
-  GenericLaserScanFilterNode() :
-    scan_sub_(nh_, "scan_in", 50),
-    tf_filter_(scan_sub_, tf_, "base_link", 50),
+  ScanToScanFilterChain() :
+    private_nh_("~"),
+    scan_sub_(nh_, "scan", 50),
+    tf_filter_(scan_sub_, tf_, "", 50),
     filter_chain_("sensor_msgs::LaserScan")
   {
     // Configure filter chain
-    filter_chain_.configure("~");
+    filter_chain_.configure("filter_chain", private_nh_);
     
-    // Setup tf::MessageFilter for input
-    tf_filter_.registerCallback(boost::bind(&GenericLaserScanFilterNode::callback, this, _1));
-    tf_filter_.setTolerance(ros::Duration(0.03));
+    std::string tf_message_filter_target_frame;
+
+    if (private_nh_.hasParam("tf_message_filter_target_frame"))
+    {
+      private_nh_.getParam("tf_message_filter_target_frame", tf_message_filter_target_frame);
+
+      tf_filter_.setTargetFrame(tf_message_filter_target_frame);
+      tf_filter_.setTolerance(ros::Duration(0.03));
+
+      // Setup tf::MessageFilter generates callback
+      tf_filter_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
+    }
+    else 
+    {
+      tf_filter_.connectInput(no_sub_);
+      // Pass through if no tf_message_filter_target_frame
+      scan_sub_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
+    }
     
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("output", 1000);
-
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&GenericLaserScanFilterNode::deprecation_warn, this, _1));
+    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
   }
   
-  void deprecation_warn(const ros::TimerEvent& e)
-  {
-    ROS_WARN("'generic_laser_filter_node' has been deprecated.  Please switch to 'scan_to_scan_filter_chain'.");
-  }
-
   // Callback
   void callback(const sensor_msgs::LaserScan::ConstPtr& msg_in)
   {
@@ -93,9 +102,9 @@ public:
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "scan_filter_node");
+  ros::init(argc, argv, "scan_to_scan_filter_chain");
   
-  GenericLaserScanFilterNode t;
+  ScanToScanFilterChain t;
   ros::spin();
   
   return 0;

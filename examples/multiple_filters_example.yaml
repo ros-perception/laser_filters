@@ -1,9 +1,15 @@
 filter_chain:
-- type: LaserMedianFilter
-  name: laser_median_test_5_from_file
+- type: LaserArrayFilter
+  name: laser_median_5
   params: 
-    internal_filter:
-      - name: median_test_5_from_file
+    range_filter_chain:
+      - name: median_5
+        type: MultiChannelMedianFilterFloat 
+        params:
+          number_of_observations: 5
+          unused: 10
+    intensity_filter_chain:
+      - name: median_5
         type: MultiChannelMedianFilterFloat 
         params:
           number_of_observations: 5
