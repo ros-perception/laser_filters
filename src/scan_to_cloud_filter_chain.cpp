@@ -198,44 +198,6 @@ public:
 
 
   ////////////////////////////////////////////////////////////////////////////////
-  /** \brief Given a PointCloud representing a single laser scan (usually obtained
-   * after LaserProjection's projectLaser(), and the index of the channel
-   * representing the true measurement "index", create a complete PointCloud
-   * representation which replaces the invalid measurements with 0 values.
-   * \param c_idx the channel index for the "index"
-   * \param cloud_in the input PointCloud message
-   * \param cloud_out the output PointCloud message
-   */
-  void
-  constructCompleteLaserScanCloud (int c_idx, sensor_msgs::PointCloud cloud_in, sensor_msgs::PointCloud &cloud_out)
-  {
-    // Use the index to revert to a full laser scan cloud (inefficient locally, but efficient globally)
-    int idx = 0;
-    for (unsigned int i = 0; i < cloud_out.points.size (); i++)
-    {
-      unsigned int j = (int)cloud_in.channels[c_idx].values[idx];  // Find out the true index value
-      if (i == j)
-      {
-        // Copy relevant data
-        cloud_out.points[i].x = cloud_in.points[idx].x;
-        cloud_out.points[i].y = cloud_in.points[idx].y;
-        cloud_out.points[i].z = cloud_in.points[idx].z;
-        for (unsigned int d = 0; d < cloud_out.get_channels_size (); d++)
-          cloud_out.channels[d].values[i] = cloud_in.channels[d].values[idx];
-
-        idx++;                                        // Assume chan['index'] is sorted (which should be true)
-        if (idx >= (int)cloud_in.channels[c_idx].values.size ()) idx = cloud_in.channels[c_idx].values.size () - 1;
-      }
-      else
-      {
-        // Bogus XYZ entry. No need to copy channels.
-        cloud_out.points[i].x = cloud_out.points[i].y = cloud_out.points[i].z = 1e9;
-      }
-    }
-  }
-
-
-  ////////////////////////////////////////////////////////////////////////////////
   void
   scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_msg)
   {
@@ -247,7 +209,6 @@ public:
     // Project laser into point cloud
     sensor_msgs::PointCloud tmp_cloud;
     sensor_msgs::PointCloud scan_cloud;
-    int n_scan = filtered_scan.ranges.size ();      // Save the number of measurements
 
     //\TODO CLEAN UP HACK 
     // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
@@ -283,43 +244,10 @@ public:
       tf_.transformPointCloud(target_frame_,  tmp_cloud, scan_cloud);
     }
       
+    sensor_msgs::PointCloud filtered_cloud;
+    cloud_filter_chain_.update (scan_cloud, filtered_cloud);
 
-    /// ---[ Perhaps unnecessary, but find out which channel contains the index
-    int c_idx = -1;
-    for (unsigned int d = 0; d < scan_cloud.get_channels_size (); d++)
-    {
-      if (scan_cloud.channels[d].name == "index")
-      {
-        c_idx = d;
-        break;
-      }
-    }
-    if (c_idx == -1 || scan_cloud.channels[c_idx].values.size () == 0) return;
-    /// ]--
-
-    // Prepare the storage for the temporary array ([] and resize are faster than push_back)
-    sensor_msgs::PointCloud scan_full_cloud (scan_cloud);
-    scan_full_cloud.points.resize (n_scan);
-    for (unsigned int d = 0; d < scan_cloud.get_channels_size (); d++)
-      scan_full_cloud.channels[d].values.resize (n_scan);
-
-    // Prepare data storage for the output array ([] and resize are faster than push_back)
-    sensor_msgs::PointCloud filtered_cloud (scan_cloud);
-    filtered_cloud.points.resize (n_scan);
-    for (unsigned int d = 0; d < scan_cloud.get_channels_size (); d++)
-      filtered_cloud.channels[d].values.resize  (n_scan);
-
-    // Construct a complete laser cloud resembling the original LaserScan (0..LASER_MAX measurements)
-    constructCompleteLaserScanCloud (c_idx, scan_cloud, scan_full_cloud);
-
-    // Filter points
-    // Commented and replaced by laser scan filter Tully  filterShadowPoints (scan_full_cloud, filtered_cloud);
-
-    sensor_msgs::PointCloud clear_footprint_cloud;
-    cloud_filter_chain_.update (filtered_cloud, clear_footprint_cloud);
-
-    // Set timestamp/frameid and publish
-    cloud_pub_.publish(clear_footprint_cloud);
+    cloud_pub_.publish(filtered_cloud);
   }
 
 } ;
