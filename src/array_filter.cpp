@@ -28,67 +28,78 @@
  *
  */
 
-#include "laser_filters/median_filter.h"
+#include "laser_filters/array_filter.h"
 
 namespace laser_filters
 {
-LaserMedianFilter::LaserMedianFilter() :
-  num_ranges_(1), xmlrpc_value_(), range_filter_(NULL), intensity_filter_(NULL)
-{
-    ROS_WARN("LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");  
-};
-
-bool LaserMedianFilter::configure()
+LaserArrayFilter::LaserArrayFilter() :
+  num_ranges_(1), range_filter_(NULL), intensity_filter_(NULL)
 {
   
-  if (!getParam("internal_filter", xmlrpc_value_))
+};
+
+bool LaserArrayFilter::configure()
+{
+ 
+  bool found_range_config = getParam("range_filter_chain", range_config_);
+  bool found_intensity_config = getParam("intensity_filter_chain", intensity_config_);
+ 
+  if (!found_range_config && !found_intensity_config)
   {
-    ROS_ERROR("Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
+    ROS_ERROR("Cannot Configure LaserArrayFilter: Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
   }
   
-  if (range_filter_) delete range_filter_;
-  range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!range_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+  if (range_filter_)
+    delete range_filter_;
+
+  if (intensity_filter_)
+    delete intensity_filter_;
   
-  if (intensity_filter_) delete intensity_filter_;
-  intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!intensity_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+  if (found_range_config)
+  {
+    range_filter_ = new filters::MultiChannelFilterChain<float>("float");
+    if (!range_filter_->configure(num_ranges_, range_config_))
+      return false;
+  }
+
+  if (found_intensity_config)
+  {
+    intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
+    if (!intensity_filter_->configure(num_ranges_, intensity_config_))
+      return false;
+  }
+  
   return true;
 };
 
-LaserMedianFilter::~LaserMedianFilter()
+LaserArrayFilter::~LaserArrayFilter()
 {
-  delete range_filter_;
-  delete intensity_filter_;
+  if (range_filter_)
+    delete range_filter_;
+
+  if (intensity_filter_)
+    delete intensity_filter_;
 };
 
-bool LaserMedianFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+bool LaserArrayFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
 {
   if (!this->configured_) 
   {
-    ROS_ERROR("LaserMedianFilter not configured");
+    ROS_ERROR("LaserArrayFilter not configured");
     return false;
   }
+
   boost::mutex::scoped_lock lock(data_lock);
   scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
-
   if (scan_in.get_ranges_size() != num_ranges_) //Reallocating
   {
-    ROS_INFO("Laser filter clearning and reallocating due to larger scan size");
-    delete range_filter_;
-    delete intensity_filter_;
-
-
     num_ranges_ = scan_in.get_ranges_size();
+
+    ROS_INFO("LaserArrayFilter cleaning and reallocating due to larger scan size");
     
-    range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!range_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
-    
-    intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!intensity_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
-    
+    configure();
   }
 
   /** \todo check for length of intensities too */

@@ -1,4 +1,4 @@
-filter_chain:
+scan_filter_chain:
 - name: intensity
   type: LaserScanIntensityFilter
   params:

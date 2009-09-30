@@ -1,9 +1,9 @@
 <class_libraries>
   <library path="lib/liblaser_scan_filters">
-    <class name="LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
+    <class name="LaserArrayFilter" type="laser_filters::LaserArrayFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
-	This is a median filter which filters sensor_msgs::LaserScan messages.  
+	This is a filter which runs two internal MultiChannelFilterChain filters on the range and intensity measurements.  
       </description>
     </class>
     <class name="LaserScanIntensityFilter" type="laser_filters::LaserScanIntensityFilter" 
@@ -22,6 +22,12 @@
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
       This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
+      </description>
+    </class>
+    <class name="LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	DEPRECATED: This is a median filter which filters sensor_msgs::LaserScan messages.  
       </description>
     </class>
     <class name="LaserScanFootprintFilter" type="laser_filters::LaserScanFootprintFilter" 

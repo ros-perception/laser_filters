@@ -1,4 +1,4 @@
-filters:
+scan_filter_chain:
 - name: footprint_filter
   type: LaserScanFootprintFilter
   params:
