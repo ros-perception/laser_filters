@@ -7,7 +7,7 @@ which use the sensor_msgs/LaserScan type.
 </description>
 <author>Tully Foote</author>
 <license>BSD</license>
-<review status="API cleared" notes=""/>
+<review status="Doc reviewed" notes="09/29/2009"/>
 <url>http://ros.org/wiki/laser_filters</url>
 <depend package="sensor_msgs"/>
 <depend package="roscpp"/>
