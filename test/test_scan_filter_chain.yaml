@@ -1,4 +1,4 @@
-filter_chain:
+intensity_filter_chain:
 - name: intensity_threshold
   type: LaserScanIntensityFilter
   params: 
@@ -13,3 +13,8 @@ bad_filter_chain:
     lower_threshold: 0.5
     upper_threshold: 3.0
     disp_histogram: 0
+
+interp_filter_chain:
+- name: interpolation
+  type: InterpolationFilter
+

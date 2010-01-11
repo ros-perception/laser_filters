@@ -79,11 +79,32 @@ TEST(ScanToScanFilterChain, IntensityFilter)
   expected_msg.set_ranges_vec(v1); 
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
 
-  EXPECT_TRUE(filter_chain_.configure("filter_chain"));
+  EXPECT_TRUE(filter_chain_.configure("intensity_filter_chain"));
 
   msg_in = gen_msg();
 
-  filter_chain_.update(msg_in, msg_out);
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+  
+  for( int i=0; i<10; i++){
+  EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
+  }
+
+  filter_chain_.clear();
+}
+
+TEST(ScanToScanFilterChain, InterpFilter)
+{
+  sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
+  float temp[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.set_ranges_vec(v1); 
+  filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
+
+  EXPECT_TRUE(filter_chain_.configure("interp_filter_chain"));
+
+  msg_in = gen_msg();
+
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
   
   for( int i=0; i<10; i++){
   EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
