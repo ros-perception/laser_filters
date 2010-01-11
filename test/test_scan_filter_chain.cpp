@@ -113,6 +113,27 @@ TEST(ScanToScanFilterChain, InterpFilter)
   filter_chain_.clear();
 }
 
+TEST(ScanToScanFilterChain, ShadowFilter)
+{
+  sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
+  float temp[] = {-1.0, 0.1, -1.0, 1.0, 1.0, -9.0, 1.0, 1.0, 1.0, -2.3};
+  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.set_ranges_vec(v1); 
+  filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
+
+  EXPECT_TRUE(filter_chain_.configure("shadow_filter_chain"));
+
+  msg_in = gen_msg();
+
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+  
+  for( int i=0; i<10; i++){
+  EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
+  }
+
+  filter_chain_.clear();
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);

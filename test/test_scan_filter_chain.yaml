@@ -18,3 +18,11 @@ interp_filter_chain:
 - name: interpolation
   type: InterpolationFilter
 
+shadow_filter_chain:
+- name: shadows
+  type: ScanShadowsFilter
+  params:
+    min_angle: 80
+    max_angle: 100
+    neighbors: 1
+    window: 1
