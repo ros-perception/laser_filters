@@ -63,7 +63,7 @@ public:
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
-    ROS_ERROR("upper_threshold %f", upper_threshold_);
+
     return true;
   }
 
@@ -91,7 +91,6 @@ public:
       {      
 
         filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;                           // If so, then make it a value bigger than the max range
-        ROS_ERROR("%f outside threshold, set to %f", filtered_scan.intensities[i],filtered_scan.ranges[i]);                                                                                
       }
 
       int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;

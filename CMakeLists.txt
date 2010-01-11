@@ -20,7 +20,7 @@ rosbuild_add_executable(generic_laser_filter_node src/generic_laser_filter_node.
 rosbuild_link_boost(generic_laser_filter_node system)
 
 #test scan filter chain filter
-#rosbuild_add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
-#target_link_libraries(test_scan_filter_chain laser_scan_filters)
-#rosbuild_add_gtest_build_flags(test_scan_filter_chain)
-#rosbuild_add_rostest(test/test_scan_filter_chain.launch)
+rosbuild_add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
+target_link_libraries(test_scan_filter_chain laser_scan_filters)
+rosbuild_add_gtest_build_flags(test_scan_filter_chain)
+rosbuild_add_rostest(test/test_scan_filter_chain.launch)
