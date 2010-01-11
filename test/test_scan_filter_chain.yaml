@@ -1,0 +1,15 @@
+filter_chain:
+- name: intensity_threshold
+  type: LaserScanIntensityFilter
+  params: 
+    lower_threshold: 0.5
+    upper_threshold: 3.0
+    disp_histogram: 1
+
+bad_filter_chain:
+- name: dark_shadows
+  type: LaserScanIntensiFilter
+  params:
+    lower_threshold: 0.5
+    upper_threshold: 3.0
+    disp_histogram: 0
