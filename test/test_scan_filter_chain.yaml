@@ -26,3 +26,19 @@ shadow_filter_chain:
     max_angle: 100
     neighbors: 1
     window: 1
+
+array_filter_chain:
+  - type: LaserArrayFilter
+    name: laser_median_filter
+    params: 
+      range_filter_chain:
+        - name: median_2
+          type: MultiChannelMeanFilterFloat 
+          params:
+            number_of_observations: 3
+      intensity_filter_chain:
+        - name: median_2
+          type: MultiChannelMeanFilterFloat
+          params:
+            number_of_observations: 3
+

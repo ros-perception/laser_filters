@@ -134,6 +134,34 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   filter_chain_.clear();
 }
 
+TEST(ScanToScanFilterChain, ArrayFilter)
+{
+  sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
+  float temp[] = {1.0, 0.4, 1.0, 1.0, 1.0, 6.3333, 1.0, 1.0, 1.0, 1.8667};
+  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.set_ranges_vec(v1); 
+  filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
+
+  EXPECT_TRUE(filter_chain_.configure("array_filter_chain"));
+
+  msg_in = gen_msg();
+  
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+  float temp2[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  std::vector<float> v2 (temp2, temp2 + sizeof(temp2) / sizeof(float));
+  msg_in.set_ranges_vec(v2);
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+  msg_in = gen_msg();
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+  
+  for( int i=0; i<10; i++){
+    EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-3);
+    EXPECT_NEAR(msg_out.intensities[i],msg_in.intensities[i],1e-3);
+  }
+
+  filter_chain_.clear();
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
