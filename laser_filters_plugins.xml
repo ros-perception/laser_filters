@@ -24,6 +24,12 @@
       This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
       </description>
     </class>
+    <class name="LaserScanAngularBoundsFilter" type="laser_filters::LaserScanAngularBoundsFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	 This is a filter that removes points in a laser scan outside of certain angular bounds.
+      </description>
+    </class>
     <class name="LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>

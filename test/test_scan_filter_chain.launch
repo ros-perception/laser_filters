@@ -1,0 +1,4 @@
+<launch>
+        <rosparam command="load" file="$(find laser_filters)/test/test_scan_filter_chain.yaml"/>
+        <test test-name="test_scan_filter_chain" pkg="laser_filters" type="test_scan_filter_chain"/>
+</launch>

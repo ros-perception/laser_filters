@@ -63,6 +63,7 @@ public:
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
+
     return true;
   }
 
@@ -87,7 +88,8 @@ public:
     {
       if (filtered_scan.intensities[i] <= lower_threshold_ ||                           // Is this reading below our lower threshold?
           filtered_scan.intensities[i] >= upper_threshold_)                             // Is this reading above our upper threshold?
-      {                                                                                 
+      {      
+
         filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;                           // If so, then make it a value bigger than the max range
       }
 
