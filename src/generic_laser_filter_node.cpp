@@ -63,7 +63,7 @@ public:
     filter_chain_("sensor_msgs::LaserScan")
   {
     // Configure filter chain
-    filter_chain_.configure("~");
+    filter_chain_.configure("");
     
     // Setup tf::MessageFilter for input
     tf_filter_.registerCallback(boost::bind(&GenericLaserScanFilterNode::callback, this, _1));
