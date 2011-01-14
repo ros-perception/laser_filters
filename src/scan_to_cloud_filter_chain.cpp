@@ -65,7 +65,6 @@ public:
   int window_;
     
   bool high_fidelity_;                    // High fidelity (interpolating time across scan)
-  bool preservative_;                     //keep max range values?
   std::string target_frame_;                   // Target frame for high fidelity result
   std::string scan_topic_, cloud_topic_;
 
@@ -85,7 +84,6 @@ public:
 
   // Timer for displaying deprecation warnings
   ros::Timer deprecation_timer_;
-  bool  using_preservative_deprecated_;
   bool  using_scan_topic_deprecated_;
   bool  using_cloud_topic_deprecated_;
   bool  using_default_target_frame_deprecated_;
@@ -108,7 +106,6 @@ public:
     using_default_target_frame_deprecated_ = !private_nh.hasParam("target_frame");
 
     // DEPRECATED
-    using_preservative_deprecated_ = private_nh.hasParam("preservative");
     using_scan_topic_deprecated_ = private_nh.hasParam("scan_topic");
     using_cloud_topic_deprecated_ = private_nh.hasParam("cloud_topic");
     using_laser_max_range_deprecated_ = private_nh.hasParam("laser_max_range");
@@ -121,7 +118,6 @@ public:
 
     private_nh.param("filter_window", window_, 2);
     private_nh.param("laser_max_range", laser_max_range_, DBL_MAX);
-    private_nh.param("preservative", preservative_, false);
     private_nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
     private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
 
@@ -164,9 +160,6 @@ public:
   // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
   void deprecation_warn(const ros::TimerEvent& e)
   {
-    if (using_preservative_deprecated_)
-      ROS_WARN("Use of '~preservative' parameter in scan_to_cloud_filter_chain has been deprecated.");
-
     if (using_scan_topic_deprecated_)
       ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
@@ -240,7 +233,7 @@ public:
     }
     else
     {
-      projector_.projectLaser (filtered_scan, tmp_cloud, laser_max_range_, preservative_, mask);
+      projector_.projectLaser (filtered_scan, tmp_cloud, laser_max_range_, mask);
       tf_.transformPointCloud(target_frame_,  tmp_cloud, scan_cloud);
     }
       
