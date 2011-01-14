@@ -8,7 +8,7 @@ intensity_filter_chain:
 
 bad_filter_chain:
 - name: dark_shadows
-  type: LaserScanIntensiFilter
+  type: LaserScanIntensityFilter
   params:
     lower_threshold: 0.5
     upper_threshold: 3.0

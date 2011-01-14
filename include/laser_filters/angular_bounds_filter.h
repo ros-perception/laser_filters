@@ -64,8 +64,8 @@ namespace laser_filters
       virtual ~LaserScanAngularBoundsFilter(){}
 
       bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan){
-        filtered_scan.set_ranges_size(input_scan.ranges.size());
-        filtered_scan.set_intensities_size(input_scan.intensities.size());
+        filtered_scan.ranges.resize(input_scan.ranges.size());
+        filtered_scan.intensities.resize(input_scan.intensities.size());
 
         double start_angle = input_scan.angle_min;
         double current_angle = input_scan.angle_min;
@@ -109,10 +109,10 @@ namespace laser_filters
         filtered_scan.range_min = input_scan.range_min;
         filtered_scan.range_max = input_scan.range_max;
 
-        filtered_scan.set_ranges_size(count);
+        filtered_scan.ranges.resize(count);
 
         if(input_scan.intensities.size() >= count)
-          filtered_scan.set_intensities_size(count);
+          filtered_scan.intensities.resize(count);
 
         ROS_DEBUG("Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
 

@@ -93,9 +93,9 @@ bool LaserArrayFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
   boost::mutex::scoped_lock lock(data_lock);
   scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
-  if (scan_in.get_ranges_size() != num_ranges_) //Reallocating
+  if (scan_in.ranges.size() != num_ranges_) //Reallocating
   {
-    num_ranges_ = scan_in.get_ranges_size();
+    num_ranges_ = scan_in.ranges.size();
 
     ROS_INFO("LaserArrayFilter cleaning and reallocating due to larger scan size");
     
