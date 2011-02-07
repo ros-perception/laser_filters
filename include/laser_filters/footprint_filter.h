@@ -107,7 +107,7 @@ public:
 
   int indexChannel(const sensor_msgs::PointCloud& scan_cloud){
       int c_idx = -1;
-      for (unsigned int d = 0; d < scan_cloud.get_channels_size (); d++)
+      for (unsigned int d = 0; d < scan_cloud.channels.size (); d++)
       {
         if (scan_cloud.channels[d].name == "index")
         {

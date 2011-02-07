@@ -40,10 +40,10 @@
 #include "pluginlib/class_list_macros.h"
 
 
-PLUGINLIB_REGISTER_CLASS(LaserMedianFilter, laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserArrayFilter, laser_filters::LaserArrayFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserScanIntensityFilter, laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserScanAngularBoundsFilter, laser_filters::LaserScanAngularBoundsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(LaserScanFootprintFilter, laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(ScanShadowsFilter, laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_REGISTER_CLASS(InterpolationFilter, laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserMedianFilter, laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserArrayFilter, laser_filters::LaserArrayFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanIntensityFilter, laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanAngularBoundsFilter, laser_filters::LaserScanAngularBoundsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanFootprintFilter, laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, ScanShadowsFilter, laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, InterpolationFilter, laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)

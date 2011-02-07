@@ -74,14 +74,14 @@ bool LaserMedianFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
   scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
 
-  if (scan_in.get_ranges_size() != num_ranges_) //Reallocating
+  if (scan_in.ranges.size() != num_ranges_) //Reallocating
   {
     ROS_INFO("Laser filter clearning and reallocating due to larger scan size");
     delete range_filter_;
     delete intensity_filter_;
 
 
-    num_ranges_ = scan_in.get_ranges_size();
+    num_ranges_ = scan_in.ranges.size();
     
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
     if (!range_filter_->configure(num_ranges_, xmlrpc_value_)) return false;

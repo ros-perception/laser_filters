@@ -49,8 +49,8 @@ sensor_msgs::LaserScan gen_msg(){
   msg.scan_time = 0.1;
   msg.range_min = 0.5;
   msg.range_max = 1.5;
-  msg.set_ranges_vec(v1);
-  msg.set_intensities_vec(v1);
+  msg.ranges = v1;
+  msg.intensities = v1;
 
   return msg;
 }
@@ -76,7 +76,7 @@ TEST(ScanToScanFilterChain, IntensityFilter)
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {1.0, 2.5, 1.0, 1.0, 1.0, 2.5, 1.0, 1.0, 1.0, 2.3};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.set_ranges_vec(v1); 
+  expected_msg.ranges = v1;
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
 
   EXPECT_TRUE(filter_chain_.configure("intensity_filter_chain"));
@@ -97,7 +97,7 @@ TEST(ScanToScanFilterChain, InterpFilter)
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.set_ranges_vec(v1); 
+  expected_msg.ranges = v1;
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
 
   EXPECT_TRUE(filter_chain_.configure("interp_filter_chain"));
@@ -118,7 +118,7 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {-1.0, 0.1, -1.0, 1.0, 1.0, -9.0, 1.0, 1.0, 1.0, -2.3};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.set_ranges_vec(v1); 
+  expected_msg.ranges = v1; 
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
 
   EXPECT_TRUE(filter_chain_.configure("shadow_filter_chain"));
@@ -139,7 +139,7 @@ TEST(ScanToScanFilterChain, ArrayFilter)
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {1.0, 0.4, 1.0, 1.0, 1.0, 6.3333, 1.0, 1.0, 1.0, 1.8667};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.set_ranges_vec(v1); 
+  expected_msg.ranges = v1; 
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
 
   EXPECT_TRUE(filter_chain_.configure("array_filter_chain"));
@@ -149,7 +149,7 @@ TEST(ScanToScanFilterChain, ArrayFilter)
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
   float temp2[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
   std::vector<float> v2 (temp2, temp2 + sizeof(temp2) / sizeof(float));
-  msg_in.set_ranges_vec(v2);
+  msg_in.ranges = v2;
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
   msg_in = gen_msg();
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));

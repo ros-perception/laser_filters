@@ -91,7 +91,7 @@ public:
     filtered_scan.header = input_scan.header;
     filtered_scan.points.resize (input_scan.points.size());
     filtered_scan.channels.resize (input_scan.channels.size());
-    for (unsigned int d = 0; d < input_scan.get_channels_size (); d++){
+    for (unsigned int d = 0; d < input_scan.channels.size (); d++){
       filtered_scan.channels[d].values.resize  (input_scan.points.size());
       filtered_scan.channels[d].name = input_scan.channels[d].name;
     }
@@ -101,7 +101,7 @@ public:
     {
       if (!inFootprint(laser_cloud.points[i])){
         filtered_scan.points[num_pts] = input_scan.points[i];
-        for (unsigned int d = 0; d < filtered_scan.get_channels_size (); d++)
+        for (unsigned int d = 0; d < filtered_scan.channels.size (); d++)
           filtered_scan.channels[d].values[num_pts] = input_scan.channels[d].values[i];
         num_pts++;
       }
@@ -109,7 +109,7 @@ public:
 
     // Resize output vectors
     filtered_scan.points.resize (num_pts);
-    for (unsigned int d = 0; d < filtered_scan.get_channels_size (); d++)
+    for (unsigned int d = 0; d < filtered_scan.channels.size (); d++)
       filtered_scan.channels[d].values.resize (num_pts);
 
     return true;
