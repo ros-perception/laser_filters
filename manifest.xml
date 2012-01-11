@@ -16,6 +16,7 @@ which use the sensor_msgs/LaserScan type.
 <depend package="message_filters"/>
 <depend package="laser_geometry"/>
 <depend package="pluginlib"/>
+<depend package="pcl_ros"/>
 <export>
 <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
 <filters plugin="${prefix}/laser_filters_plugins.xml"/>
