@@ -35,7 +35,7 @@
  */
 
 #include <ros/ros.h>
-#include <sensor_msgs/PointCloud.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/LaserScan.h>
 
 #include <float.h>
@@ -50,7 +50,7 @@
 
 //Filters
 #include "filters/filter_chain.h"
-
+#include <pcl_ros/transforms.h>
 
 /** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
  */
@@ -78,7 +78,7 @@ public:
   tf::MessageFilter<sensor_msgs::LaserScan> filter_;
 
   double tf_tolerance_;
-  filters::FilterChain<sensor_msgs::PointCloud> cloud_filter_chain_;
+  filters::FilterChain<sensor_msgs::PointCloud2> cloud_filter_chain_;
   filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
   ros::Publisher cloud_pub_;
 
@@ -134,9 +134,9 @@ public:
     filter_.connectInput(sub_);
 
     if (using_cloud_topic_deprecated_)
-      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> (cloud_topic_, 10);
+      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_, 10);
     else
-      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud> ("cloud_filtered", 10);
+      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2> ("cloud_filtered", 10);
 
     std::string cloud_filter_xml;
 
@@ -200,8 +200,8 @@ public:
     scan_filter_chain_.update (*scan_msg, filtered_scan);
 
     // Project laser into point cloud
-    sensor_msgs::PointCloud tmp_cloud;
-    sensor_msgs::PointCloud scan_cloud;
+    sensor_msgs::PointCloud2 tmp_cloud;
+    sensor_msgs::PointCloud2 scan_cloud;
 
     //\TODO CLEAN UP HACK 
     // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
@@ -234,10 +234,10 @@ public:
     else
     {
       projector_.projectLaser (filtered_scan, tmp_cloud, laser_max_range_, mask);
-      tf_.transformPointCloud(target_frame_,  tmp_cloud, scan_cloud);
+      pcl_ros::transformPointCloud(target_frame_, tmp_cloud, scan_cloud, tf_);
     }
       
-    sensor_msgs::PointCloud filtered_cloud;
+    sensor_msgs::PointCloud2 filtered_cloud;
     cloud_filter_chain_.update (scan_cloud, filtered_cloud);
 
     cloud_pub_.publish(filtered_cloud);
