@@ -17,12 +17,12 @@ rosbuild_add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_fi
 rosbuild_link_boost(laser_scan_filters system)
 
 rosbuild_add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
-rosbuild_link_boost(scan_to_cloud_filter_chain system)
+rosbuild_link_boost(scan_to_cloud_filter_chain system signals)
 rosbuild_add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
-rosbuild_link_boost(scan_to_scan_filter_chain system)
+rosbuild_link_boost(scan_to_scan_filter_chain system signals)
 
 rosbuild_add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
-rosbuild_link_boost(generic_laser_filter_node system)
+rosbuild_link_boost(generic_laser_filter_node system signals)
 
 #test scan filter chain filter
 rosbuild_add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
