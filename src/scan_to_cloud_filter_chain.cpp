@@ -93,6 +93,7 @@ public:
   bool  using_cloud_filters_deprecated_;
   bool  using_scan_filters_wrong_deprecated_;
   bool  using_cloud_filters_wrong_deprecated_;
+  bool  use_hack_;
 
   ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
@@ -120,7 +121,7 @@ public:
     private_nh.param("laser_max_range", laser_max_range_, DBL_MAX);
     private_nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
     private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
-
+    private_nh.param("use_hack", use_hack_, true);
 
     filter_.setTargetFrame(target_frame_);
     filter_.registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
@@ -205,12 +206,14 @@ public:
 
     //\TODO CLEAN UP HACK 
     // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
-    for (unsigned int i = 0; i < filtered_scan.ranges.size(); i++)
+    if(use_hack_)
     {
-      double angle = filtered_scan.angle_min + i * filtered_scan.angle_increment;
-      filtered_scan.ranges[i] = filtered_scan.ranges[i] + 0.03 * exp(-fabs(sin(angle)));
-
-    };
+      for (unsigned int i = 0; i < filtered_scan.ranges.size(); i++)
+      {
+        double angle = filtered_scan.angle_min + i * filtered_scan.angle_increment;
+        filtered_scan.ranges[i] = filtered_scan.ranges[i] + 0.03 * exp(-fabs(sin(angle)));
+      }
+    }
 
     // Transform into a PointCloud message
     int mask = laser_geometry::channel_option::Intensity |
