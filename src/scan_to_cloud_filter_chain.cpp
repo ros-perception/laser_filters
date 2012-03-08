@@ -97,7 +97,7 @@ public:
 
   ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
-                   cloud_filter_chain_("sensor_msgs::PointCloud"), scan_filter_chain_("sensor_msgs::LaserScan")
+                   cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
   {
     private_nh.param("high_fidelity", high_fidelity_, false);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
