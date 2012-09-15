@@ -9,7 +9,10 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 rosbuild_add_boost_directories()
 
 find_package(Eigen REQUIRED)
-include_directories(${EIGEN_INCLUDE_DIRS})
+find_package(PCL REQUIRED)
+include_directories(SYSTEM ${EIGEN_INCLUDE_DIRS}
+                           ${PCL_INCLUDE_DIRS}
+)
 
 rosbuild_add_library(pointcloud_filters src/pointcloud_filters.cpp)
 
