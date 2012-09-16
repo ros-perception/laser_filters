@@ -41,7 +41,7 @@
 
 #include "filters/filter_base.h"
 #include <sensor_msgs/LaserScan.h>
-#include "geometry_angles_utils/angles.h"
+#include <angles/angles.h>
 
 namespace laser_filters{
 
