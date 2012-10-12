@@ -16,4 +16,5 @@
   <depend stack="pluginlib" /> <!-- pluginlib -->
   <depend stack="ros" />
   <depend stack="ros_comm" /> <!-- std_msgs, roscpp, message_filters -->
+  <depend stack="laser_geometry"/>
 </stack>
