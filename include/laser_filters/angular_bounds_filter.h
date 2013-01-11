@@ -67,10 +67,10 @@ namespace laser_filters
         filtered_scan.ranges.resize(input_scan.ranges.size());
         filtered_scan.intensities.resize(input_scan.intensities.size());
 
-        double start_angle = input_scan.angle_min; //increased scanwise until it results to start of filtered range
-        double current_angle = input_scan.angle_min; //increased scanwise, at end of loop results to end of filtered range
+        double start_angle = input_scan.angle_min; //increased raywise until it results to start of filtered range
+        double current_angle = input_scan.angle_min; //increased raywise, at end of loop results to end of filtered range
         ros::Time start_time = input_scan.header.stamp;
-        unsigned int count = 0; //counts the number of scans in filtered range
+        unsigned int count = 0; //counts the number of rays in filtered range
         
         //loop through the scan and truncate the beginning and the end of the scan as necessary
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
