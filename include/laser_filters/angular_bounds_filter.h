@@ -67,30 +67,30 @@ namespace laser_filters
         filtered_scan.ranges.resize(input_scan.ranges.size());
         filtered_scan.intensities.resize(input_scan.intensities.size());
 
-        double start_angle = input_scan.angle_min;
-        double current_angle = input_scan.angle_min;
+        double start_angle = input_scan.angle_min; //increased scanwise until it results to start of filtered range
+        double current_angle = input_scan.angle_min; //increased scanwise, at end of loop results to end of filtered range
         ros::Time start_time = input_scan.header.stamp;
-        unsigned int count = 0;
+        unsigned int count = 0; //counts the number of scans in filtered range
+        
         //loop through the scan and truncate the beginning and the end of the scan as necessary
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
           //wait until we get to our desired starting angle
-          if((input_scan.angle_increment > 0 && start_angle < lower_angle_) || 
-              (input_scan.angle_increment < 0 && start_angle > lower_angle_)){
+          if((start_angle < lower_angle_) || (start_angle > upper_angle_)){
             start_angle += input_scan.angle_increment;
             start_time += ros::Duration(input_scan.time_increment);
           }
           else{
             filtered_scan.ranges[count] = input_scan.ranges[i];
 
-            //make sure  that we don't update intensity data if its not available
+            //make sure that we don't update intensity data if its not available
             if(input_scan.intensities.size() > i)
               filtered_scan.intensities[count] = input_scan.intensities[i];
 
             count++;
 
             //check if we need to break out of the loop, basically if the next increment will put us over the threshold
-            if((input_scan.angle_increment > 0 && current_angle + input_scan.angle_increment > upper_angle_) || 
-                (input_scan.angle_increment < 0 && current_angle + input_scan.angle_increment < upper_angle_)){
+            if((current_angle + input_scan.angle_increment > upper_angle_) || 
+                (current_angle + input_scan.angle_increment < lower_angle_)){
               break;
             }
           }
