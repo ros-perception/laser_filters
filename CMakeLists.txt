@@ -24,7 +24,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS}
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES
+  LIBRARIES point_cloud_filters laser_scan_filters
   CATKIN_DEPENDS ${THIS_PACKAGE_ROS_DEPS}
   DEPENDS
   )
@@ -45,8 +45,8 @@ target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIB
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${PCL_LIBRARIES})
 
-add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
-target_link_libraries(test_scan_filter_chain laser_scan_filters gtest)
+catkin_add_gtest(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
+target_link_libraries(test_scan_filter_chain laser_scan_filters)
 
 add_rostest(test/test_scan_filter_chain.launch)
 
@@ -56,7 +56,6 @@ add_rostest(test/test_scan_filter_chain.launch)
 
 install(TARGETS pointcloud_filters laser_scan_filters 
   scan_to_cloud_filter_chain generic_laser_filter_node
-  test_scan_filter_chain
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
