@@ -5,13 +5,10 @@ project(laser_filters)
 # Find dependencies
 ##############################################################################
 
-# do we still need this? -jbinney
-#list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
   laser_geometry pluginlib pcl_ros)
 
-find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
+find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS} rostest)
 find_package(Boost REQUIRED COMPONENTS system signals)
 find_package(Eigen REQUIRED)
 find_package(PCL REQUIRED)
