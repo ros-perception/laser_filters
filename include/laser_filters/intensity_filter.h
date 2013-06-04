@@ -96,6 +96,8 @@ public:
       int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
       if (cur_bucket >= num_buckets-1)
 	cur_bucket = num_buckets-1 ;
+      if (cur_bucket < 0)
+        cur_bucket = 0;
       histogram[cur_bucket]++ ;
     }
 
