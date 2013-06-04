@@ -91,6 +91,7 @@ public:
       {      
 
         filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;                           // If so, then make it a value bigger than the max range
+        filtered_scan.intensities[i] = hist_max;                                         // ... and also set the intensities to avoid integer overflow in cur_bucket for huge intensities (like 2e30)
       }
 
       int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
