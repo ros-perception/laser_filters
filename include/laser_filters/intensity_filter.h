@@ -74,12 +74,6 @@ public:
 
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
   {
-    const double hist_max = 4*12000.0 ;
-    const int num_buckets = 24 ;
-    int histogram[num_buckets] ;
-    for (int i=0; i < num_buckets; i++)
-      histogram[i] = 0 ;
-
     filtered_scan = input_scan ;
 
     for (unsigned int i=0; 
@@ -88,25 +82,36 @@ public:
     {
       if (filtered_scan.intensities[i] <= lower_threshold_ ||                           // Is this reading below our lower threshold?
           filtered_scan.intensities[i] >= upper_threshold_)                             // Is this reading above our upper threshold?
-      {      
-
         filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;                           // If so, then make it a value bigger than the max range
-      }
-
-      int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
-      if (cur_bucket >= num_buckets-1)
-	cur_bucket = num_buckets-1 ;
-      histogram[cur_bucket]++ ;
     }
 
     if (disp_hist_ > 0)                                                                 // Display Histogram
     {
-      printf("********** SCAN **********\n") ;
+      const double hist_max = 4*12000.0 ;
+      const int num_buckets = 24 ;
+      std::vector<int> histogram(num_buckets, 0);
+
+      int num_negative = 0;
+      for (unsigned int i=0;
+           i < input_scan.ranges.size() && i < input_scan.intensities.size();
+           i++) // Need to check ever reading in the current scan
+      {
+        int cur_bucket((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
+        if (cur_bucket >= num_buckets-1)
+          histogram[num_buckets-1]++;
+        else if (cur_bucket < 0)
+          ++num_negative;
+        else
+          histogram[cur_bucket]++;
+      }
+
+      std::cout << "********** SCAN **********" << std::endl;
+      std::cout << "negative - 0: " << num_negative << std::endl;
       for (int i=0; i < num_buckets; i++)
       {
-        printf("%u - %u: %u\n", (unsigned int) hist_max/num_buckets*i,
-                                (unsigned int) hist_max/num_buckets*(i+1),
-                                histogram[i]) ;
+        std::cout << (unsigned int) hist_max/num_buckets*i << " - ";
+        std::cout << (unsigned int) hist_max/num_buckets*(i+1) << ": ";
+        std::cout << histogram[i] << std::endl;
       }
     }
     return true;
