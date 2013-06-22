@@ -21,7 +21,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS}
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES point_cloud_filters laser_scan_filters
+  LIBRARIES pointcloud_filters laser_scan_filters
   CATKIN_DEPENDS ${THIS_PACKAGE_ROS_DEPS}
   DEPENDS
   )
