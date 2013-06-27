@@ -55,7 +55,9 @@ add_rostest(test/test_scan_filter_chain.launch)
 ##############################################################################
 
 install(TARGETS pointcloud_filters laser_scan_filters 
-  scan_to_cloud_filter_chain generic_laser_filter_node
+  scan_to_cloud_filter_chain
+  scan_to_scan_filter_chain
+  generic_laser_filter_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
