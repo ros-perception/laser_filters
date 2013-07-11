@@ -33,4 +33,4 @@ target_link_libraries(test_scan_filter_chain laser_scan_filters)
 rosbuild_add_gtest_build_flags(test_scan_filter_chain)
 rosbuild_add_rostest(test/test_scan_filter_chain.launch)
 
-rosbuild_make_distribution(1.5.5)
+rosbuild_make_distribution(1.5.6)
