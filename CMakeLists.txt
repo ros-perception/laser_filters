@@ -6,7 +6,7 @@ project(laser_filters)
 ##############################################################################
 
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
-  laser_geometry pluginlib pcl_ros)
+  laser_geometry pluginlib pcl_ros angles)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS} rostest)
 find_package(Boost REQUIRED COMPONENTS system signals)
