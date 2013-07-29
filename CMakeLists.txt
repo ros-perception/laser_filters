@@ -45,7 +45,7 @@ target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBR
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES} ${PCL_LIBRARIES})
 
-catkin_add_gtest(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
+add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
 target_link_libraries(test_scan_filter_chain laser_scan_filters)
 
 add_rostest(test/test_scan_filter_chain.launch)
