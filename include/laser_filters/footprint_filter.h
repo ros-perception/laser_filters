@@ -55,7 +55,7 @@ namespace laser_filters
 class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 {
 public:
-  LaserScanFootprintFilter()
+  LaserScanFootprintFilter(): up_and_running_(false)
   {
     ROS_WARN("LaserScanFootprintFilter has been deprecated.  Please use PR2LaserScanFootprintFilter instead.\n");
   }
@@ -81,10 +81,15 @@ public:
     sensor_msgs::PointCloud laser_cloud;
 
     try{
-    projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, tf_);
+      projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, tf_);
     }
     catch(tf::TransformException& ex){
-      ROS_ERROR("Transform unavailable %s", ex.what());
+      if(up_and_running_){
+        ROS_WARN_THROTTLE(1, "Dropping Scan: Transform unavailable %s", ex.what());
+      }
+      else {
+        ROS_INFO_THROTTLE(.3, "Ignoring Scan: Waiting for TF");
+      }
       return false;
     }
 
@@ -102,6 +107,8 @@ public:
         filtered_scan.ranges[index] = filtered_scan.range_max + 1.0 ; // If so, then make it a value bigger than the max range
       }
     }
+
+    up_and_running_ = true;
     return true;
   }
 
@@ -128,6 +135,7 @@ private:
   tf::TransformListener tf_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
+  bool up_and_running_;
 } ;
 
 }
