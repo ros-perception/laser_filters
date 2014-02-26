@@ -74,7 +74,7 @@ public:
   {
     filtered_scan = input_scan;
     for (unsigned int i=0;
-         i < input_scan.ranges.size() && i < input_scan.intensities.size();
+         i < input_scan.ranges.size();
          i++) // Need to check ever reading in the current scan
     {
       {
