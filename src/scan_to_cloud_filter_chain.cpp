@@ -50,7 +50,6 @@
 
 //Filters
 #include "filters/filter_chain.h"
-#include <pcl_ros/transforms.h>
 
 /** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
  */
@@ -201,7 +200,6 @@ public:
     scan_filter_chain_.update (*scan_msg, filtered_scan);
 
     // Project laser into point cloud
-    sensor_msgs::PointCloud2 tmp_cloud;
     sensor_msgs::PointCloud2 scan_cloud;
 
     //\TODO CLEAN UP HACK 
@@ -236,8 +234,7 @@ public:
     }
     else
     {
-      projector_.projectLaser (filtered_scan, tmp_cloud, laser_max_range_, mask);
-      pcl_ros::transformPointCloud(target_frame_, tmp_cloud, scan_cloud, tf_);
+      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
     }
       
     sensor_msgs::PointCloud2 filtered_cloud;
