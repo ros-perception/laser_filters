@@ -8,7 +8,7 @@ project(laser_filters)
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
   laser_geometry pluginlib angles)
 
-find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS} rostest)
+find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system signals)
 find_package(Eigen REQUIRED)
 include_directories(include ${catkin_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS}
@@ -44,10 +44,13 @@ target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBR
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${Eigen_LIBRARIES})
 
-add_executable(test_scan_filter_chain EXCLUDE_FROM_ALL test/test_scan_filter_chain.cpp)
-target_link_libraries(test_scan_filter_chain laser_scan_filters)
+if (CATKIN_ENABLE_TESTING)
+  find_package(rostest)
+  add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
+  target_link_libraries(test_scan_filter_chain laser_scan_filters)
 
-add_rostest(test/test_scan_filter_chain.launch)
+  add_rostest(test/test_scan_filter_chain.launch)
+endif()
 
 ##############################################################################
 # Install
