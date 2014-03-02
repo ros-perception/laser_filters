@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.6.13 (2014-03-02)
+-------------------
 * separate tests
 * remove PCL dependency
 * Don't check the intensities
