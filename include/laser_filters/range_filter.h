@@ -52,16 +52,13 @@ public:
 
   double lower_threshold_ ;
   double upper_threshold_ ;
-  int disp_hist_ ;
 
   bool configure()
   {
     lower_threshold_ = 0.0;
     upper_threshold_ = 100000.0;
-    disp_hist_ = 1;
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
-
     return true;
   }
 
@@ -80,7 +77,7 @@ public:
       {
       if (filtered_scan.ranges[i] <= lower_threshold_ || filtered_scan.ranges[i] >= upper_threshold_)
         {
-          filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;
+          filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
         }
       }
     }
