@@ -142,7 +142,7 @@ public:
     ROS_DEBUG("ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d", (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
     for ( std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
       {
-	scan_out.ranges[*it] = -1.0 * fabs(scan_in.ranges[*it]); //Failed test so set the ranges to invalid value
+          scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();
       }
     return true;
   }

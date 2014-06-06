@@ -90,7 +90,7 @@ public:
           filtered_scan.intensities[i] >= upper_threshold_)                             // Is this reading above our upper threshold?
       {      
 
-        filtered_scan.ranges[i] = input_scan.range_max + 1.0 ;                           // If so, then make it a value bigger than the max range
+        filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();              // If so, then make it a value bigger than the max range
       }
 
       int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
