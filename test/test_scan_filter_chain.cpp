@@ -55,6 +55,20 @@ sensor_msgs::LaserScan gen_msg(){
   return msg;
 }
 
+/** Verifies that two vectors of range values are the same. Allows the case
+ * where corresponding values are both NaN.
+ */
+void expect_ranges_eq(const std::vector<float> &a, const std::vector<float> &b) {
+  for( int i=0; i<10; i++) {
+    if(isnan(a[i])) {
+      EXPECT_TRUE(isnan(a[i]));
+    }
+    else {
+      EXPECT_NEAR(a[i], b[i], 1e-6);
+    }
+  }
+}
+
 TEST(ScanToScanFilterChain, BadConfiguration)
 {
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
@@ -74,7 +88,8 @@ TEST(ScanToScanFilterChain, BadConfiguration)
 TEST(ScanToScanFilterChain, IntensityFilter)
 {
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
-  float temp[] = {1.0, 2.5, 1.0, 1.0, 1.0, 2.5, 1.0, 1.0, 1.0, 2.3};
+  float nanval = std::numeric_limits<float>::quiet_NaN();
+  float temp[] = {1.0, nanval, 1.0, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, 2.3};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
   expected_msg.ranges = v1;
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
@@ -84,10 +99,7 @@ TEST(ScanToScanFilterChain, IntensityFilter)
   msg_in = gen_msg();
 
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
-  
-  for( int i=0; i<10; i++){
-  EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
-  }
+  expect_ranges_eq(msg_out.ranges, expected_msg.ranges);
 
   filter_chain_.clear();
 }
@@ -116,7 +128,8 @@ TEST(ScanToScanFilterChain, InterpFilter)
 TEST(ScanToScanFilterChain, ShadowFilter)
 {
   sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
-  float temp[] = {-1.0, 0.1, -1.0, 1.0, 1.0, -9.0, 1.0, 1.0, 1.0, -2.3};
+  float nanval = std::numeric_limits<float>::quiet_NaN();
+  float temp[] = {nanval, 0.1, nanval, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, nanval};
   std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
   expected_msg.ranges = v1; 
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
@@ -126,10 +139,8 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   msg_in = gen_msg();
 
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
-  
-  for( int i=0; i<10; i++){
-  EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
-  }
+
+  expect_ranges_eq(msg_out.ranges, expected_msg.ranges);
 
   filter_chain_.clear();
 }
