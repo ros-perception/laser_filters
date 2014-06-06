@@ -2,6 +2,12 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.1 (2014-06-06)
+-----------
+* Tests expect NaN for invalid ranges
+* Modify intensity, scan shadow, and range filters to set invalid values to NaN
+* Contributors: Allison Tse, Jonathan Binney
+
 1.6.14 (2014-03-04)
 -------------------
 * fix compilation on some platforms
