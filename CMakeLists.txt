@@ -48,7 +48,7 @@ if (CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
   target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} gtest)
-  add_dependencies(test_scan_filter_chain DEPENDS gtest)
+  add_dependencies(test_scan_filter_chain gtest)
 
   add_rostest(test/test_scan_filter_chain.launch)
 endif()
