@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.2 (2014-06-24)
+------------------
 * Merge pull request `#19 <https://github.com/ros-perception/laser_filters/issues/19>`_ from v4hn/no-DEPENDS-dependency
   remove superfluous DEPENDS
 * remove superfluous DEPENDS
