@@ -2,6 +2,14 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#19 <https://github.com/ros-perception/laser_filters/issues/19>`_ from v4hn/no-DEPENDS-dependency
+  remove superfluous DEPENDS
+* remove superfluous DEPENDS
+  There never was a DEPENDS flag in add_dependencies...
+* Contributors: Vincent Rabaud, v4hn
+
 1.7.1 (2014-06-06)
 -----------
 * Tests expect NaN for invalid ranges
