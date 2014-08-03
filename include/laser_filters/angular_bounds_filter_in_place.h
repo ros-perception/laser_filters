@@ -34,15 +34,15 @@
 *
 * Author: Kevin Hallenbeck
 *********************************************************************/
-#ifndef LASER_SCAN_ANGULAR_REMOVAL_FILTER_H
-#define LASER_SCAN_ANGULAR_REMOVAL_FILTER_H
+#ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
+#define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
 
 namespace laser_filters
 {
-  class LaserScanAngularRemovalFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+  class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::LaserScan>
   {
     public:
       double lower_angle_;
@@ -61,7 +61,7 @@ namespace laser_filters
         return true;
       }
 
-      virtual ~LaserScanAngularRemovalFilter(){}
+      virtual ~LaserScanAngularBoundsFilterInPlace(){}
 
       bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan){
         filtered_scan = input_scan; //copy entire message

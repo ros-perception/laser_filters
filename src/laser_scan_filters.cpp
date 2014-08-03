@@ -35,7 +35,7 @@
 #include "laser_filters/footprint_filter.h"
 #include "laser_filters/interpolation_filter.h"
 #include "laser_filters/angular_bounds_filter.h"
-#include "laser_filters/angular_removal_filter.h"
+#include "laser_filters/angular_bounds_filter_in_place.h"
 #include "sensor_msgs/LaserScan.h"
 #include "filters/filter_base.h"
 
@@ -47,7 +47,7 @@ PLUGINLIB_DECLARE_CLASS(laser_filters, LaserArrayFilter, laser_filters::LaserArr
 PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanIntensityFilter, laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanRangeFilter, laser_filters::LaserScanRangeFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanAngularBoundsFilter, laser_filters::LaserScanAngularBoundsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanAngularRemovalFilter, laser_filters::LaserScanAngularRemovalFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanAngularBoundsFilterInPlace, laser_filters::LaserScanAngularBoundsFilterInPlace, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_DECLARE_CLASS(laser_filters, LaserScanFootprintFilter, laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_DECLARE_CLASS(laser_filters, ScanShadowsFilter, laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_DECLARE_CLASS(laser_filters, InterpolationFilter, laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)
