@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.3 (2014-09-06)
+------------------
 * Added new filter LaserScanAngularRemovalFilterInPlace to remove sections of a LaserScan
 * Contributors: Kevin Hallenbeck, Vincent Rabaud
 
