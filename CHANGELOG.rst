@@ -2,6 +2,11 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added new filter LaserScanAngularRemovalFilterInPlace to remove sections of a LaserScan
+* Contributors: Kevin Hallenbeck, Vincent Rabaud
+
 1.7.2 (2014-06-24)
 ------------------
 * Merge pull request `#19 <https://github.com/ros-perception/laser_filters/issues/19>`_ from v4hn/no-DEPENDS-dependency
@@ -11,7 +16,7 @@ Changelog for package laser_filters
 * Contributors: Vincent Rabaud, v4hn
 
 1.7.1 (2014-06-06)
------------
+------------------
 * Tests expect NaN for invalid ranges
 * Modify intensity, scan shadow, and range filters to set invalid values to NaN
 * Contributors: Allison Tse, Jonathan Binney
