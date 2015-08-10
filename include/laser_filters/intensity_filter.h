@@ -93,7 +93,9 @@ public:
         filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();              // If so, then make it an invalid value (NaN)
       }
 
-      int cur_bucket = (int) ((filtered_scan.intensities[i]/hist_max)*num_buckets) ;
+      if( isinf((double)filtered_scan.intensities[i]) || isnan((double)filtered_scan.intensities[i]) )
+	continue;
+      int cur_bucket = (int) ((std::min((double)filtered_scan.intensities[i], hist_max)/hist_max)*num_buckets) ;
       if (cur_bucket >= num_buckets-1)
 	cur_bucket = num_buckets-1 ;
       histogram[cur_bucket]++ ;
