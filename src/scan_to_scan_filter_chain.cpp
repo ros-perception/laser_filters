@@ -46,6 +46,7 @@ protected:
   tf::TransformListener *tf_;
   message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub_;
   tf::MessageFilter<sensor_msgs::LaserScan> *tf_filter_;
+  double tf_filter_tolerance_;
 
   // Filter Chain
   filters::FilterChain<sensor_msgs::LaserScan> filter_chain_;
@@ -82,10 +83,12 @@ public:
     {
       private_nh_.getParam("tf_message_filter_target_frame", tf_message_filter_target_frame);
 
+      private_nh_.param("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
+
       tf_ = new tf::TransformListener();
       tf_filter_ = new tf::MessageFilter<sensor_msgs::LaserScan>(scan_sub_, *tf_, "", 50);
       tf_filter_->setTargetFrame(tf_message_filter_target_frame);
-      tf_filter_->setTolerance(ros::Duration(0.03));
+      tf_filter_->setTolerance(ros::Duration(tf_filter_tolerance_));
 
       // Setup tf::MessageFilter generates callback
       tf_filter_->registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
