@@ -96,12 +96,21 @@ public:
         filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
       }
 
-      if( isinf((double)filtered_scan.intensities[i]) || isnan((double)filtered_scan.intensities[i]) )
-	continue;
-      int cur_bucket = (int) ((std::min((double)filtered_scan.intensities[i], hist_max)/hist_max)*num_buckets) ;
-      if (cur_bucket >= num_buckets-1)
-	cur_bucket = num_buckets-1 ;
-      histogram[cur_bucket]++ ;
+      // Calculate histogram
+      if (disp_hist_enabled_){
+        // If intensity value is inf or NaN, skip voting histogram
+        if( isinf((double)filtered_scan.intensities[i]) ||
+            isnan((double)filtered_scan.intensities[i]) )
+          continue;
+
+        // Choose bucket to vote on histogram,
+        // and check the index of bucket is in the histogram array
+        int cur_bucket = (int)(filtered_scan.intensities[i] / hist_max * num_buckets);
+        if (cur_bucket > num_buckets-1)
+          cur_bucket = num_buckets-1;
+        else if (cur_bucket < 0) cur_bucket = 0;
+        histogram[cur_bucket]++;
+      }
     }
 
     // Display Histogram
