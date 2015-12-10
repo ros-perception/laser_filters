@@ -54,6 +54,7 @@ public:
   double lower_threshold_ ;
   double upper_threshold_ ;
   int disp_hist_ ;
+  bool disp_hist_enabled_;
 
   bool configure()
   {
@@ -64,13 +65,12 @@ public:
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
 
+    disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
+
     return true;
   }
 
-  virtual ~LaserScanIntensityFilter()
-  { 
-
-  }
+  virtual ~LaserScanIntensityFilter(){}
 
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
   {
@@ -80,28 +80,41 @@ public:
     for (int i=0; i < num_buckets; i++)
       histogram[i] = 0 ;
 
-    filtered_scan = input_scan ;
+    filtered_scan = input_scan;
 
-    for (unsigned int i=0; 
-         i < input_scan.ranges.size() && i < input_scan.intensities.size(); 
-         i++) // Need to check ever reading in the current scan
+    // Need to check ever reading in the current scan
+    for (unsigned int i=0;
+         i < input_scan.ranges.size() && i < input_scan.intensities.size();
+         i++)
     {
-      if (filtered_scan.intensities[i] <= lower_threshold_ ||                           // Is this reading below our lower threshold?
-          filtered_scan.intensities[i] >= upper_threshold_)                             // Is this reading above our upper threshold?
-      {      
-
-        filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();              // If so, then make it an invalid value (NaN)
+      // Is this reading below our lower threshold?
+      // Is this reading above our upper threshold?
+      if (filtered_scan.intensities[i] <= lower_threshold_ ||
+          filtered_scan.intensities[i] >= upper_threshold_)
+      {
+        // If so, then make it an invalid value (NaN)
+        filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
       }
 
-      if( isinf((double)filtered_scan.intensities[i]) || isnan((double)filtered_scan.intensities[i]) )
-	continue;
-      int cur_bucket = (int) ((std::min((double)filtered_scan.intensities[i], hist_max)/hist_max)*num_buckets) ;
-      if (cur_bucket >= num_buckets-1)
-	cur_bucket = num_buckets-1 ;
-      histogram[cur_bucket]++ ;
+      // Calculate histogram
+      if (disp_hist_enabled_){
+        // If intensity value is inf or NaN, skip voting histogram
+        if( isinf((double)filtered_scan.intensities[i]) ||
+            isnan((double)filtered_scan.intensities[i]) )
+          continue;
+
+        // Choose bucket to vote on histogram,
+        // and check the index of bucket is in the histogram array
+        int cur_bucket = (int)(filtered_scan.intensities[i] / hist_max * num_buckets);
+        if (cur_bucket > num_buckets-1)
+          cur_bucket = num_buckets-1;
+        else if (cur_bucket < 0) cur_bucket = 0;
+        histogram[cur_bucket]++;
+      }
     }
 
-    if (disp_hist_ > 0)                                                                 // Display Histogram
+    // Display Histogram
+    if (disp_hist_enabled_)
     {
       printf("********** SCAN **********\n") ;
       for (int i=0; i < num_buckets; i++)
@@ -113,8 +126,7 @@ public:
     }
     return true;
   }
-} ;
-
+};
 }
 
 #endif // LASER_SCAN_INTENSITY_FILTER_H
