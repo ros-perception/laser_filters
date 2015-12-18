@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.4 (2015-12-17)
+------------------
 * [intensity_filter.h] fix: check if cur_bucket value is out of index of histogram array
 * [intensity_filter.h] refactor codes; clearify by using boolean to enable/disable displaying histogram
 * scan_to_scan_filter_chain: make tf filter tolerance customizable
