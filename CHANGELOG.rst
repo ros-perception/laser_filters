@@ -2,6 +2,18 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [intensity_filter.h] fix: check if cur_bucket value is out of index of histogram array
+* [intensity_filter.h] refactor codes; clearify by using boolean to enable/disable displaying histogram
+* scan_to_scan_filter_chain: make tf filter tolerance customizable
+  0.03 is completely arbitrary and too small in my case.
+* scan2scan filter: only publish result if filter succeeded
+* added cartesian box filter
+* add check inf or nan of input laser_scan intensities
+* scan_to_scan_filter_chain: Only subscribe to /tf if requested by parameter
+* Contributors: Furushchev, Jonathan Binney, Kevin Hallenbeck, Sebastian Pütz, Vincent Rabaud, Yuto Inagaki, v4hn
+
 1.7.3 (2014-09-06)
 ------------------
 * Added new filter LaserScanAngularRemovalFilterInPlace to remove sections of a LaserScan
