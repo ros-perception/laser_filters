@@ -126,8 +126,11 @@ public:
   void callback(const sensor_msgs::LaserScan::ConstPtr& msg_in)
   {
     // Run the filter chain
-    if (filter_chain_.update(*msg_in, msg_));
+    if (filter_chain_.update(*msg_in, msg_))
+    {
+      //only publish result if filter succeeded
       output_pub_.publish(msg_);
+    }
   }
 };
 
