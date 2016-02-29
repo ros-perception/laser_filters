@@ -5,7 +5,7 @@
     which use the sensor_msgs/LaserScan type.
   </description>
   <version>1.7.4</version>
-  <maintainer email="jon.binney@gmail.com">Jon Binney</maintainer>
+  <maintainer email="jbinney@willowgarage.com">Jon Binney</maintainer>
   <author>Tully Foote</author>
   <license>BSD</license>
 
@@ -13,8 +13,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>cmake_modules</build_depend>
-  <build_depend>eigen</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
@@ -25,8 +23,6 @@
   <build_depend>rostest</build_depend>
   <build_depend>angles</build_depend>
 
-  <run_depend>cmake_modules</run_depend>
-  <run_depend>eigen</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
