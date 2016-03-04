@@ -32,6 +32,7 @@
   <run_depend>laser_geometry</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>angles</run_depend>
+  <run_depend>cmake_modules</run_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
