@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -36,7 +36,7 @@
 #define LASER_SCAN_FOOTPRINT_FILTER_H
 /**
 \author Tully Foote
-@b ScanFootprintFilter takes input scans and corrects for footprint angle assuming a flat target.  
+@b ScanFootprintFilter takes input scans and corrects for footprint angle assuming a flat target.
 This is useful for ground plane extraction
 
 **/
@@ -55,10 +55,7 @@ namespace laser_filters
 class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 {
 public:
-  LaserScanFootprintFilter(): up_and_running_(false)
-  {
-    ROS_WARN("LaserScanFootprintFilter has been deprecated.  Please use PR2LaserScanFootprintFilter instead.\n");
-  }
+  LaserScanFootprintFilter(): up_and_running_(false) {}
 
   bool configure()
   {
@@ -71,7 +68,7 @@ public:
   }
 
   virtual ~LaserScanFootprintFilter()
-  { 
+  {
 
   }
 
@@ -99,8 +96,8 @@ public:
       ROS_ERROR("We need an index channel to be able to filter out the footprint");
       return false;
     }
-    
-    for (unsigned int i=0; i < laser_cloud.points.size(); i++)  
+
+    for (unsigned int i=0; i < laser_cloud.points.size(); i++)
     {
       if (inFootprint(laser_cloud.points[i])){
         int index = laser_cloud.channels[c_idx].values[i];
