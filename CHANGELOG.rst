@@ -2,6 +2,18 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.1 (2016-03-26)
+-----------
+* Remove deprecated warning from footprint filter
+* catkin_make requires cmake_modules in run_depends
+* Restore cmake_modules build dependency
+* Update package.xml
+* Update maintainer email address
+* Add Travis CI config
+* Update scan_to_scan_filter_chain.cpp
+* only publish result if filter succeeded
+* Contributors: Isaac I.Y. Saito, Jon Binney, Jonathan Binney, Kei Okada, Naveed Usmani, asimay
+
 1.7.4 (2015-12-17)
 ------------------
 * [intensity_filter.h] fix: check if cur_bucket value is out of index of histogram array
