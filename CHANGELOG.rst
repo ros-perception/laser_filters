@@ -2,6 +2,12 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove unneeded eigen and cmake_modules
+  Nothing was actually compiling against eigen.
+* Contributors: Jonathan Binney
+
 1.8.1 (2016-03-26)
 -----------
 * Remove deprecated warning from footprint filter
