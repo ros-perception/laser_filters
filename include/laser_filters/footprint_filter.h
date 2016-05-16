@@ -101,7 +101,7 @@ public:
     {
       if (inFootprint(laser_cloud.points[i])){
         int index = laser_cloud.channels[c_idx].values[i];
-        filtered_scan.ranges[index] = filtered_scan.range_max + 1.0 ; // If so, then make it a value bigger than the max range
+        filtered_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
       }
     }
 
