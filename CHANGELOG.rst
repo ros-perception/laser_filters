@@ -2,6 +2,11 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Replaced the invalid value of scans for the footprint_filter by NaN
+* Contributors: Alain Minier
+
 1.8.2 (2016-04-06)
 ------------------
 * Remove unneeded eigen and cmake_modules
