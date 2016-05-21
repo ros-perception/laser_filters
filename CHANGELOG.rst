@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.3 (2016-05-20)
+------------------
 * Replaced the invalid value of scans for the footprint_filter by NaN
 * Contributors: Alain Minier
 
