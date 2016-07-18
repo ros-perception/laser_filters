@@ -99,8 +99,8 @@ public:
       // Calculate histogram
       if (disp_hist_enabled_){
         // If intensity value is inf or NaN, skip voting histogram
-        if( isinf((double)filtered_scan.intensities[i]) ||
-            isnan((double)filtered_scan.intensities[i]) )
+        if( std::isinf((double)filtered_scan.intensities[i]) ||
+            std::isnan((double)filtered_scan.intensities[i]) )
           continue;
 
         // Choose bucket to vote on histogram,
