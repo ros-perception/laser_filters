@@ -1,6 +1,6 @@
 intensity_filter_chain:
 - name: intensity_threshold
-  type: LaserScanIntensityFilter
+  type: laser_filters/LaserScanIntensityFilter
   params: 
     lower_threshold: 0.5
     upper_threshold: 3.0
@@ -8,7 +8,7 @@ intensity_filter_chain:
 
 bad_filter_chain:
 - name: dark_shadows
-  type: LaserScanIntensityFilter
+  type: laser_filters/LaserScanIntensityFilter
   params:
     lower_threshold: 0.5
     upper_threshold: 3.0
@@ -16,11 +16,11 @@ bad_filter_chain:
 
 interp_filter_chain:
 - name: interpolation
-  type: InterpolationFilter
+  type: laser_filters/InterpolationFilter
 
 shadow_filter_chain:
 - name: shadows
-  type: ScanShadowsFilter
+  type: laser_filters/ScanShadowsFilter
   params:
     min_angle: 80
     max_angle: 100
@@ -28,17 +28,17 @@ shadow_filter_chain:
     window: 1
 
 array_filter_chain:
-  - type: LaserArrayFilter
+  - type: laser_filters/LaserArrayFilter
     name: laser_median_filter
     params: 
       range_filter_chain:
         - name: median_2
-          type: MultiChannelMeanFilterFloat 
+          type: filters/MultiChannelMeanFilterFloat 
           params:
             number_of_observations: 3
       intensity_filter_chain:
         - name: median_2
-          type: MultiChannelMeanFilterFloat
+          type: filters/MultiChannelMeanFilterFloat
           params:
             number_of_observations: 3
 
