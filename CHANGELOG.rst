@@ -2,6 +2,12 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Specify packages names for filters in tests
+* Use std:: namespace for c++11 compat.
+* Contributors: Jon Binney, Jonathan Binney, Mike Purvis
+
 1.8.3 (2016-05-20)
 ------------------
 * Replaced the invalid value of scans for the footprint_filter by NaN
