@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.4 (2017-04-07)
+------------------
 * Specify packages names for filters in tests
 * Use std:: namespace for c++11 compat.
 * Contributors: Jon Binney, Jonathan Binney, Mike Purvis
