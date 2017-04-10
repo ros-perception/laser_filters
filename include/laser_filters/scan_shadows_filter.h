@@ -119,6 +119,9 @@ public:
     // For each point in the current line scan
     for (unsigned int i = 0; i < scan_in.ranges.size (); i++)
     {
+      if( isnan((double)scan_in.ranges[i]))
+        continue;
+
       for (int y = -window_; y < window_ + 1; y++)
       {
         int j = i + y;
