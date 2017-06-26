@@ -42,3 +42,11 @@ array_filter_chain:
           params:
             number_of_observations: 3
 
+mask_filter_chain:
+- name: mask
+  type: laser_filters/LaserScanMaskFilter
+  params:
+    masks:
+      laser:
+      - 1
+      - 5

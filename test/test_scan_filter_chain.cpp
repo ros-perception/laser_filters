@@ -173,6 +173,26 @@ TEST(ScanToScanFilterChain, ArrayFilter)
   filter_chain_.clear();
 }
 
+TEST(ScanToScanFilterChain, MaskFilter)
+{
+  sensor_msgs::LaserScan msg_in, msg_out, expected_msg;
+  const float nanval = std::numeric_limits<float>::quiet_NaN();
+  const float temp[] = {1.0, nanval, 1.0, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, 2.3};
+  const std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.ranges = v1;
+  filters::FilterChain<sensor_msgs::LaserScan> filter_chain_("sensor_msgs::LaserScan");
+
+  EXPECT_TRUE(filter_chain_.configure("mask_filter_chain"));
+
+  msg_in = gen_msg();
+
+  EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
+
+  expect_ranges_eq(msg_out.ranges, expected_msg.ranges);
+
+  filter_chain_.clear();
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
