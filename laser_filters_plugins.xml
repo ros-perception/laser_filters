@@ -48,6 +48,12 @@
 	 This is a filter that removes points in a laser scan inside of a cartesian box.
       </description>
     </class>
+    <class name="laser_filters/LaserScanMaskFilter" type="laser_filters::LaserScanMaskFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	 This is a filter that removes points on directions defined in a mask from a laser scan.
+      </description>
+    </class>
     <class name="laser_filters/LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
