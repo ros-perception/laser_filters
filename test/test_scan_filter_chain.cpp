@@ -61,7 +61,7 @@ sensor_msgs::LaserScan gen_msg(){
 void expect_ranges_eq(const std::vector<float> &a, const std::vector<float> &b) {
   for( int i=0; i<10; i++) {
     if(std::isnan(a[i])) {
-      EXPECT_TRUE(std::isnan(a[i]));
+      EXPECT_TRUE(std::isnan(b[i]));
     }
     else {
       EXPECT_NEAR(a[i], b[i], 1e-6);
@@ -119,7 +119,7 @@ TEST(ScanToScanFilterChain, InterpFilter)
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
   
   for( int i=0; i<10; i++){
-  EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
+    EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
   }
 
   filter_chain_.clear();
@@ -199,4 +199,3 @@ int main(int argc, char **argv){
   ros::init(argc, argv, "test_scan_to_scan_filter_chain");
   return RUN_ALL_TESTS();
 }
-
