@@ -52,14 +52,14 @@ public:
 
   double lower_threshold_ ;
   double upper_threshold_ ;
-  bool use_message_range_ ;
+  bool use_message_range_limits_ ;
   float lower_replacement_value_ ;
   float upper_replacement_value_ ;
 
   bool configure()
   {
-    use_message_range_ = false;
-    getParam("use_message_range", use_message_range_);
+    use_message_range_limits_ = false;
+    getParam("use_message_range_limits", use_message_range_limits_);
 
     // work around the not implemented getParam(std::string name, float& value) method
     double temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
@@ -86,7 +86,7 @@ public:
 
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
   {
-    if (use_message_range_)
+    if (use_message_range_limits_)
     {
       lower_threshold_ = input_scan.range_min;
       upper_threshold_ = input_scan.range_max;
