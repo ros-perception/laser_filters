@@ -2,6 +2,19 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* rename parameter to be more descriptive
+* change range_filter to infinity for it to work with obstacle_layer
+  if you use the ´inf_is_valid´ parameter raytracing is still possible for
+  scans out of the window.
+  Usefull for laserscanners that may deliver ranges > range_max ... or
+* Fix a small typo in one of the test cases.
+* Add LaserScanMaskFilter.
+  This commit adds LaserScanMaskFilter that removes points on directions defined in a mask, defined as a parameter, from a laser scan.
+  It can be used to remove unreliable points caused by hardware related problems for example scratches on an optical window of the sensor.
+* Contributors: Atsushi Watanabe, Hunter L. Allen, Jannik Abbenseth, Jonathan Binney
+
 1.8.4 (2017-04-07)
 ------------------
 * Specify packages names for filters in tests
