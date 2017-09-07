@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.5 (2017-09-06)
+------------------
 * rename parameter to be more descriptive
 * change range_filter to infinity for it to work with obstacle_layer
   if you use the ´inf_is_valid´ parameter raytracing is still possible for
