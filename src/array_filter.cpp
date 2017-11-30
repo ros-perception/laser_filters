@@ -82,7 +82,7 @@ LaserArrayFilter::~LaserArrayFilter()
     delete intensity_filter_;
 };
 
-bool LaserArrayFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+bool LaserArrayFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
 {
   if (!this->configured_) 
   {

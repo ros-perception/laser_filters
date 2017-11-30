@@ -36,7 +36,11 @@
 
 #include "boost/thread/mutex.hpp"
 #include "boost/scoped_ptr.hpp"
-#include "sensor_msgs/LaserScan.h"
+#include <sensor_msgs/msg/Laser_Scan.hpp>
+
+#ifndef ROS_INFO
+#define ROS_INFO(...)
+#endif // !ROS_INFO
 
 #include "filters/median.h"
 #include "filters/mean.h"
@@ -46,7 +50,7 @@
 namespace laser_filters{
 
 /** \brief A class to provide median filtering of laser scans in time*/
-class LaserArrayFilter : public filters::FilterBase<sensor_msgs::LaserScan> 
+class LaserArrayFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
 {
 public:
   /** \brief Constructor
@@ -61,18 +65,18 @@ public:
    * \param scan_in The new scan to filter
    * \param scan_out The filtered scan
    */
-  bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
+  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
 
 
 private:
   unsigned int filter_length_; ///How many scans to average over
   unsigned int num_ranges_; /// How many data point are in each row
 
-  XmlRpc::XmlRpcValue range_config_;
-  XmlRpc::XmlRpcValue intensity_config_;
+  rclcpp::parameter::ParameterVariant range_config_;
+  rclcpp::parameter::ParameterVariant intensity_config_;
 
   boost::mutex data_lock; /// Protection from multi threaded programs
-  sensor_msgs::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
+  sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
   
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;

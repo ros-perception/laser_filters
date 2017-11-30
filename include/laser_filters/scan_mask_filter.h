@@ -41,9 +41,12 @@
 
 
 #include "filters/filter_base.h"
-#include "sensor_msgs/LaserScan.h"
 
-#include <XmlRpcException.h>
+#include <sensor_msgs/msg/Laser_Scan.hpp>
+
+#ifndef ROS_INFO
+#define ROS_INFO(...)
+#endif // !ROS_INFO
 
 #include <limits>
 #include <map>
@@ -53,28 +56,32 @@
 namespace laser_filters
 {
 
-class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   std::map<std::string, std::vector<size_t> > masks_;
 
   bool configure()
   {
-    XmlRpc::XmlRpcValue config;
+    rclcpp::parameter::ParameterVariant config;
     if (!getParam("masks", config))
     {
       ROS_ERROR("LaserScanMaskFilter: masks is not defined in the config.");
       return false;
     }
-    if (config.getType() == XmlRpc::XmlRpcValue::TypeArray)
+
+#ifdef ROS2_SUPPORTS_PARAMETER_ARRAYS
+    // TODO: support parameter array
+
+    if (config.get_type() == rclcpp::parameter::ParameterType::TypeArray)
     {
       ROS_ERROR("LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
       return false;
     }
-    for (XmlRpc::XmlRpcValue::iterator it = config.begin();
+    for (rclcpp::parameter::ParameterIterator it = config.begin();
         it != config.end(); ++it)
     {
-      if (it->second.getType() == XmlRpc::XmlRpcValue::TypeArray)
+      if (it->second.get_type() == rclcpp::parameter::ParameterType::TypeArray)
       {
         std::string frame_id = (std::string)(it->first);
         masks_[frame_id] = std::vector<size_t>();
@@ -88,13 +95,15 @@ public:
           ROS_INFO("LaserScanMaskFilter: %s: %d directions will be masked.",
               frame_id.c_str(), (int)masks_[frame_id].size());
         }
-        catch(XmlRpc::XmlRpcException &e)
+        catch(rclcpp::parameter::ParameterException &e)
         {
-          ROS_ERROR("LaserScanMaskFilter: %s", e.getMessage().c_str());
+          ROS_ERROR("LaserScanMaskFilter: %s", e.get_message().c_str());
           return false;
         }
       }
     }
+#endif // ROS2_SUPPORTS_PARAMETER_ARRAYS
+
     return true;
   }
 
@@ -102,7 +111,7 @@ public:
   {
   }
 
-  bool update(const sensor_msgs::LaserScan& data_in, sensor_msgs::LaserScan& data_out)
+  bool update(const sensor_msgs::msg::LaserScan& data_in, sensor_msgs::msg::LaserScan& data_out)
   {
     data_out = data_in;
     if (masks_.find(data_out.header.frame_id) == masks_.end())

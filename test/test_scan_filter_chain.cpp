@@ -31,7 +31,7 @@
 #include <filters/filter_chain.h>
 #include <ros/ros.h>
 #include "sensor_msgs/LaserScan.h"
-#include <pluginlib/class_loader.h>
+#include <pluginlib/class_loader.hpp>
 
 
 sensor_msgs::LaserScan gen_msg(){
