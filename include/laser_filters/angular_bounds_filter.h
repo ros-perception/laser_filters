@@ -38,11 +38,12 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
 #include <filters/filter_base.h>
-#include <sensor_msgs/LaserScan.h>
+#include <builtin_interfaces/msg/Time.hpp>
+#include <sensor_msgs/msg/Laser_Scan.hpp>
 
 namespace laser_filters
 {
-  class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+  class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
   {
     public:
       double lower_angle_;
@@ -63,13 +64,13 @@ namespace laser_filters
 
       virtual ~LaserScanAngularBoundsFilter(){}
 
-      bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan){
+      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
         filtered_scan.ranges.resize(input_scan.ranges.size());
         filtered_scan.intensities.resize(input_scan.intensities.size());
 
         double start_angle = input_scan.angle_min;
         double current_angle = input_scan.angle_min;
-        ros::Time start_time = input_scan.header.stamp;
+        builtin_interfaces::msg::Time start_time = input_scan.header.stamp;
         unsigned int count = 0;
         //loop through the scan and truncate the beginning and the end of the scan as necessary
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
@@ -77,7 +78,7 @@ namespace laser_filters
           if(start_angle < lower_angle_){
             start_angle += input_scan.angle_increment;
             current_angle += input_scan.angle_increment;
-            start_time += ros::Duration(input_scan.time_increment);
+            start_time.set__sec(start_time.sec + input_scan.time_increment);
           }
           else{
             filtered_scan.ranges[count] = input_scan.ranges[i];

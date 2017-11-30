@@ -40,7 +40,17 @@
 #include <set>
 
 #include "filters/filter_base.h"
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/Laser_Scan.hpp>
+
+#ifdef _WIN32
+#define _USE_MATH_DEFINES // for C  
+#include <math.h>  
+#endif // _WIN32
+
+#ifndef ROS_INFO
+#define ROS_INFO(...)
+#endif // !ROS_INFO
+
 #include <angles/angles.h>
 
 namespace laser_filters{
@@ -48,7 +58,7 @@ namespace laser_filters{
 /** @b ScanShadowsFilter is a simple filter that filters shadow points in a laser scan line 
  */
 
-class ScanShadowsFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class ScanShadowsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
 
@@ -67,23 +77,23 @@ public:
   /**@b Configure the filter from XML */
   bool configure()
   {
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("min_angle"), min_angle_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
     {
       ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
       return false;
     }
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("max_angle"), max_angle_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_angle"), max_angle_))
     {
       ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
       return false;
     }
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("window"), window_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("window"), window_))
     {
       ROS_ERROR("Error: ShadowsFilter was not given window.\n");
       return false;
     }
     neighbors_ = 0;//default value
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("neighbors"), neighbors_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("neighbors"), neighbors_))
     {
       ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
     }
@@ -110,7 +120,7 @@ public:
    * \param scan_in the input LaserScan message
    * \param scan_out the output LaserScan message
    */
-  bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
   {
     //copy across all data first
     scan_out = scan_in;

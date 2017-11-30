@@ -42,12 +42,13 @@
 
 
 #include "filters/filter_base.h"
-#include "sensor_msgs/LaserScan.h"
+
+#include <sensor_msgs/msg/Laser_Scan.hpp>
 
 namespace laser_filters
 {
 
-class InterpolationFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class InterpolationFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
 
@@ -60,7 +61,7 @@ public:
   { 
   }
 
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
   {
     double previous_valid_range = input_scan.range_max - .01;
     double next_valid_range = input_scan.range_max - .01;

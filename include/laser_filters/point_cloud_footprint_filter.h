@@ -43,17 +43,17 @@ This is useful for ground plane extraction
 
 #include "laser_geometry/laser_geometry.h"
 #include "filters/filter_base.h"
-#include "tf/transform_listener.h"
-#include "sensor_msgs/PointCloud.h"
-#include "ros/ros.h"
+#include "tf2_ros/transform_listener.h"
+#include "sensor_msgs/msg/Point_Cloud.hpp"
+#include "geometry_msgs/msg/Point32.hpp"
 
 namespace laser_filters
 {
 
-class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::PointCloud>
+class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud>
 {
 public:
-  PointCloudFootprintFilter() {
+  PointCloudFootprintFilter() : tf_(buffer_) {
     ROS_WARN("PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
   }
 
@@ -72,21 +72,25 @@ public:
 
   }
 
-  bool update(const sensor_msgs::PointCloud& input_scan, sensor_msgs::PointCloud& filtered_scan)
+  bool update(const sensor_msgs::msg::PointCloud& input_scan, sensor_msgs::msg::PointCloud& filtered_scan)
   {
     if(&input_scan == &filtered_scan){
       ROS_ERROR("This filter does not currently support in place copying");
       return false;
     }
-    sensor_msgs::PointCloud laser_cloud;
+    sensor_msgs::msg::PointCloud laser_cloud;
+
+#ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
+    // TODO: need to fix this ... implement transformPointClound
 
     try{
       tf_.transformPointCloud("base_link", input_scan, laser_cloud);
     }
-    catch(tf::TransformException& ex){
+    catch(tf2::TransformException& ex){
       ROS_ERROR("Transform unavailable %s", ex.what());
       return false;
     }
+#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
 
     filtered_scan.header = input_scan.header;
     filtered_scan.points.resize (input_scan.points.size());
@@ -116,14 +120,15 @@ public:
   }
 
 
-  bool inFootprint(const geometry_msgs::Point32& scan_pt){
+  bool inFootprint(const geometry_msgs::msg::Point32& scan_pt){
     if(scan_pt.x < -1.0 * inscribed_radius_ || scan_pt.x > inscribed_radius_ || scan_pt.y < -1.0 * inscribed_radius_ || scan_pt.y > inscribed_radius_)
       return false;
     return true;
   }
 
 private:
-  tf::TransformListener tf_;
+  tf2_ros::Buffer buffer_;
+  tf2_ros::TransformListener tf_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
 } ;
