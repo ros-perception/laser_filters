@@ -43,9 +43,8 @@
  */
 
 #include "laser_filters/box_filter.h"
-#include <ros/ros.h>
 
-laser_filters::LaserScanBoxFilter::LaserScanBoxFilter(){
+laser_filters::LaserScanBoxFilter::LaserScanBoxFilter() : tf_(buffer_) {
 
 }
 
@@ -95,14 +94,15 @@ bool laser_filters::LaserScanBoxFilter::configure(){
 }
 
 bool laser_filters::LaserScanBoxFilter::update(
-    const sensor_msgs::LaserScan& input_scan,
-    sensor_msgs::LaserScan &output_scan)
+    const sensor_msgs::msg::LaserScan& input_scan,
+    sensor_msgs::msg::LaserScan &output_scan)
 {
   output_scan = input_scan;
-  sensor_msgs::PointCloud2 laser_cloud;
+  sensor_msgs::msg::PointCloud2 laser_cloud;
   
   std::string error_msg;
 
+#ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
   bool success = tf_.waitForTransform(
     box_frame_,
     input_scan.header.frame_id,
@@ -115,11 +115,12 @@ bool laser_filters::LaserScanBoxFilter::update(
     ROS_WARN("Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
     return false;
   }
+#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
 
   try{
-    projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, tf_);
+    projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, buffer_);
   }
-  catch(tf::TransformException& ex){
+  catch(tf2::TransformException& ex){
     if(up_and_running_){
       ROS_WARN_THROTTLE(1, "Dropping Scan: Tansform unavailable %s", ex.what());
       return true;
@@ -130,6 +131,8 @@ bool laser_filters::LaserScanBoxFilter::update(
     }
     return false;
   }
+
+#ifdef SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
   const int i_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "index");
   const int x_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "x");
   const int y_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "y");
@@ -172,17 +175,18 @@ bool laser_filters::LaserScanBoxFilter::update(
     float z = *((float*)(&laser_cloud.data[z_idx]));
     int index = *((int*)(&laser_cloud.data[i_idx]));
 
-    tf::Point point(x, y, z);
+    Point point(x, y, z);
 
     if(inBox(point)){
       output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
     }
   }
+#endif // SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
   up_and_running_ = true;
   return true;
 }
 
-bool laser_filters::LaserScanBoxFilter::inBox(tf::Point &point){
+bool laser_filters::LaserScanBoxFilter::inBox(Point &point){
   return
     point.x() < max_.x() && point.x() > min_.x() && 
     point.y() < max_.y() && point.y() > min_.y() &&

@@ -49,12 +49,21 @@
 
 #include <filters/filter_base.h>
 
-#include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/point_cloud_conversion.h>
+#include <tf2/transform_datatypes.h>
+#include <tf2_ros/transform_listener.h>
+#include <sensor_msgs/msg/Laser_Scan.hpp>
+
+typedef tf2::Vector3 Point;
+
+#ifndef ROS_WARN_THROTTLE
+#define ROS_WARN_THROTTLE(...)
+#endif // !ROS_WARN_THROTTLE
+#ifndef ROS_INFO_THROTTLE
+#define ROS_INFO_THROTTLE(...)
+#endif // !ROS_INFO_THROTTLE
+
 #include <laser_geometry/laser_geometry.h>
 
-#include <tf/transform_datatypes.h>
-#include <tf/transform_listener.h>
 
 
 namespace laser_filters
@@ -62,26 +71,27 @@ namespace laser_filters
 /**
  * @brief This is a filter that removes points in a laser scan inside of a cartesian box.
  */
-class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
   public:
     LaserScanBoxFilter();
     bool configure();
 
     bool update(
-      const sensor_msgs::LaserScan& input_scan,
-      sensor_msgs::LaserScan& filtered_scan);
+      const sensor_msgs::msg::LaserScan& input_scan,
+      sensor_msgs::msg::LaserScan& filtered_scan);
 
   private:
-    bool inBox(tf::Point &point);
+    bool inBox(Point &point);
     std::string box_frame_;
     laser_geometry::LaserProjection projector_;
     
     // tf listener to transform scans into the box_frame
-    tf::TransformListener tf_; 
-    
+    tf2_ros::TransformListener tf_;
+    tf2_ros::Buffer buffer_;
+
     // defines two opposite corners of the box
-    tf::Point min_, max_; 
+    Point min_, max_; 
     bool up_and_running_;
 };
 
