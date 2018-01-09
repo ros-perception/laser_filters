@@ -33,7 +33,7 @@
 namespace laser_filters
 {
 LaserMedianFilter::LaserMedianFilter() :
-  num_ranges_(1), xmlrpc_value_(), range_filter_(NULL), intensity_filter_(NULL)
+  num_ranges_(1), parameter_value_(), range_filter_(NULL), intensity_filter_(NULL)
 {
     ROS_WARN("LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");  
 };
@@ -41,7 +41,7 @@ LaserMedianFilter::LaserMedianFilter() :
 bool LaserMedianFilter::configure()
 {
   
-  if (!getParam("internal_filter", xmlrpc_value_))
+  if (!getParam("internal_filter", parameter_value_))
   {
     ROS_ERROR("Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
@@ -49,11 +49,11 @@ bool LaserMedianFilter::configure()
   
   if (range_filter_) delete range_filter_;
   range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!range_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+  if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
   
   if (intensity_filter_) delete intensity_filter_;
   intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!intensity_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+  if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
   return true;
 };
 
@@ -63,7 +63,7 @@ LaserMedianFilter::~LaserMedianFilter()
   delete intensity_filter_;
 };
 
-bool LaserMedianFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+bool LaserMedianFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
 {
   if (!this->configured_) 
   {
@@ -84,10 +84,10 @@ bool LaserMedianFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     num_ranges_ = scan_in.ranges.size();
     
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!range_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+    if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
     
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!intensity_filter_->configure(num_ranges_, xmlrpc_value_)) return false;
+    if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
     
   }
 

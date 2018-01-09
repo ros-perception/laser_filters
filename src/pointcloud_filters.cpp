@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "sensor_msgs/PointCloud.h"
+#include "sensor_msgs/msg/Point_Cloud.hpp"
 #include "laser_filters/point_cloud_footprint_filter.h"
-#include "pluginlib/class_list_macros.h"
+#include <pluginlib/class_list_macros.hpp>  // NOLINT
 
-PLUGINLIB_DECLARE_CLASS(laser_filters, PointCloudFootprintFilter, laser_filters::PointCloudFootprintFilter, filters::FilterBase<sensor_msgs::PointCloud>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::PointCloudFootprintFilter, filters::FilterBase<sensor_msgs::msg::PointCloud>)

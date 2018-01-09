@@ -38,11 +38,11 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 
 #include <filters/filter_base.h>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/Laser_Scan.hpp>
 
 namespace laser_filters
 {
-  class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::LaserScan>
+  class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::msg::LaserScan>
   {
     public:
       double lower_angle_;
@@ -63,7 +63,7 @@ namespace laser_filters
 
       virtual ~LaserScanAngularBoundsFilterInPlace(){}
 
-      bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan){
+      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
         filtered_scan = input_scan; //copy entire message
 
         double current_angle = input_scan.angle_min;
