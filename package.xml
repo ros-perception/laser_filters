@@ -24,7 +24,6 @@
   <build_depend>tf2_ros</build_depend>
   <build_depend>laser_geometry</build_depend>
   <build_depend>angles</build_depend>
-  <build_depend>xmlrpcpp</build_depend>
   <build_depend>rostime</build_depend>
 
   <exec_depend>pluginlib</exec_depend>
@@ -37,7 +36,6 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>laser_geometry</exec_depend>
   <exec_depend>angles</exec_depend>
-  <exec_depend>xmlrpcpp</exec_depend>
   <exec_depend>rostime</exec_depend>
 
   <export>

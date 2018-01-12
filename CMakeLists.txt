@@ -17,8 +17,9 @@ find_package(message_filters REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(laser_geometry REQUIRED)
 find_package(angles REQUIRED)
-find_package(xmlrpcpp REQUIRED)
 find_package(rostime REQUIRED)
+
+find_package(Eigen3 REQUIRED)
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS system signals thread filesystem)
@@ -36,9 +37,9 @@ include_directories(include
   ${tf2_ros_INCLUDE_DIRS}
   ${laser_geometry_INCLUDE_DIRS}
   ${angles_INCLUDE_DIRS}
-  ${xmlrpcpp_INCLUDE_DIRS}
   ${rostime_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
 )
 
@@ -53,7 +54,6 @@ link_directories(
   ${tf2_ros_LIBRARY_DIRS}
   ${laser_geometry_LIBRARY_DIRS}
   ${angles_LIBRARY_DIRS}
-  ${xmlrpcpp_LIBRARY_DIRS}
   ${rostime_LIBRARY_DIRS}
 )
 
@@ -71,7 +71,6 @@ set(${PROJECT_NAME}_LIBRARIES
   ${tf2_ros_LIBRARIES}
   ${laser_geometry_LIBRARIES}
   ${angles_LIBRARIES}
-  ${xmlrpcpp_LIBRARIES}
   ${rostime_LIBRARIES}
   ${Boost_LIBRARIES}
 )
