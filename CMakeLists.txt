@@ -19,8 +19,6 @@ find_package(laser_geometry REQUIRED)
 find_package(angles REQUIRED)
 find_package(rostime REQUIRED)
 
-find_package(Eigen3 REQUIRED)
-
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS system signals thread filesystem)
 
