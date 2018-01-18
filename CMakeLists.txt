@@ -8,7 +8,6 @@ project(laser_filters)
 find_package(ament_cmake REQUIRED)
 
 find_package(pluginlib REQUIRED)
-find_package(class_loader REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
@@ -22,11 +21,8 @@ find_package(rostime REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED COMPONENTS system signals thread filesystem)
 
-find_package(TinyXML REQUIRED HINTS "*.lib") # add hint seems to allow debug lib to be found when appropriate
-
 include_directories(include 
   ${pluginlib_INCLUDE_DIRS}
-  ${class_loader_INCLUDE_DIRS}
   ${sensor_msgs_INCLUDE_DIRS}
   ${rclcpp_INCLUDE_DIRS}
   ${tf2_INCLUDE_DIRS}
@@ -36,14 +32,11 @@ include_directories(include
   ${laser_geometry_INCLUDE_DIRS}
   ${angles_INCLUDE_DIRS}
   ${rostime_INCLUDE_DIRS}
-  ${TinyXML_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
 )
 
 link_directories(
   ${pluginlib_LIBRARY_DIRS}
-  ${class_loader_LIBRARY_DIRS}
   ${sensor_msgs_LIBRARY_DIRS}
   ${rclcpp_LIBRARY_DIRS}
   ${tf2_LIBRARY_DIRS}
@@ -60,7 +53,6 @@ add_definitions(-DTRANSFORM_LISTENER_NOT_IMPLEMENTED)
 
 set(${PROJECT_NAME}_LIBRARIES 
   ${pluginlib_LIBRARIES}
-  ${class_loader_LIBRARIES}
   ${sensor_msgs_LIBRARIES}
   ${rclcpp_LIBRARIES}
   ${tf2_LIBRARIES}
