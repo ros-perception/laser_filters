@@ -51,7 +51,7 @@
 
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 typedef tf2::Vector3 Point;
 

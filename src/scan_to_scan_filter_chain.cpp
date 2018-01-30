@@ -29,7 +29,7 @@
 
 
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 // TF
 #include <tf2_ros/transform_listener.h>

@@ -42,7 +42,7 @@
 
 #include "filters/filter_base.h"
 
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #ifndef ROS_INFO
 #define ROS_INFO(...)
