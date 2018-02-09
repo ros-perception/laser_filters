@@ -39,7 +39,7 @@
 
 #include <filters/filter_base.h>
 #include <builtin_interfaces/msg/Time.hpp>
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {

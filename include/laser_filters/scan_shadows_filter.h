@@ -40,7 +40,7 @@
 #include <set>
 
 #include "filters/filter_base.h"
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #ifdef _WIN32
 #define _USE_MATH_DEFINES // for C  

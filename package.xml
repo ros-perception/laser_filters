@@ -15,7 +15,6 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>pluginlib</build_depend>
-  <build_depend>class_loader</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>rclcpp</build_depend>
   <build_depend>tf2</build_depend>
@@ -24,11 +23,9 @@
   <build_depend>tf2_ros</build_depend>
   <build_depend>laser_geometry</build_depend>
   <build_depend>angles</build_depend>
-  <build_depend>xmlrpcpp</build_depend>
   <build_depend>rostime</build_depend>
 
   <exec_depend>pluginlib</exec_depend>
-  <exec_depend>class_loader</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>tf2</exec_depend>
@@ -37,7 +34,6 @@
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>laser_geometry</exec_depend>
   <exec_depend>angles</exec_depend>
-  <exec_depend>xmlrpcpp</exec_depend>
   <exec_depend>rostime</exec_depend>
 
   <export>

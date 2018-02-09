@@ -38,7 +38,7 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 
 #include <filters/filter_base.h>
-#include <sensor_msgs/msg/Laser_Scan.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {
