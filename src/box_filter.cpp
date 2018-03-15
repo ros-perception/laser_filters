@@ -51,7 +51,7 @@ laser_filters::LaserScanBoxFilter::LaserScanBoxFilter(){
 
 bool laser_filters::LaserScanBoxFilter::configure(){
   up_and_running_ = true;
-  double min_x, min_y, min_z, max_x, max_y, max_z;
+  double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
   bool box_frame_set = getParam("box_frame", box_frame_);
   bool x_max_set = getParam("max_x", max_x);
   bool y_max_set = getParam("max_y", max_y);
