@@ -44,14 +44,16 @@ namespace laser_filters
 class ScanShadowDetector
 {
 public:
-  float min_angle_tan_, max_angle_tan_;  // Filter angle threshold
+  float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
 
   void configure(const float min_angle, const float max_angle)
   {
     min_angle_tan_ = tanf(min_angle);
+    max_angle_tan_ = tanf(max_angle);
+
+    // Correct sign of tan around singularity points
     if (min_angle_tan_ < 0.0)
       min_angle_tan_ = -min_angle_tan_;
-    max_angle_tan_ = tanf(max_angle);
     if (max_angle_tan_ > 0.0)
       max_angle_tan_ = -max_angle_tan_;
   }

@@ -70,6 +70,7 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
         {
           for (float inc = 0.01; inc < 0.1; inc += 0.02)
           {
+            // Compare with original ScanShadowsFilter implementation
             EXPECT_EQ(
                 detector.isShadow(r1, r2, inc),
                 isShadowPureImpl(r1, r2, inc, min_angle, max_angle));
