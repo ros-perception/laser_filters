@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.6 (2018-04-11)
+------------------
 * Updated deprecated pluginlib macros to avoid warning messages
 * Contributors: Jonathan Binney, Nick Lamprianidis
 
