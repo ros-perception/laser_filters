@@ -31,6 +31,7 @@ add_library(pointcloud_filters src/pointcloud_filters.cpp)
 target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
 
 add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_filter.cpp src/array_filter.cpp src/box_filter.cpp)
+set_target_properties(laser_scan_filters PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
@@ -45,7 +46,7 @@ target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBR
 if (CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
-  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} gtest)
+  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} ${GTEST_LIBRARIES})
   add_dependencies(test_scan_filter_chain gtest)
 
   add_rostest(test/test_scan_filter_chain.launch)
