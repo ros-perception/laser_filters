@@ -37,8 +37,8 @@
 #ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
-#include <filters/filter_base.h>
-#include <builtin_interfaces/msg/Time.hpp>
+#include <filters/filter_base.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -51,10 +51,8 @@ namespace laser_filters
 
       bool configure()
       {
-        lower_angle_ = 0;
-        upper_angle_ = 0;
-
-        if(!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_)){
+    	// Get the parameter value, If the parameter was not set, then assign default value.
+        if(!node_->get_parameter_or("lower_angle", lower_angle_, 0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0)){
           ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }

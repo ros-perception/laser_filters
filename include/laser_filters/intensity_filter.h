@@ -41,9 +41,9 @@
 **/
 
 
-#include "filters/filter_base.h"
-
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <cmath> // for isnan()
 
 namespace laser_filters
 {
@@ -59,17 +59,17 @@ public:
 
   bool configure()
   {
-    lower_threshold_ = 8000.0;
-    upper_threshold_ = 100000.0;
-    disp_hist_ = 1;
-    getParam("lower_threshold", lower_threshold_);
-    getParam("upper_threshold", upper_threshold_) ;
-    getParam("disp_histogram",  disp_hist_) ;
+	// Get the parameter value, If the parameter was not set, then assign default value.
+	node_->get_parameter_or("params.lower_threshold", lower_threshold_, 8000.0);
+	node_->get_parameter_or("params.upper_threshold", upper_threshold_, 100000.0) ;
+	node_->get_parameter_or("params.disp_histogram",  disp_hist_, 1) ;
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
     return true;
   }
+
+  LaserScanIntensityFilter(){}
 
   virtual ~LaserScanIntensityFilter(){}
 

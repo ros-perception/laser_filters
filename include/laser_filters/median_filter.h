@@ -38,14 +38,9 @@
 #include "boost/scoped_ptr.hpp"
 
 #include <sensor_msgs/msg/laser_scan.hpp>
-
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
-
-#include "filters/median.h"
-#include "filters/mean.h"
-#include "filters/filter_chain.h"
+#include "filters/median.hpp"
+#include "filters/mean.hpp"
+#include "filters/filter_chain.hpp"
 #include "boost/thread/mutex.hpp"
 
 namespace laser_filters{
@@ -76,11 +71,10 @@ private:
   boost::mutex data_lock; /// Protection from multi threaded programs
   sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
 
-  rclcpp::parameter::ParameterVariant parameter_value_;
-  
+  rclcpp::Parameter parameter_value_;
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;
-  
+  using FilterBase<sensor_msgs::msg::LaserScan>::node_;
 };
 
 

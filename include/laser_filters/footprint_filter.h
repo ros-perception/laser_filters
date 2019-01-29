@@ -42,13 +42,13 @@ This is useful for ground plane extraction
 **/
 
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
-#include <sensor_msgs/msg/Point_Cloud.hpp>
-#include <geometry_msgs/msg/Point32.hpp>
+#include <sensor_msgs/msg/point_cloud.hpp>
+#include <geometry_msgs/msg/point32.hpp>
 
 #ifndef ROS_WARN_THROTTLE
 #define ROS_WARN_THROTTLE(...)
@@ -57,7 +57,7 @@ This is useful for ground plane extraction
 #define ROS_INFO_THROTTLE(...)
 #endif // !ROS_INFO_THROTTLE
 
-#include "laser_geometry/laser_geometry.h"
+#include "laser_geometry/laser_geometry.hpp"
 
 namespace laser_filters
 {
@@ -65,11 +65,12 @@ namespace laser_filters
 class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-  LaserScanFootprintFilter(): tf_(buffer_), up_and_running_(false) {}
-
+  LaserScanFootprintFilter(): clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
+  buffer_(clock), tf_(buffer_), up_and_running_(false) {}
   bool configure()
   {
-    if(!getParam("inscribed_radius", inscribed_radius_))
+    // Get the parameter value.
+    if(!node_->get_parameter("inscribed_radius", inscribed_radius_))
     {
       ROS_ERROR("LaserScanFootprintFilter needs inscribed_radius to be set");
       return false;
@@ -88,7 +89,7 @@ public:
     sensor_msgs::msg::PointCloud laser_cloud;
 
     try{
-      projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, buffer_);
+      projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, buffer_, laser_geometry::channel_option::Intensity);
     }
     catch(tf2::TransformException& ex){
       if(up_and_running_){
@@ -140,6 +141,8 @@ public:
 
 private:
   tf2_ros::TransformListener tf_;
+  //A clock to use for time and sleeping
+  rclcpp::Clock::SharedPtr clock;
   tf2_ros::Buffer buffer_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;

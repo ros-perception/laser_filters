@@ -39,15 +39,8 @@
 \brief LaserScanMaskFilter removes points on directions defined in a mask from a laser scan.
 **/
 
-
-#include "filters/filter_base.h"
-
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
-
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
-
 #include <limits>
 #include <map>
 #include <string>
@@ -59,15 +52,36 @@ namespace laser_filters
 class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-  std::map<std::string, std::vector<size_t> > masks_;
+  std::map<std::string, std::vector<int64_t> > masks_;
+
+  LaserScanMaskFilter()
+  {
+  }
+
+  virtual ~LaserScanMaskFilter()
+  {
+  }
 
   bool configure()
   {
-    rclcpp::parameter::ParameterVariant config;
-    if (!getParam("masks", config))
+    rclcpp::Parameter config;
+
+    // Get the parameter value.
+    if (!node_->get_parameter("params.masks.laser", config))
     {
       ROS_ERROR("LaserScanMaskFilter: masks is not defined in the config.");
       return false;
+    }
+
+    if(config.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER_ARRAY)
+    {
+    	ROS_INFO("LaserScanMaskFilter: Name: %s - Type: %d",config.get_name().c_str(), config.get_type());
+    	masks_["laser"] = config.as_integer_array();
+    }
+    else
+    {
+        ROS_ERROR("LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
+        return false;
     }
 
 #ifdef ROS2_SUPPORTS_PARAMETER_ARRAYS
@@ -107,10 +121,6 @@ public:
     return true;
   }
 
-  virtual ~LaserScanMaskFilter()
-  {
-  }
-
   bool update(const sensor_msgs::msg::LaserScan& data_in, sensor_msgs::msg::LaserScan& data_out)
   {
     data_out = data_in;
@@ -120,10 +130,10 @@ public:
           data_out.header.frame_id.c_str());
       return true;
     }
-
-    const std::vector<size_t> &mask = masks_[data_out.header.frame_id];
+    const std::vector<int64_t> &mask = masks_[data_out.header.frame_id];
     const size_t len = data_out.ranges.size();
-    for (std::vector<size_t>::const_iterator it = mask.begin();
+
+    for (std::vector<int64_t>::const_iterator it = mask.begin();
         it != mask.end(); ++it)
     {
       if (*it > len) continue;

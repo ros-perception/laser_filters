@@ -39,7 +39,7 @@
 
 #include <set>
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 #ifdef _WIN32
@@ -66,37 +66,34 @@ public:
   double min_angle_, max_angle_;          // Filter angle threshold
   int window_, neighbors_;
     
-
-  ////////////////////////////////////////////////////////////////////////////////
   ScanShadowsFilter () 
   {
-
-
   }
 
-  /**@b Configure the filter from XML */
+  /**@b Configure the filter */
   bool configure()
   {
-    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
-      return false;
-    }
-    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_angle"), max_angle_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
-      return false;
-    }
-    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("window"), window_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given window.\n");
-      return false;
-    }
-    neighbors_ = 0;//default value
-    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("neighbors"), neighbors_))
-    {
-      ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
-    }
+	  // Get the parameter value.
+	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.min_angle", min_angle_))
+	  {
+		  ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+		  return false;
+	  }
+	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.max_angle", max_angle_))
+	  {
+		  ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+		  return false;
+	  }
+	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.window", window_))
+	  {
+		  ROS_ERROR("Error: ShadowsFilter was not given window.\n");
+		  return false;
+	  }
+	  // default value i.e. "neighbors_ = 0"
+	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("params.neighbors", neighbors_, 0))
+	  {
+		  ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
+	  }
 
     return true;
   }
