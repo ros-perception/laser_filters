@@ -41,7 +41,8 @@ typedef tf2_ros::TransformListener TransformListener;
 #define NO_TIMER
 
 #include "message_filters/subscriber.h"
-#include "filters/filter_chain.h"
+#include "filters/filter_chain.hpp"
+#include <iostream>
 
 class GenericLaserScanFilterNode
 {
@@ -77,9 +78,10 @@ public:
   // Constructor
   GenericLaserScanFilterNode(rclcpp::Node::SharedPtr nh) :
     nh_(nh),
-    scan_sub_(nh_, "scan", 50),
+    scan_sub_(nh_, "scan"),
+	buffer_(nh->get_clock()),
     tf_(buffer_),
-    tf_filter_(scan_sub_, buffer_, "base_link", 50),
+    tf_filter_(scan_sub_, buffer_, "base_link", 50, 0),
     filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
@@ -87,7 +89,9 @@ public:
     
     // Setup tf::MessageFilter for input
     tf_filter_.registerCallback(std::bind(&GenericLaserScanFilterNode::callback, this, std::placeholders::_1));
-    tf_filter_.setTolerance(tf2::Duration(ros::Duration(0.03).toNSec()));
+    rclcpp::Duration tolerance = rclcpp::Duration(0.03);
+    tolerance.nanoseconds();
+    tf_filter_.setTolerance(tolerance);
     
     // Advertise output
     output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("output", 1000);
@@ -121,7 +125,6 @@ public:
 
 int main(int argc, char **argv)
 {
-  ros::Time::init();
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_filter_node");
   GenericLaserScanFilterNode t(nh);

@@ -40,7 +40,7 @@
 // TODO: fix this
 #define NO_TIMER
 
-#include "filters/filter_chain.h"
+#include "filters/filter_chain.hpp"
 
 class ScanToScanFilterChain
 {
@@ -73,14 +73,16 @@ public:
   // Constructor
   ScanToScanFilterChain(rclcpp::Node::SharedPtr node) :
     nh_(node),
-    scan_sub_(nh_, "scan", 50),
+    scan_sub_(nh_, "scan"),
+    buffer_(node->get_clock()),
     tf_(NULL),
     tf_filter_(NULL),
     filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
     
-    rclcpp::parameter::ParameterVariant variant;
+    rclcpp::Parameter variant;
+
     using_filter_chain_deprecated_ = !nh_->get_parameter("filter_chain", variant);
 
     if (using_filter_chain_deprecated_)
@@ -92,14 +94,18 @@ public:
 
     if (nh_->get_parameter("tf_message_filter_target_frame", variant))
     {
+      // Get the parameter value.
       nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame);
 
+      // Get the parameter value, If the parameter was not set, then assign default value.
       nh_->get_parameter_or("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
 
       tf_.reset(new tf2_ros::TransformListener(buffer_));
-      tf_filter_.reset(new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, buffer_, "", 50));
+      tf_filter_.reset(new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, buffer_, "", 50, 0));
       tf_filter_->setTargetFrame(tf_message_filter_target_frame);
-      tf_filter_->setTolerance(tf2::Duration(ros::Duration(tf_filter_tolerance_).toNSec()));
+      rclcpp::Duration tolerance = rclcpp::Duration(tf_filter_tolerance_);
+      tolerance.nanoseconds();
+      tf_filter_->setTolerance(tolerance);
 
       // Setup tf::MessageFilter generates callback
       tf_filter_->registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
@@ -151,7 +157,6 @@ public:
 
 int main(int argc, char **argv)
 {
-  ros::Time::init();
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_to_scan_filter_chain");
   ScanToScanFilterChain t(nh);

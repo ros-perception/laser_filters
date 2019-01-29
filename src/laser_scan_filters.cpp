@@ -39,10 +39,10 @@
 #include "laser_filters/angular_bounds_filter_in_place.h"
 #include "laser_filters/box_filter.h"
 
-#include <builtin_interfaces/msg/Time.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 #include <pluginlib/class_list_macros.hpp>  // NOLINT
 
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)

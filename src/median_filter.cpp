@@ -40,8 +40,7 @@ LaserMedianFilter::LaserMedianFilter() :
 
 bool LaserMedianFilter::configure()
 {
-  
-  if (!getParam("internal_filter", parameter_value_))
+  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("internal_filter", parameter_value_))
   {
     ROS_ERROR("Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
@@ -49,11 +48,13 @@ bool LaserMedianFilter::configure()
   
   if (range_filter_) delete range_filter_;
   range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
+
+  if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) return false;
   
   if (intensity_filter_) delete intensity_filter_;
   intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-  if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
+
+  if (!intensity_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) return false;
   return true;
 };
 
@@ -80,14 +81,20 @@ bool LaserMedianFilter::update(const sensor_msgs::msg::LaserScan& scan_in, senso
     delete range_filter_;
     delete intensity_filter_;
 
+    //TODO: verify node name
+    auto node = rclcpp::Node::make_shared("scan_filter_chain");
 
     num_ranges_ = scan_in.ranges.size();
     
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
+
+    //if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
+    if (!range_filter_->configure(num_ranges_, node)) return false;
     
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
+
+    //if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
+    if (!intensity_filter_->configure(num_ranges_, node)) return false;
     
   }
 
