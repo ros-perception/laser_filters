@@ -34,15 +34,12 @@
 // TF
 #include <tf2_ros/transform_listener.h>
 #include "tf2_ros/message_filter.h"
-
-typedef tf2::TransformException TransformException;
-typedef tf2_ros::TransformListener TransformListener;
-
-#define NO_TIMER
-
 #include "message_filters/subscriber.h"
 #include "filters/filter_chain.hpp"
 #include <iostream>
+
+typedef tf2::TransformException TransformException;
+typedef tf2_ros::TransformListener TransformListener;
 
 class GenericLaserScanFilterNode
 {
@@ -64,14 +61,12 @@ protected:
   sensor_msgs::msg::LaserScan msg_;
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr output_pub_;
 
-#ifndef NO_TIMER
-  ros::Timer deprecation_timer_;
-#endif // !NO_TIMER
+  // Timer for displaying deprecation warnings
+  rclcpp::TimerBase::SharedPtr deprecation_timer_;
 
 private:
   void foo(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
-
   }
 
 public:
@@ -100,17 +95,14 @@ public:
       std::bind(&GenericLaserScanFilterNode::foo, this, std::placeholders::_1);
     nh_->create_subscription<sensor_msgs::msg::LaserScan>("scan", standard_callback, rmw_qos_profile_default);
 
-#ifndef NO_TIMER
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&GenericLaserScanFilterNode::deprecation_warn, this, _1));
-#endif // !NO_TIMER
+    deprecation_timer_ = nh_->create_wall_timer(std::chrono::milliseconds(5000), std::bind(&GenericLaserScanFilterNode::deprecation_warn, this));
+
   }
   
-#ifndef NO_TIMER
-  void deprecation_warn(const ros::TimerEvent& e)
+  void deprecation_warn()
   {
     ROS_WARN("'generic_laser_filter_node' has been deprecated.  Please switch to 'scan_to_scan_filter_chain'.");
   }
-#endif // !NO_TIMER
 
   // Callback
   void callback(const std::shared_ptr<const sensor_msgs::msg::LaserScan>& msg_in)
