@@ -28,7 +28,7 @@
  *
  */
 
-#include "laser_filters/median_filter.h"
+#include "laser_filters/median_filter.hpp"
 
 namespace laser_filters
 {

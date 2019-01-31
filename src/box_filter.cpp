@@ -42,7 +42,7 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
-#include "laser_filters/box_filter.h"
+#include "laser_filters/box_filter.hpp"
 
 laser_filters::LaserScanBoxFilter::LaserScanBoxFilter() : clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
 buffer_(clock), tf_(buffer_) {
