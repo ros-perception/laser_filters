@@ -41,7 +41,7 @@
 **/
 
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 
 #include <sensor_msgs/msg/laser_scan.hpp>
 
@@ -55,6 +55,12 @@ public:
   bool configure()
   {
     return true;
+  }
+
+  /** \brief Constructor
+   */
+  InterpolationFilter()
+  {
   }
 
   virtual ~InterpolationFilter()

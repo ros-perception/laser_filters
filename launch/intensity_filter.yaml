@@ -1,0 +1,8 @@
+scan_filter_chain:
+  ros__parameters:
+    name: intensity
+    type: LaserScanIntensityFilter
+    params:
+      lower_threshold: 8000.0
+      upper_threshold: 100000.0
+      disp_histogram: 0

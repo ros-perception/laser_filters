@@ -40,7 +40,7 @@
 **/
 
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -58,24 +58,22 @@ public:
 
   bool configure()
   {
-    use_message_range_limits_ = false;
-    getParam("use_message_range_limits", use_message_range_limits_);
+    // Get the parameter value, If the parameter was not set, then assign default value.
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("use_message_range_limits", use_message_range_limits_, false);
 
     // work around the not implemented getParam(std::string name, float& value) method
     double temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    getParam("lower_replacement_value", temp_replacement_value);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("lower_replacement_value", temp_replacement_value);
     lower_replacement_value_ = static_cast<float>(temp_replacement_value);
 
     // work around the not implemented getParam(std::string name, float& value) method
     temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    getParam("upper_replacement_value", temp_replacement_value);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("upper_replacement_value", temp_replacement_value);
     upper_replacement_value_ = static_cast<float>(temp_replacement_value);
 
-
-    lower_threshold_ = 0.0;
-    upper_threshold_ = 100000.0;
-    getParam("lower_threshold", lower_threshold_);
-    getParam("upper_threshold", upper_threshold_) ;
+    // Get the parameter value, If the parameter was not set, then assign default value.
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("lower_threshold", lower_threshold_, 0.0);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("upper_threshold", upper_threshold_, 100000.0) ;
     return true;
   }
 

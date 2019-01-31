@@ -47,7 +47,7 @@
 #ifndef BOXFILTER_H
 #define BOXFILTER_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
@@ -62,8 +62,7 @@ typedef tf2::Vector3 Point;
 #define ROS_INFO_THROTTLE(...)
 #endif // !ROS_INFO_THROTTLE
 
-#include <laser_geometry/laser_geometry.h>
-
+#include <laser_geometry/laser_geometry.hpp>
 
 
 namespace laser_filters
@@ -88,6 +87,8 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     
     // tf listener to transform scans into the box_frame
     tf2_ros::TransformListener tf_;
+    //A clock to use for time and sleeping
+    rclcpp::Clock::SharedPtr clock;
     tf2_ros::Buffer buffer_;
 
     // defines two opposite corners of the box

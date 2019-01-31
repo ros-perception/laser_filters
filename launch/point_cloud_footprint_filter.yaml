@@ -1,0 +1,6 @@
+cloud_filter_chain:
+  ros__parameters:
+    type: PointCloudFootprintFilter
+    name: footprint_filter
+    params:
+      inscribed_radius: 0.325

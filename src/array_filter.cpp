@@ -28,7 +28,7 @@
  *
  */
 
-#include "laser_filters/array_filter.h"
+#include "laser_filters/array_filter.hpp"
 
 namespace laser_filters
 {
@@ -41,8 +41,8 @@ LaserArrayFilter::LaserArrayFilter() :
 bool LaserArrayFilter::configure()
 {
  
-  bool found_range_config = getParam("range_filter_chain", range_config_);
-  bool found_intensity_config = getParam("intensity_filter_chain", intensity_config_);
+  bool found_range_config = node_->get_parameter("range_filter_chain", range_config_);
+  bool found_intensity_config = node_->get_parameter("intensity_filter_chain", intensity_config_);
  
   if (!found_range_config && !found_intensity_config)
   {
@@ -59,14 +59,18 @@ bool LaserArrayFilter::configure()
   if (found_range_config)
   {
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!range_filter_->configure(num_ranges_, range_config_))
+    //TODO verify configure param to filters pkg
+    //if (!range_filter_->configure(num_ranges_, range_config_))
+    if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_))
       return false;
   }
 
   if (found_intensity_config)
   {
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!intensity_filter_->configure(num_ranges_, intensity_config_))
+    //TODO verify configure param to filters pkg
+    //if (!intensity_filter_->configure(num_ranges_, intensity_config_))
+    if (!intensity_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_))
       return false;
   }
   

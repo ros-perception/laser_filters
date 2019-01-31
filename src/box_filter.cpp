@@ -42,23 +42,26 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
-#include "laser_filters/box_filter.h"
+#include "laser_filters/box_filter.hpp"
 
-laser_filters::LaserScanBoxFilter::LaserScanBoxFilter() : tf_(buffer_) {
+laser_filters::LaserScanBoxFilter::LaserScanBoxFilter() : clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
+buffer_(clock), tf_(buffer_) {
 
 }
 
 bool laser_filters::LaserScanBoxFilter::configure(){
   up_and_running_ = true;
   double min_x, min_y, min_z, max_x, max_y, max_z;
-  bool box_frame_set = getParam("box_frame", box_frame_);
-  bool x_max_set = getParam("max_x", max_x);
-  bool y_max_set = getParam("max_y", max_y);
-  bool z_max_set = getParam("max_z", max_z);
-  bool x_min_set = getParam("min_x", min_x);
-  bool y_min_set = getParam("min_y", min_y);
-  bool z_min_set = getParam("min_z", min_z);
-  
+
+  // Get the parameter value.
+  bool box_frame_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("box_frame", box_frame_);
+  bool x_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_x", max_x);
+  bool y_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_y", max_y);
+  bool z_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_z", max_z);
+  bool x_min_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("min_x", min_x);
+  bool y_min_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("min_y", min_y);
+  bool z_min_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("min_z", min_z);
+
   max_.setX(max_x);
   max_.setY(max_y);
   max_.setZ(max_z);

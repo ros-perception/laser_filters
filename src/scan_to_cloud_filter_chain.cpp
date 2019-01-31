@@ -35,27 +35,21 @@
  */
 
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/Point_Cloud2.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 // TF
 #include <tf2_ros/transform_listener.h>
 #include "tf2_ros/message_filter.h"
-
 #include "message_filters/subscriber.h"
-
-//TODO: Fix this
-#define NO_TIMER
-#define ROS_WARN(...)
-
-
 #include <float.h>
 
 // Laser projection
-#include <laser_geometry/laser_geometry.h>
+#include <laser_geometry/laser_geometry.hpp>
 
 //Filters
-#include "filters/filter_chain.h"
+#include "filters/filter_chain.hpp"
+
 
 /** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
  */
@@ -88,9 +82,8 @@ public:
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
 
   // Timer for displaying deprecation warnings
-#ifndef NO_TIMER
-  ros::Timer deprecation_timer_;
-#endif // !NO_TIMER
+  rclcpp::TimerBase::SharedPtr deprecation_timer_;
+
   bool  using_scan_topic_deprecated_;
   bool  using_cloud_topic_deprecated_;
   bool  using_default_target_frame_deprecated_;
@@ -102,21 +95,21 @@ public:
   bool  using_cloud_filters_wrong_deprecated_;
   bool  incident_angle_correction_;
 
-  ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain(rclcpp::Node::SharedPtr node) :
                    nh(node),
                    laser_max_range_ (DBL_MAX),
-                   sub_(nh, "scan", 50),
+                   sub_(nh, "scan"),
+				   buffer_(node->get_clock()),
                    tf_(buffer_),
-                   filter_(sub_, buffer_, "", 50),
-                   cloud_filter_chain_("sensor_msgs::msg::PointCloud2"), 
+                   filter_(sub_, buffer_, "", 50, 0),
+                   cloud_filter_chain_("sensor_msgs::msg::PointCloud2"),
                    scan_filter_chain_("sensor_msgs::msg::LaserScan")
   {
     nh->get_parameter_or("high_fidelity", high_fidelity_, false);
     nh->get_parameter_or("notifier_tolerance", tf_tolerance_, 0.03);
     nh->get_parameter_or("target_frame", target_frame_, std::string("base_link"));
 
-    rclcpp::parameter::ParameterVariant variant;
+    rclcpp::Parameter variant;
 
     // DEPRECATED with default value
     using_default_target_frame_deprecated_ = !nh->get_parameter("target_frame", variant);
@@ -140,12 +133,14 @@ public:
 
     filter_.setTargetFrame(target_frame_);
     filter_.registerCallback(std::bind(&ScanToCloudFilterChain::scanCallback, this, std::placeholders::_1));
-    filter_.setTolerance(tf2::Duration(ros::Duration(tf_tolerance_).toNSec()));
+    rclcpp::Duration tolerance = rclcpp::Duration(tf_tolerance_);
+    tolerance.nanoseconds();
+    filter_.setTolerance(tolerance);
 
     if (using_scan_topic_deprecated_)
-      sub_.subscribe(nh, scan_topic_, 50);
+      sub_.subscribe(nh, scan_topic_);
     else
-      sub_.subscribe(nh, "scan", 50);
+      sub_.subscribe(nh, "scan");
 
     filter_.connectInput(sub_);
 
@@ -154,7 +149,7 @@ public:
     else
       cloud_pub_ = nh->create_publisher<sensor_msgs::msg::PointCloud2>("cloud_filtered", 10);
 
-    std::string cloud_filter_xml;
+    //std::string cloud_filter_xml;
 
     if (using_cloud_filters_deprecated_)
       cloud_filter_chain_.configure("cloud_filters/filter_chain", nh);
@@ -170,48 +165,42 @@ public:
     else
       scan_filter_chain_.configure("scan_filter_chain", nh);
 
-#ifndef NO_TIMER
-    deprecation_timer_ = nh.createTimer(ros::Duration(5.0), boost::bind(&ScanToCloudFilterChain::deprecation_warn, this, _1));
-#endif //!NO_TIMER
+    deprecation_timer_ = nh->create_wall_timer(std::chrono::milliseconds(5000), std::bind(&ScanToCloudFilterChain::deprecation_warn, this));
   }
 
-#ifndef NO_TIMER
   // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
-  void deprecation_warn(const ros::TimerEvent& e)
-  {
-    if (using_scan_topic_deprecated_)
-      ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+   void deprecation_warn()
+   {
+     if (using_scan_topic_deprecated_)
+       ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
-    if (using_cloud_topic_deprecated_)
-      ROS_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+     if (using_cloud_topic_deprecated_)
+       ROS_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
-    if (using_laser_max_range_deprecated_)
-      ROS_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+     if (using_laser_max_range_deprecated_)
+       ROS_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
-    if (using_filter_window_deprecated_)
-      ROS_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+     if (using_filter_window_deprecated_)
+       ROS_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
-    if (using_default_target_frame_deprecated_)
-      ROS_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+     if (using_default_target_frame_deprecated_)
+       ROS_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
 
-    if (using_cloud_filters_deprecated_)
-      ROS_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+     if (using_cloud_filters_deprecated_)
+       ROS_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
 
-    if (using_scan_filters_deprecated_)
-      ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+     if (using_scan_filters_deprecated_)
+       ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
 
-    if (using_cloud_filters_wrong_deprecated_)
-      ROS_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+     if (using_cloud_filters_wrong_deprecated_)
+       ROS_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
 
-    if (using_scan_filters_wrong_deprecated_)
-      ROS_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+     if (using_scan_filters_wrong_deprecated_)
+       ROS_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
 
-  }
-#endif // !NO_TIMER
+   }
 
-  ////////////////////////////////////////////////////////////////////////////////
-  void
-  scanCallback (const std::shared_ptr<const sensor_msgs::msg::LaserScan>& scan_msg)
+  void scanCallback (const std::shared_ptr<const sensor_msgs::msg::LaserScan>& scan_msg)
   {
     //    sensor_msgs::msg::LaserScan scan_msg = *scan_in;
 
@@ -269,7 +258,6 @@ public:
 int
 main (int argc, char** argv)
 {
-  ros::Time::init();
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_to_cloud_filter_chain");
   ScanToCloudFilterChain f(nh);

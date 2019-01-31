@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LASER_SCAN_ARRAY_FILTER_H
-#define LASER_SCAN_ARRAY_FILTER_H
+#ifndef LASER_SCAN_MEDIAN_FILTER_H
+#define LASER_SCAN_MEDIAN_FILTER_H
 
 #include <map>
 #include <iostream>
@@ -36,28 +36,24 @@
 
 #include "boost/thread/mutex.hpp"
 #include "boost/scoped_ptr.hpp"
+
 #include <sensor_msgs/msg/laser_scan.hpp>
-
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
-
-#include "filters/median.h"
-#include "filters/mean.h"
-#include "filters/filter_chain.h"
+#include "filters/median.hpp"
+#include "filters/mean.hpp"
+#include "filters/filter_chain.hpp"
 #include "boost/thread/mutex.hpp"
 
 namespace laser_filters{
 
 /** \brief A class to provide median filtering of laser scans in time*/
-class LaserArrayFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
+class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
 {
 public:
   /** \brief Constructor
    * \param averaging_length How many scans to average over.
    */
-  LaserArrayFilter();
-  ~LaserArrayFilter();
+  LaserMedianFilter();
+  ~LaserMedianFilter();
 
   bool configure();
 
@@ -72,15 +68,13 @@ private:
   unsigned int filter_length_; ///How many scans to average over
   unsigned int num_ranges_; /// How many data point are in each row
 
-  rclcpp::parameter::ParameterVariant range_config_;
-  rclcpp::parameter::ParameterVariant intensity_config_;
-
   boost::mutex data_lock; /// Protection from multi threaded programs
   sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
-  
+
+  rclcpp::Parameter parameter_value_;
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;
-  
+  using FilterBase<sensor_msgs::msg::LaserScan>::node_;
 };
 
 
