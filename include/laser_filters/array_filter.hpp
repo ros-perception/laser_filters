@@ -76,6 +76,7 @@ private:
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;
   
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
 

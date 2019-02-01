@@ -47,10 +47,6 @@
 #include <math.h>  
 #endif // _WIN32
 
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
-
 #include <angles/angles.h>
 
 namespace laser_filters{
@@ -60,6 +56,8 @@ namespace laser_filters{
 
 class ScanShadowsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 public:
 
   double laser_max_range_;           // Used in laser scan projection
@@ -76,23 +74,23 @@ public:
 	  // Get the parameter value.
 	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.min_angle", min_angle_))
 	  {
-		  ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+		  RCLCPP_ERROR(laser_filters_logger, "Error: ShadowsFilter was not given min_angle.\n");
 		  return false;
 	  }
 	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.max_angle", max_angle_))
 	  {
-		  ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+		  RCLCPP_ERROR(laser_filters_logger, "Error: ShadowsFilter was not given min_angle.\n");
 		  return false;
 	  }
 	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("params.window", window_))
 	  {
-		  ROS_ERROR("Error: ShadowsFilter was not given window.\n");
+		  RCLCPP_ERROR(laser_filters_logger, "Error: ShadowsFilter was not given window.\n");
 		  return false;
 	  }
 	  // default value i.e. "neighbors_ = 0"
 	  if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("params.neighbors", neighbors_, 0))
 	  {
-		  ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
+		  RCLCPP_INFO(laser_filters_logger, "Error: ShadowsFilter was not given neighbors.\n");
 	  }
 
     return true;
@@ -146,7 +144,7 @@ public:
       }
     }
 
-    ROS_DEBUG("ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d", (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
+    RCLCPP_DEBUG(laser_filters_logger, "ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d", (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
     for ( std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
       {
           scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value

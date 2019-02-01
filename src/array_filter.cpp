@@ -46,7 +46,7 @@ bool LaserArrayFilter::configure()
  
   if (!found_range_config && !found_intensity_config)
   {
-    ROS_ERROR("Cannot Configure LaserArrayFilter: Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params. Filter definitions needed inside for processing range and intensity");
+    RCLCPP_ERROR(laser_filters_logger, "Cannot Configure LaserArrayFilter: Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
   }
   
@@ -90,7 +90,7 @@ bool LaserArrayFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor
 {
   if (!this->configured_) 
   {
-    ROS_ERROR("LaserArrayFilter not configured");
+    RCLCPP_ERROR(laser_filters_logger, "LaserArrayFilter not configured");
     return false;
   }
 
@@ -101,7 +101,7 @@ bool LaserArrayFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor
   {
     num_ranges_ = scan_in.ranges.size();
 
-    ROS_INFO("LaserArrayFilter cleaning and reallocating due to larger scan size");
+    RCLCPP_INFO(laser_filters_logger, "LaserArrayFilter cleaning and reallocating due to larger scan size");
     
     configure();
   }

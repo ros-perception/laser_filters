@@ -50,13 +50,6 @@ This is useful for ground plane extraction
 #include <sensor_msgs/msg/point_cloud.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 
-#ifndef ROS_WARN_THROTTLE
-#define ROS_WARN_THROTTLE(...)
-#endif // !ROS_WARN_THROTTLE
-#ifndef ROS_INFO_THROTTLE
-#define ROS_INFO_THROTTLE(...)
-#endif // !ROS_INFO_THROTTLE
-
 #include "laser_geometry/laser_geometry.hpp"
 
 namespace laser_filters
@@ -72,7 +65,7 @@ public:
     // Get the parameter value.
     if(!node_->get_parameter("inscribed_radius", inscribed_radius_))
     {
-      ROS_ERROR("LaserScanFootprintFilter needs inscribed_radius to be set");
+      RCLCPP_ERROR(laser_filters_logger, "LaserScanFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
@@ -93,10 +86,10 @@ public:
     }
     catch(tf2::TransformException& ex){
       if(up_and_running_){
-        ROS_WARN_THROTTLE(1, "Dropping Scan: Transform unavailable %s", ex.what());
+        RCLCPP_WARN(laser_filters_logger, "Dropping Scan: Transform unavailable %s", ex.what());
       }
       else {
-        ROS_INFO_THROTTLE(.3, "Ignoring Scan: Waiting for TF");
+        RCLCPP_INFO(laser_filters_logger, "Ignoring Scan: Waiting for TF");
       }
       return false;
     }
@@ -104,7 +97,7 @@ public:
     int c_idx = indexChannel(laser_cloud);
 
     if (c_idx == -1 || laser_cloud.channels[c_idx].values.size () == 0){
-      ROS_ERROR("We need an index channel to be able to filter out the footprint");
+      RCLCPP_ERROR(laser_filters_logger, "We need an index channel to be able to filter out the footprint");
       return false;
     }
 
@@ -147,6 +140,7 @@ private:
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
   bool up_and_running_;
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 } ;
 
 }

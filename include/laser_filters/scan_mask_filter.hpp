@@ -51,6 +51,8 @@ namespace laser_filters
 
 class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 public:
   std::map<std::string, std::vector<int64_t> > masks_;
 
@@ -69,18 +71,18 @@ public:
     // Get the parameter value.
     if (!node_->get_parameter("params.masks.laser", config))
     {
-      ROS_ERROR("LaserScanMaskFilter: masks is not defined in the config.");
+      RCLCPP_ERROR(laser_filters_logger, "LaserScanMaskFilter: masks is not defined in the config.");
       return false;
     }
 
     if(config.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER_ARRAY)
     {
-    	ROS_INFO("LaserScanMaskFilter: Name: %s - Type: %d",config.get_name().c_str(), config.get_type());
+    	RCLCPP_INFO(laser_filters_logger, "LaserScanMaskFilter: Name: %s - Type: %d",config.get_name().c_str(), config.get_type());
     	masks_["laser"] = config.as_integer_array();
     }
     else
     {
-        ROS_ERROR("LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
+        RCLCPP_ERROR(laser_filters_logger, "LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
         return false;
     }
 
@@ -89,7 +91,7 @@ public:
 
     if (config.get_type() == rclcpp::parameter::ParameterType::TypeArray)
     {
-      ROS_ERROR("LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
+      RCLCPP_ERROR(laser_filters_logger, "LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
       return false;
     }
     for (rclcpp::parameter::ParameterIterator it = config.begin();
@@ -106,12 +108,12 @@ public:
             size_t id = static_cast<int>(it->second[i]);
             masks_[frame_id].push_back(id);
           }
-          ROS_INFO("LaserScanMaskFilter: %s: %d directions will be masked.",
+          RCLCPP_INFO(laser_filters_logger, "LaserScanMaskFilter: %s: %d directions will be masked.",
               frame_id.c_str(), (int)masks_[frame_id].size());
         }
         catch(rclcpp::parameter::ParameterException &e)
         {
-          ROS_ERROR("LaserScanMaskFilter: %s", e.get_message().c_str());
+          RCLCPP_ERROR(laser_filters_logger, "LaserScanMaskFilter: %s", e.get_message().c_str());
           return false;
         }
       }
@@ -126,7 +128,7 @@ public:
     data_out = data_in;
     if (masks_.find(data_out.header.frame_id) == masks_.end())
     {
-      ROS_WARN("LaserScanMaskFilter: frame_id %s is not registered.",
+      RCLCPP_WARN(laser_filters_logger, "LaserScanMaskFilter: frame_id %s is not registered.",
           data_out.header.frame_id.c_str());
       return true;
     }

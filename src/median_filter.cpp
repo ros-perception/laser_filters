@@ -35,14 +35,14 @@ namespace laser_filters
 LaserMedianFilter::LaserMedianFilter() :
   num_ranges_(1), parameter_value_(), range_filter_(NULL), intensity_filter_(NULL)
 {
-    ROS_WARN("LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");  
+    RCLCPP_WARN(laser_filters_logger, "LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");  
 };
 
 bool LaserMedianFilter::configure()
 {
   if (!FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("internal_filter", parameter_value_))
   {
-    ROS_ERROR("Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
+    RCLCPP_ERROR(laser_filters_logger, "Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
   }
   
@@ -68,7 +68,7 @@ bool LaserMedianFilter::update(const sensor_msgs::msg::LaserScan& scan_in, senso
 {
   if (!this->configured_) 
   {
-    ROS_ERROR("LaserMedianFilter not configured");
+    RCLCPP_ERROR(laser_filters_logger, "LaserMedianFilter not configured");
     return false;
   }
   boost::mutex::scoped_lock lock(data_lock);
@@ -77,7 +77,7 @@ bool LaserMedianFilter::update(const sensor_msgs::msg::LaserScan& scan_in, senso
 
   if (scan_in.ranges.size() != num_ranges_) //Reallocating
   {
-    ROS_INFO("Laser filter clearning and reallocating due to larger scan size");
+    RCLCPP_INFO(laser_filters_logger, "Laser filter clearning and reallocating due to larger scan size");
     delete range_filter_;
     delete intensity_filter_;
 

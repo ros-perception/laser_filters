@@ -65,6 +65,7 @@ protected:
   rclcpp::TimerBase::SharedPtr deprecation_timer_;
 
 private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
   void foo(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
   }
@@ -101,7 +102,7 @@ public:
   
   void deprecation_warn()
   {
-    ROS_WARN("'generic_laser_filter_node' has been deprecated.  Please switch to 'scan_to_scan_filter_chain'.");
+    RCLCPP_WARN(laser_filters_logger, "'generic_laser_filter_node' has been deprecated.  Please switch to 'scan_to_scan_filter_chain'.");
   }
 
   // Callback

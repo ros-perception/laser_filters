@@ -70,25 +70,25 @@ bool laser_filters::LaserScanBoxFilter::configure(){
   min_.setZ(min_z);
   
   if(!box_frame_set){
-    ROS_ERROR("box_frame is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "box_frame is not set!");
   }
   if(!x_max_set){
-    ROS_ERROR("max_x is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "max_x is not set!");
   }
   if(!y_max_set){
-    ROS_ERROR("max_y is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "max_y is not set!");
   }
   if(!z_max_set){
-    ROS_ERROR("max_z is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "max_z is not set!");
   }
   if(!x_min_set){
-    ROS_ERROR("min_x is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "min_x is not set!");
   }
   if(!y_min_set){
-    ROS_ERROR("min_y is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "min_y is not set!");
   }
   if(!z_min_set){
-    ROS_ERROR("min_z is not set!");
+    RCLCPP_ERROR(laser_filters_logger, "min_z is not set!");
   }
 
   return box_frame_set && x_max_set && y_max_set && z_max_set &&
@@ -115,7 +115,7 @@ bool laser_filters::LaserScanBoxFilter::update(
     &error_msg
   );
   if(!success){
-    ROS_WARN("Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+    RCLCPP_WARN(laser_filters_logger, "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
     return false;
   }
 #endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
@@ -125,12 +125,12 @@ bool laser_filters::LaserScanBoxFilter::update(
   }
   catch(tf2::TransformException& ex){
     if(up_and_running_){
-      ROS_WARN_THROTTLE(1, "Dropping Scan: Tansform unavailable %s", ex.what());
+      RCLCPP_WARN(laser_filters_logger, "Dropping Scan: Tansform unavailable %s", ex.what());
       return true;
     }
     else
     {
-      ROS_INFO_THROTTLE(.3, "Ignoring Scan: Waiting for TF");
+      RCLCPP_INFO(laser_filters_logger, "Ignoring Scan: Waiting for TF");
     }
     return false;
   }
@@ -142,7 +142,7 @@ bool laser_filters::LaserScanBoxFilter::update(
   const int z_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "z");
 
   if(i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1){
-      ROS_INFO_THROTTLE(.3, "x, y, z and index fields are required, skipping scan");
+      RCLCPP_INFO(laser_filters_logger, "x, y, z and index fields are required, skipping scan");
 
   }
 

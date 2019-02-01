@@ -40,6 +40,8 @@
 
 class ScanToScanFilterChain
 {
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 protected:
   // Our NodeHandle
   rclcpp::Node::SharedPtr nh_;
@@ -133,7 +135,7 @@ public:
   void deprecation_warn()
   {
     if (using_filter_chain_deprecated_)
-      ROS_WARN("Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
+      RCLCPP_WARN(laser_filters_logger, "Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
   }
 
   // Callback

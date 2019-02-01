@@ -55,13 +55,6 @@
 
 typedef tf2::Vector3 Point;
 
-#ifndef ROS_WARN_THROTTLE
-#define ROS_WARN_THROTTLE(...)
-#endif // !ROS_WARN_THROTTLE
-#ifndef ROS_INFO_THROTTLE
-#define ROS_INFO_THROTTLE(...)
-#endif // !ROS_INFO_THROTTLE
-
 #include <laser_geometry/laser_geometry.hpp>
 
 
@@ -94,6 +87,8 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     // defines two opposite corners of the box
     Point min_, max_; 
     bool up_and_running_;
+
+    rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
 }

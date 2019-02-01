@@ -55,6 +55,8 @@
  */
 class ScanToCloudFilterChain
 {
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 public:
 
   // ROS related
@@ -172,31 +174,31 @@ public:
    void deprecation_warn()
    {
      if (using_scan_topic_deprecated_)
-       ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
      if (using_cloud_topic_deprecated_)
-       ROS_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
      if (using_laser_max_range_deprecated_)
-       ROS_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
      if (using_filter_window_deprecated_)
-       ROS_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
      if (using_default_target_frame_deprecated_)
-       ROS_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+       RCLCPP_WARN(laser_filters_logger, "Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
 
      if (using_cloud_filters_deprecated_)
-       ROS_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
 
      if (using_scan_filters_deprecated_)
-       ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
 
      if (using_cloud_filters_wrong_deprecated_)
-       ROS_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
 
      if (using_scan_filters_wrong_deprecated_)
-       ROS_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
 
    }
 
@@ -235,7 +237,7 @@ public:
       }
       catch (tf2::TransformException &ex)
       {
-        ROS_WARN("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
+        RCLCPP_WARN(laser_filters_logger, "High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
         return;
         //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
       }

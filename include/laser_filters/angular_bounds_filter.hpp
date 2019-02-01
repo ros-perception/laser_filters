@@ -45,6 +45,8 @@ namespace laser_filters
 {
   class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
   {
+    private:
+      rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
     public:
       double lower_angle_;
       double upper_angle_;
@@ -53,7 +55,7 @@ namespace laser_filters
       {
     	// Get the parameter value, If the parameter was not set, then assign default value.
         if(!node_->get_parameter_or("lower_angle", lower_angle_, 0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0)){
-          ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
+          RCLCPP_ERROR(laser_filters_logger, "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -113,7 +115,7 @@ namespace laser_filters
         if(input_scan.intensities.size() >= count)
           filtered_scan.intensities.resize(count);
 
-        ROS_DEBUG("Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
+        RCLCPP_DEBUG(laser_filters_logger, "Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
 
         return true;
 
