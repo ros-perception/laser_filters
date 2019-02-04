@@ -57,14 +57,14 @@ class ScanToCloudFilterChain
 {
 private:
   rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
-public:
 
+public:
   // ROS related
   laser_geometry::LaserProjection projector_; // Used to project laser scans
 
   double laser_max_range_;           // Used in laser scan projection
   int window_;
-    
+
   bool high_fidelity_;                    // High fidelity (interpolating time across scan)
   std::string target_frame_;                   // Target frame for high fidelity result
   std::string scan_topic_, cloud_topic_;
@@ -86,26 +86,26 @@ public:
   // Timer for displaying deprecation warnings
   rclcpp::TimerBase::SharedPtr deprecation_timer_;
 
-  bool  using_scan_topic_deprecated_;
-  bool  using_cloud_topic_deprecated_;
-  bool  using_default_target_frame_deprecated_;
-  bool  using_laser_max_range_deprecated_;
-  bool  using_filter_window_deprecated_;
-  bool  using_scan_filters_deprecated_;
-  bool  using_cloud_filters_deprecated_;
-  bool  using_scan_filters_wrong_deprecated_;
-  bool  using_cloud_filters_wrong_deprecated_;
-  bool  incident_angle_correction_;
+  bool using_scan_topic_deprecated_;
+  bool using_cloud_topic_deprecated_;
+  bool using_default_target_frame_deprecated_;
+  bool using_laser_max_range_deprecated_;
+  bool using_filter_window_deprecated_;
+  bool using_scan_filters_deprecated_;
+  bool using_cloud_filters_deprecated_;
+  bool using_scan_filters_wrong_deprecated_;
+  bool using_cloud_filters_wrong_deprecated_;
+  bool incident_angle_correction_;
 
-  ScanToCloudFilterChain(rclcpp::Node::SharedPtr node) :
-                   nh(node),
-                   laser_max_range_ (DBL_MAX),
-                   sub_(nh, "scan"),
-				   buffer_(node->get_clock()),
-                   tf_(buffer_),
-                   filter_(sub_, buffer_, "", 50, 0),
-                   cloud_filter_chain_("sensor_msgs::msg::PointCloud2"),
-                   scan_filter_chain_("sensor_msgs::msg::LaserScan")
+  ScanToCloudFilterChain(rclcpp::Node::SharedPtr node)
+  : nh(node),
+    laser_max_range_(DBL_MAX),
+    sub_(nh, "scan"),
+    buffer_(node->get_clock()),
+    tf_(buffer_),
+    filter_(sub_, buffer_, "", 50, 0),
+    cloud_filter_chain_("sensor_msgs::msg::PointCloud2"),
+    scan_filter_chain_("sensor_msgs::msg::LaserScan")
   {
     nh->get_parameter_or("high_fidelity", high_fidelity_, false);
     nh->get_parameter_or("notifier_tolerance", tf_tolerance_, 0.03);
@@ -123,8 +123,10 @@ public:
     using_filter_window_deprecated_ = nh->get_parameter("filter_window", variant);
     using_cloud_filters_deprecated_ = nh->get_parameter("cloud_filters/filter_chain", variant);
     using_scan_filters_deprecated_ = nh->get_parameter("scan_filters/filter_chain", variant);
-    using_cloud_filters_wrong_deprecated_ = nh->get_parameter("cloud_filters/cloud_filter_chain", variant);
-    using_scan_filters_wrong_deprecated_ = nh->get_parameter("scan_filters/scan_filter_chain", variant);
+    using_cloud_filters_wrong_deprecated_ = nh->get_parameter("cloud_filters/cloud_filter_chain",
+        variant);
+    using_scan_filters_wrong_deprecated_ = nh->get_parameter("scan_filters/scan_filter_chain",
+        variant);
 
 
     nh->get_parameter_or("filter_window", window_, 2);
@@ -134,90 +136,113 @@ public:
     nh->get_parameter_or("incident_angle_correction", incident_angle_correction_, true);
 
     filter_.setTargetFrame(target_frame_);
-    filter_.registerCallback(std::bind(&ScanToCloudFilterChain::scanCallback, this, std::placeholders::_1));
+    filter_.registerCallback(std::bind(&ScanToCloudFilterChain::scanCallback, this,
+      std::placeholders::_1));
     rclcpp::Duration tolerance = rclcpp::Duration(tf_tolerance_);
     tolerance.nanoseconds();
     filter_.setTolerance(tolerance);
 
-    if (using_scan_topic_deprecated_)
+    if (using_scan_topic_deprecated_) {
       sub_.subscribe(nh, scan_topic_);
-    else
+    } else {
       sub_.subscribe(nh, "scan");
+    }
 
     filter_.connectInput(sub_);
 
-    if (using_cloud_topic_deprecated_)
+    if (using_cloud_topic_deprecated_) {
       cloud_pub_ = nh->create_publisher<sensor_msgs::msg::PointCloud2>(cloud_topic_, 10);
-    else
+    } else {
       cloud_pub_ = nh->create_publisher<sensor_msgs::msg::PointCloud2>("cloud_filtered", 10);
+    }
 
     //std::string cloud_filter_xml;
 
-    if (using_cloud_filters_deprecated_)
+    if (using_cloud_filters_deprecated_) {
       cloud_filter_chain_.configure("cloud_filters/filter_chain", nh);
-    else if (using_cloud_filters_wrong_deprecated_)
+    } else if (using_cloud_filters_wrong_deprecated_) {
       cloud_filter_chain_.configure("cloud_filters/cloud_filter_chain", nh);
-    else
+    } else {
       cloud_filter_chain_.configure("cloud_filter_chain", nh);
+    }
 
-    if (using_scan_filters_deprecated_)
+    if (using_scan_filters_deprecated_) {
       scan_filter_chain_.configure("scan_filter/filter_chain", nh);
-    else if (using_scan_filters_wrong_deprecated_)
+    } else if (using_scan_filters_wrong_deprecated_) {
       scan_filter_chain_.configure("scan_filters/scan_filter_chain", nh);
-    else
+    } else {
       scan_filter_chain_.configure("scan_filter_chain", nh);
+    }
 
-    deprecation_timer_ = nh->create_wall_timer(std::chrono::milliseconds(5000), std::bind(&ScanToCloudFilterChain::deprecation_warn, this));
+    deprecation_timer_ =
+      nh->create_wall_timer(std::chrono::milliseconds(5000),
+        std::bind(&ScanToCloudFilterChain::deprecation_warn, this));
   }
 
   // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
-   void deprecation_warn()
-   {
-     if (using_scan_topic_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+  void deprecation_warn()
+  {
+    if (using_scan_topic_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    }
 
-     if (using_cloud_topic_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    if (using_cloud_topic_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    }
 
-     if (using_laser_max_range_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    if (using_laser_max_range_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    }
 
-     if (using_filter_window_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    if (using_filter_window_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+    }
 
-     if (using_default_target_frame_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+    if (using_default_target_frame_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+    }
 
-     if (using_cloud_filters_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+    if (using_cloud_filters_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+    }
 
-     if (using_scan_filters_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+    if (using_scan_filters_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+    }
 
-     if (using_cloud_filters_wrong_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+    if (using_cloud_filters_wrong_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+    }
 
-     if (using_scan_filters_wrong_deprecated_)
-       RCLCPP_WARN(laser_filters_logger, "Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+    if (using_scan_filters_wrong_deprecated_) {
+      RCLCPP_WARN(laser_filters_logger,
+        "Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+    }
 
-   }
+  }
 
-  void scanCallback (const std::shared_ptr<const sensor_msgs::msg::LaserScan>& scan_msg)
+  void scanCallback(const std::shared_ptr<const sensor_msgs::msg::LaserScan> & scan_msg)
   {
     //    sensor_msgs::msg::LaserScan scan_msg = *scan_in;
 
     sensor_msgs::msg::LaserScan filtered_scan;
-    scan_filter_chain_.update (*scan_msg, filtered_scan);
+    scan_filter_chain_.update(*scan_msg, filtered_scan);
 
     // Project laser into point cloud
     sensor_msgs::msg::PointCloud2 scan_cloud;
 
-    //\TODO CLEAN UP HACK 
+    //\TODO CLEAN UP HACK
     // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
-    if(incident_angle_correction_)
-    {
-      for (unsigned int i = 0; i < filtered_scan.ranges.size(); i++)
-      {
+    if (incident_angle_correction_) {
+      for (unsigned int i = 0; i < filtered_scan.ranges.size(); i++) {
         double angle = filtered_scan.angle_min + i * filtered_scan.angle_increment;
         filtered_scan.ranges[i] = filtered_scan.ranges[i] + 0.03 * exp(-fabs(sin(angle)));
       }
@@ -228,37 +253,34 @@ public:
       laser_geometry::channel_option::Distance |
       laser_geometry::channel_option::Index |
       laser_geometry::channel_option::Timestamp;
-      
-    if (high_fidelity_)
-    {
-      try
-      {
-        projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, buffer_, mask);
-      }
-      catch (tf2::TransformException &ex)
-      {
-        RCLCPP_WARN(laser_filters_logger, "High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
+
+    if (high_fidelity_) {
+      try {
+        projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, buffer_,
+          mask);
+      } catch (tf2::TransformException & ex) {
+        RCLCPP_WARN(laser_filters_logger,
+          "High fidelity enabled, but TF returned a transform exception to frame %s: %s",
+          target_frame_.c_str(), ex.what());
         return;
         //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
       }
+    } else {
+      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, buffer_,
+        laser_max_range_, mask);
     }
-    else
-    {
-      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, buffer_, laser_max_range_, mask);
-    }
-      
+
     sensor_msgs::msg::PointCloud2 filtered_cloud;
-    cloud_filter_chain_.update (scan_cloud, filtered_cloud);
+    cloud_filter_chain_.update(scan_cloud, filtered_cloud);
 
     cloud_pub_->publish(filtered_cloud);
   }
 
-} ;
-
+};
 
 
 int
-main (int argc, char** argv)
+main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_to_cloud_filter_chain");
@@ -272,7 +294,5 @@ main (int argc, char** argv)
 
   }
 
-  return (0);
+  return 0;
 }
-
-

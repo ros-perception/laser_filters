@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -51,7 +51,6 @@ namespace laser_filters
 class InterpolationFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-
   bool configure()
   {
     return true;
@@ -64,32 +63,34 @@ public:
   }
 
   virtual ~InterpolationFilter()
-  { 
+  {
   }
 
-  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
+  bool update(
+    const sensor_msgs::msg::LaserScan & input_scan,
+    sensor_msgs::msg::LaserScan & filtered_scan)
   {
     double previous_valid_range = input_scan.range_max - .01;
     double next_valid_range = input_scan.range_max - .01;
-    filtered_scan= input_scan;
+    filtered_scan = input_scan;
 
     unsigned int i = 0;
-    while(i < input_scan.ranges.size()) // Need to check every reading in the current scan
-    {
+    while (i < input_scan.ranges.size()) { // Need to check every reading in the current scan
       //check if the reading is out of range for some reason
       if (filtered_scan.ranges[i] <= input_scan.range_min ||
-          filtered_scan.ranges[i] >= input_scan.range_max){
+        filtered_scan.ranges[i] >= input_scan.range_max)
+      {
 
         //we need to find the next valid range reading
         unsigned int j = i + 1;
         unsigned int start_index = i;
         unsigned int end_index = i;
-        while(j < input_scan.ranges.size()){
-          if (filtered_scan.ranges[j] <= input_scan.range_min || 
-              filtered_scan.ranges[j] >= input_scan.range_max){                                                                                 
+        while (j < input_scan.ranges.size()) {
+          if (filtered_scan.ranges[j] <= input_scan.range_min ||
+            filtered_scan.ranges[j] >= input_scan.range_max)
+          {
             end_index = j;
-          }
-          else{
+          } else {
             next_valid_range = filtered_scan.ranges[j];
             break;
           }
@@ -99,15 +100,14 @@ public:
         //for now, we'll just take the average between the two valid range readings
         double average_range = (previous_valid_range + next_valid_range) / 2.0;
 
-        for(unsigned int k = start_index; k <= end_index; k++){
+        for (unsigned int k = start_index; k <= end_index; k++) {
           filtered_scan.ranges[k] = average_range;
         }
 
         //make sure to update our previous valid range reading
         previous_valid_range = next_valid_range;
         i = j + 1;
-      }
-      else{
+      } else {
         previous_valid_range = filtered_scan.ranges[i];
         ++i;
       }

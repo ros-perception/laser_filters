@@ -42,50 +42,56 @@
 
 namespace laser_filters
 {
-  class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+{
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
+
+public:
+  double lower_angle_;
+  double upper_angle_;
+
+  bool configure()
   {
-    private:
-      rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
+    // Get the parameter value, If the parameter was not set, then assign default value.
+    if (!node_->get_parameter_or("lower_angle", lower_angle_,
+      0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0))
+    {
+      RCLCPP_ERROR(laser_filters_logger,
+        "Both the lower_angle and upper_angle parameters must be set to use this filter.");
+      return false;
+    }
 
-    public:
-      double lower_angle_;
-      double upper_angle_;
+    return true;
+  }
 
-      bool configure()
-      {
-    	// Get the parameter value, If the parameter was not set, then assign default value.
-        if(!node_->get_parameter_or("lower_angle", lower_angle_, 0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0)){
-          RCLCPP_ERROR(laser_filters_logger, "Both the lower_angle and upper_angle parameters must be set to use this filter.");
-          return false;
+  virtual ~LaserScanAngularBoundsFilterInPlace() {}
+
+  bool update(
+    const sensor_msgs::msg::LaserScan & input_scan,
+    sensor_msgs::msg::LaserScan & filtered_scan)
+  {
+    filtered_scan = input_scan;     //copy entire message
+
+    double current_angle = input_scan.angle_min;
+    unsigned int count = 0;
+    //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
+    for (unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
+      if ((current_angle > lower_angle_) && (current_angle < upper_angle_)) {
+        filtered_scan.ranges[i] = input_scan.range_max + 1.0;
+        if (i < filtered_scan.intensities.size()) {
+          filtered_scan.intensities[i] = 0.0;
         }
-
-        return true;
+        count++;
       }
+      current_angle += input_scan.angle_increment;
+    }
 
-      virtual ~LaserScanAngularBoundsFilterInPlace(){}
+    RCLCPP_DEBUG(laser_filters_logger, "Filtered out %u points from the laser scan.", count);
 
-      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
-        filtered_scan = input_scan; //copy entire message
+    return true;
 
-        double current_angle = input_scan.angle_min;
-        unsigned int count = 0;
-        //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
-        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-          if((current_angle > lower_angle_) && (current_angle < upper_angle_)){
-            filtered_scan.ranges[i] = input_scan.range_max + 1.0;
-            if(i < filtered_scan.intensities.size()){
-              filtered_scan.intensities[i] = 0.0;
-            }
-            count++;
-          }
-          current_angle += input_scan.angle_increment;
-        }
-
-        RCLCPP_DEBUG(laser_filters_logger, "Filtered out %u points from the laser scan.", count);
-
-        return true;
-
-      }
-  };
+  }
 };
+}
 #endif

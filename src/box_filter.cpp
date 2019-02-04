@@ -9,11 +9,11 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,7 +32,7 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
@@ -44,17 +44,21 @@
 
 #include "laser_filters/box_filter.hpp"
 
-laser_filters::LaserScanBoxFilter::LaserScanBoxFilter() : clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
-buffer_(clock), tf_(buffer_) {
+laser_filters::LaserScanBoxFilter::LaserScanBoxFilter()
+: clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
+  buffer_(clock), tf_(buffer_)
+{
 
 }
 
-bool laser_filters::LaserScanBoxFilter::configure(){
+bool laser_filters::LaserScanBoxFilter::configure()
+{
   up_and_running_ = true;
   double min_x, min_y, min_z, max_x, max_y, max_z;
 
   // Get the parameter value.
-  bool box_frame_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("box_frame", box_frame_);
+  bool box_frame_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("box_frame",
+      box_frame_);
   bool x_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_x", max_x);
   bool y_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_y", max_y);
   bool z_max_set = FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("max_z", max_z);
@@ -68,68 +72,67 @@ bool laser_filters::LaserScanBoxFilter::configure(){
   min_.setX(min_x);
   min_.setY(min_y);
   min_.setZ(min_z);
-  
-  if(!box_frame_set){
+
+  if (!box_frame_set) {
     RCLCPP_ERROR(laser_filters_logger, "box_frame is not set!");
   }
-  if(!x_max_set){
+  if (!x_max_set) {
     RCLCPP_ERROR(laser_filters_logger, "max_x is not set!");
   }
-  if(!y_max_set){
+  if (!y_max_set) {
     RCLCPP_ERROR(laser_filters_logger, "max_y is not set!");
   }
-  if(!z_max_set){
+  if (!z_max_set) {
     RCLCPP_ERROR(laser_filters_logger, "max_z is not set!");
   }
-  if(!x_min_set){
+  if (!x_min_set) {
     RCLCPP_ERROR(laser_filters_logger, "min_x is not set!");
   }
-  if(!y_min_set){
+  if (!y_min_set) {
     RCLCPP_ERROR(laser_filters_logger, "min_y is not set!");
   }
-  if(!z_min_set){
+  if (!z_min_set) {
     RCLCPP_ERROR(laser_filters_logger, "min_z is not set!");
   }
 
   return box_frame_set && x_max_set && y_max_set && z_max_set &&
-    x_min_set && y_min_set && z_min_set;
+         x_min_set && y_min_set && z_min_set;
 
 }
 
 bool laser_filters::LaserScanBoxFilter::update(
-    const sensor_msgs::msg::LaserScan& input_scan,
-    sensor_msgs::msg::LaserScan &output_scan)
+  const sensor_msgs::msg::LaserScan & input_scan,
+  sensor_msgs::msg::LaserScan & output_scan)
 {
   output_scan = input_scan;
   sensor_msgs::msg::PointCloud2 laser_cloud;
-  
+
   std::string error_msg;
 
 #ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
   bool success = tf_.waitForTransform(
     box_frame_,
     input_scan.header.frame_id,
-    input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size()*input_scan.time_increment),
+    input_scan.header.stamp +
+    ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
     ros::Duration(1.0),
     ros::Duration(0.01),
     &error_msg
   );
-  if(!success){
-    RCLCPP_WARN(laser_filters_logger, "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+  if (!success) {
+    RCLCPP_WARN(laser_filters_logger, "Could not get transform, irgnoring laser scan! %s",
+      error_msg.c_str());
     return false;
   }
 #endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
 
-  try{
+  try {
     projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, buffer_);
-  }
-  catch(tf2::TransformException& ex){
-    if(up_and_running_){
+  } catch (tf2::TransformException & ex) {
+    if (up_and_running_) {
       RCLCPP_WARN(laser_filters_logger, "Dropping Scan: Tansform unavailable %s", ex.what());
       return true;
-    }
-    else
-    {
+    } else {
       RCLCPP_INFO(laser_filters_logger, "Ignoring Scan: Waiting for TF");
     }
     return false;
@@ -141,8 +144,8 @@ bool laser_filters::LaserScanBoxFilter::update(
   const int y_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "y");
   const int z_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "z");
 
-  if(i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1){
-      RCLCPP_INFO(laser_filters_logger, "x, y, z and index fields are required, skipping scan");
+  if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1) {
+    RCLCPP_INFO(laser_filters_logger, "x, y, z and index fields are required, skipping scan");
 
   }
 
@@ -156,8 +159,8 @@ bool laser_filters::LaserScanBoxFilter::update(
   const long int pcount = laser_cloud.width * laser_cloud.height;
   const long int limit = pstep * pcount;
 
-  int i_idx, x_idx, y_idx, z_idx;  
-  for(
+  int i_idx, x_idx, y_idx, z_idx;
+  for (
     i_idx = i_idx_offset,
     x_idx = x_idx_offset,
     y_idx = y_idx_offset,
@@ -172,15 +175,15 @@ bool laser_filters::LaserScanBoxFilter::update(
   {
 
     // TODO works only for float data types and with an index field
-    // I'm working on it, see https://github.com/ros/common_msgs/pull/78 
-    float x = *((float*)(&laser_cloud.data[x_idx]));
-    float y = *((float*)(&laser_cloud.data[y_idx]));
-    float z = *((float*)(&laser_cloud.data[z_idx]));
-    int index = *((int*)(&laser_cloud.data[i_idx]));
+    // I'm working on it, see https://github.com/ros/common_msgs/pull/78
+    float x = *((float *)(&laser_cloud.data[x_idx]));
+    float y = *((float *)(&laser_cloud.data[y_idx]));
+    float z = *((float *)(&laser_cloud.data[z_idx]));
+    int index = *((int *)(&laser_cloud.data[i_idx]));
 
     Point point(x, y, z);
 
-    if(inBox(point)){
+    if (inBox(point)) {
       output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
     }
   }
@@ -189,10 +192,10 @@ bool laser_filters::LaserScanBoxFilter::update(
   return true;
 }
 
-bool laser_filters::LaserScanBoxFilter::inBox(Point &point){
+bool laser_filters::LaserScanBoxFilter::inBox(Point & point)
+{
   return
-    point.x() < max_.x() && point.x() > min_.x() && 
+    point.x() < max_.x() && point.x() > min_.x() &&
     point.y() < max_.y() && point.y() > min_.y() &&
     point.z() < max_.z() && point.z() > min_.z();
 }
-

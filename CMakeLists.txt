@@ -97,7 +97,11 @@ ament_export_libraries(
 if(BUILD_TESTING)
 
     find_package(ament_cmake_gtest REQUIRED)
-    
+    find_package(ament_cmake_cppcheck REQUIRED)
+    find_package(ament_cmake_uncrustify REQUIRED)
+
+    ament_cppcheck(LANGUAGE "c++")
+    ament_uncrustify()
     ament_add_gtest(test_scan_filter_chain  test/test_scan_filter_chain.cpp)
     target_link_libraries(test_scan_filter_chain ${${PROJECT_NAME}_LIBRARIES})
 

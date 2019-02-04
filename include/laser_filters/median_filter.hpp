@@ -43,10 +43,11 @@
 #include "filters/filter_chain.hpp"
 #include "boost/thread/mutex.hpp"
 
-namespace laser_filters{
+namespace laser_filters
+{
 
 /** \brief A class to provide median filtering of laser scans in time*/
-class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
+class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   /** \brief Constructor
@@ -61,8 +62,7 @@ public:
    * \param scan_in The new scan to filter
    * \param scan_out The filtered scan
    */
-  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
-
+  bool update(const sensor_msgs::msg::LaserScan & scan_in, sensor_msgs::msg::LaserScan & scan_out);
 
 private:
   unsigned int filter_length_; ///How many scans to average over
@@ -78,9 +78,6 @@ private:
 
   rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
-
-
-
 
 
 }

@@ -35,13 +35,14 @@
 #include <cmath> // for isnan()
 
 
-filters::FilterChain<sensor_msgs::msg::LaserScan> *filter_chain_;
+filters::FilterChain<sensor_msgs::msg::LaserScan> * filter_chain_;
 
-sensor_msgs::msg::LaserScan gen_msg(rclcpp::Node::SharedPtr node_){
+sensor_msgs::msg::LaserScan gen_msg(rclcpp::Node::SharedPtr node_)
+{
   sensor_msgs::msg::LaserScan msg;
 
   float temp[] = {1.0, 0.1, 1.0, 1.0, 1.0, 9.0, 1.0, 1.0, 1.0, 2.3};
-  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
 
   msg.header.stamp = node_->now();
   msg.header.frame_id = "laser";
@@ -61,12 +62,12 @@ sensor_msgs::msg::LaserScan gen_msg(rclcpp::Node::SharedPtr node_){
 /** Verifies that two vectors of range values are the same. Allows the case
  * where corresponding values are both NaN.
  */
-void expect_ranges_eq(const std::vector<float> &a, const std::vector<float> &b) {
-  for( int i=0; i<10; i++) {
-    if(std::isnan(a[i])) {
+void expect_ranges_eq(const std::vector<float> & a, const std::vector<float> & b)
+{
+  for (int i = 0; i < 10; i++) {
+    if (std::isnan(a[i])) {
       EXPECT_TRUE(std::isnan(b[i]));
-    }
-    else {
+    } else {
       EXPECT_NEAR(a[i], b[i], 1e-6);
     }
   }
@@ -74,18 +75,15 @@ void expect_ranges_eq(const std::vector<float> &a, const std::vector<float> &b) 
 
 TEST(ScanToScanFilterChain, BadConfiguration)
 {
-	// node handle is created as per ros2
+  // node handle is created as per ros2
   auto node_ = rclcpp::Node::make_shared("bad_filter_chain");
 
-  try
-  {
+  try {
     filter_chain_->configure("bad_filter_chain", node_);
-  }
-  catch(pluginlib::LibraryLoadException)
-  {
+  } catch (pluginlib::LibraryLoadException) {
     EXPECT_FALSE(false);
   }
-  
+
   filter_chain_->clear();
 }
 
@@ -97,10 +95,10 @@ TEST(ScanToScanFilterChain, IntensityFilter)
   sensor_msgs::msg::LaserScan msg_in, msg_out, expected_msg;
   float nanval = std::numeric_limits<float>::quiet_NaN();
   float temp[] = {1.0, nanval, 1.0, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, 2.3};
-  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
   expected_msg.ranges = v1;
 
-  EXPECT_TRUE(filter_chain_->configure("intensity_filter_chain",node_));
+  EXPECT_TRUE(filter_chain_->configure("intensity_filter_chain", node_));
 
   msg_in = gen_msg(node_);
 
@@ -116,17 +114,17 @@ TEST(ScanToScanFilterChain, InterpFilter)
   auto node_ = rclcpp::Node::make_shared("interp_filter_chain");
   sensor_msgs::msg::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
   expected_msg.ranges = v1;
 
-  EXPECT_TRUE(filter_chain_->configure("interp_filter_chain",node_));
+  EXPECT_TRUE(filter_chain_->configure("interp_filter_chain", node_));
 
   msg_in = gen_msg(node_);
 
   EXPECT_TRUE(filter_chain_->update(msg_in, msg_out));
-  
-  for( int i=0; i<10; i++){
-    EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-6);
+
+  for (int i = 0; i < 10; i++) {
+    EXPECT_NEAR(msg_out.ranges[i], expected_msg.ranges[i], 1e-6);
   }
 
   filter_chain_->clear();
@@ -140,8 +138,8 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   sensor_msgs::msg::LaserScan msg_in, msg_out, expected_msg;
   float nanval = std::numeric_limits<float>::quiet_NaN();
   float temp[] = {nanval, 0.1, nanval, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, nanval};
-  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.ranges = v1; 
+  std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.ranges = v1;
 
   EXPECT_TRUE(filter_chain_->configure("shadow_filter_chain", node_));
 
@@ -155,7 +153,7 @@ TEST(ScanToScanFilterChain, ShadowFilter)
 }
 
 //TODO ArrayFilter testcase
-#if 0 
+#if 0
 TEST(ScanToScanFilterChain, ArrayFilter)
 {
   // node handle is created as per ros2
@@ -163,24 +161,24 @@ TEST(ScanToScanFilterChain, ArrayFilter)
 
   sensor_msgs::msg::LaserScan msg_in, msg_out, expected_msg;
   float temp[] = {1.0, 0.4, 1.0, 1.0, 1.0, 6.3333, 1.0, 1.0, 1.0, 1.8667};
-  std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
-  expected_msg.ranges = v1; 
+  std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
+  expected_msg.ranges = v1;
 
   EXPECT_TRUE(filter_chain_->configure("array_filter_chain", node_));
 
   msg_in = gen_msg(node_);
-  
+
   EXPECT_TRUE(filter_chain_->update(msg_in, msg_out));
   float temp2[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
-  std::vector<float> v2 (temp2, temp2 + sizeof(temp2) / sizeof(float));
+  std::vector<float> v2(temp2, temp2 + sizeof(temp2) / sizeof(float));
   msg_in.ranges = v2;
   EXPECT_TRUE(filter_chain_->update(msg_in, msg_out));
   msg_in = gen_msg(node_);
   EXPECT_TRUE(filter_chain_->update(msg_in, msg_out));
-  
-  for( int i=0; i<10; i++){
-    EXPECT_NEAR(msg_out.ranges[i],expected_msg.ranges[i],1e-3);
-    EXPECT_NEAR(msg_out.intensities[i],msg_in.intensities[i],1e-3);
+
+  for (int i = 0; i < 10; i++) {
+    EXPECT_NEAR(msg_out.ranges[i], expected_msg.ranges[i], 1e-3);
+    EXPECT_NEAR(msg_out.intensities[i], msg_in.intensities[i], 1e-3);
   }
 
   filter_chain_->clear();
@@ -194,7 +192,7 @@ TEST(ScanToScanFilterChain, MaskFilter)
   sensor_msgs::msg::LaserScan msg_in, msg_out, expected_msg;
   const float nanval = std::numeric_limits<float>::quiet_NaN();
   const float temp[] = {1.0, nanval, 1.0, 1.0, 1.0, nanval, 1.0, 1.0, 1.0, 2.3};
-  const std::vector<float> v1 (temp, temp + sizeof(temp) / sizeof(float));
+  const std::vector<float> v1(temp, temp + sizeof(temp) / sizeof(float));
   expected_msg.ranges = v1;
 
   EXPECT_TRUE(filter_chain_->configure("mask_filter_chain", node_));
@@ -208,19 +206,19 @@ TEST(ScanToScanFilterChain, MaskFilter)
   filter_chain_->clear();
 }
 
-
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   rclcpp::init(argc, argv);
   ::testing::InitGoogleTest(&argc, argv);
 
-  filter_chain_ = new filters::FilterChain<sensor_msgs::msg::LaserScan>("sensor_msgs::msg::LaserScan");
+  filter_chain_ = new filters::FilterChain<sensor_msgs::msg::LaserScan>(
+    "sensor_msgs::msg::LaserScan");
   int ret = RUN_ALL_TESTS();
   rclcpp::shutdown();
 
-  if(filter_chain_)
-  {
-	  delete filter_chain_;
-	  filter_chain_ = NULL;
+  if (filter_chain_) {
+    delete filter_chain_;
+    filter_chain_ = NULL;
   }
   return ret;
 }

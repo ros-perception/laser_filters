@@ -32,64 +32,71 @@
 
 namespace laser_filters
 {
-LaserArrayFilter::LaserArrayFilter() :
-  num_ranges_(1), range_filter_(NULL), intensity_filter_(NULL)
+LaserArrayFilter::LaserArrayFilter()
+: num_ranges_(1), range_filter_(NULL), intensity_filter_(NULL)
 {
-  
-};
+
+}
 
 bool LaserArrayFilter::configure()
 {
- 
+
   bool found_range_config = node_->get_parameter("range_filter_chain", range_config_);
   bool found_intensity_config = node_->get_parameter("intensity_filter_chain", intensity_config_);
- 
-  if (!found_range_config && !found_intensity_config)
-  {
-    RCLCPP_ERROR(laser_filters_logger, "Cannot Configure LaserArrayFilter: Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params. Filter definitions needed inside for processing range and intensity");
+
+  if (!found_range_config && !found_intensity_config) {
+    RCLCPP_ERROR(laser_filters_logger,
+      "Cannot Configure LaserArrayFilter: Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params. Filter definitions needed inside for processing range and intensity");
     return false;
   }
-  
-  if (range_filter_)
-    delete range_filter_;
 
-  if (intensity_filter_)
+  if (range_filter_) {
+    delete range_filter_;
+  }
+
+  if (intensity_filter_) {
     delete intensity_filter_;
-  
-  if (found_range_config)
-  {
+  }
+
+  if (found_range_config) {
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
     //TODO verify configure param to filters pkg
     //if (!range_filter_->configure(num_ranges_, range_config_))
-    if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_))
+    if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) {
       return false;
+    }
   }
 
-  if (found_intensity_config)
-  {
+  if (found_intensity_config) {
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
     //TODO verify configure param to filters pkg
     //if (!intensity_filter_->configure(num_ranges_, intensity_config_))
-    if (!intensity_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_))
+    if (!intensity_filter_->configure(num_ranges_,
+      FilterBase<sensor_msgs::msg::LaserScan>::node_))
+    {
       return false;
+    }
   }
-  
+
   return true;
-};
+}
 
 LaserArrayFilter::~LaserArrayFilter()
 {
-  if (range_filter_)
+  if (range_filter_) {
     delete range_filter_;
+  }
 
-  if (intensity_filter_)
+  if (intensity_filter_) {
     delete intensity_filter_;
-};
+  }
+}
 
-bool LaserArrayFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
+bool LaserArrayFilter::update(
+  const sensor_msgs::msg::LaserScan & scan_in,
+  sensor_msgs::msg::LaserScan & scan_out)
 {
-  if (!this->configured_) 
-  {
+  if (!this->configured_) {
     RCLCPP_ERROR(laser_filters_logger, "LaserArrayFilter not configured");
     return false;
   }
@@ -97,12 +104,12 @@ bool LaserArrayFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor
   boost::mutex::scoped_lock lock(data_lock);
   scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
-  if (scan_in.ranges.size() != num_ranges_) //Reallocating
-  {
+  if (scan_in.ranges.size() != num_ranges_) { //Reallocating
     num_ranges_ = scan_in.ranges.size();
 
-    RCLCPP_INFO(laser_filters_logger, "LaserArrayFilter cleaning and reallocating due to larger scan size");
-    
+    RCLCPP_INFO(laser_filters_logger,
+      "LaserArrayFilter cleaning and reallocating due to larger scan size");
+
     configure();
   }
 

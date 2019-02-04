@@ -9,11 +9,11 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,7 +32,7 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
@@ -41,7 +41,6 @@
  *
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
-
 
 
 #ifndef BOXFILTER_H
@@ -65,30 +64,30 @@ namespace laser_filters
  */
 class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
-  public:
-    LaserScanBoxFilter();
-    bool configure();
+public:
+  LaserScanBoxFilter();
+  bool configure();
 
-    bool update(
-      const sensor_msgs::msg::LaserScan& input_scan,
-      sensor_msgs::msg::LaserScan& filtered_scan);
+  bool update(
+    const sensor_msgs::msg::LaserScan & input_scan,
+    sensor_msgs::msg::LaserScan & filtered_scan);
 
-  private:
-    bool inBox(Point &point);
-    std::string box_frame_;
-    laser_geometry::LaserProjection projector_;
-    
-    // tf listener to transform scans into the box_frame
-    tf2_ros::TransformListener tf_;
-    //A clock to use for time and sleeping
-    rclcpp::Clock::SharedPtr clock;
-    tf2_ros::Buffer buffer_;
+private:
+  bool inBox(Point & point);
+  std::string box_frame_;
+  laser_geometry::LaserProjection projector_;
 
-    // defines two opposite corners of the box
-    Point min_, max_; 
-    bool up_and_running_;
+  // tf listener to transform scans into the box_frame
+  tf2_ros::TransformListener tf_;
+  //A clock to use for time and sleeping
+  rclcpp::Clock::SharedPtr clock;
+  tf2_ros::Buffer buffer_;
 
-    rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
+  // defines two opposite corners of the box
+  Point min_, max_;
+  bool up_and_running_;
+
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
 }
