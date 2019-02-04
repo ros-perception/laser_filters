@@ -32,16 +32,17 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_RANGE_FILTER_H
-#define LASER_SCAN_RANGE_FILTER_H
+#ifndef LASER_FILTERS__RANGE_FILTER_HPP_
+#define LASER_FILTERS__RANGE_FILTER_HPP_
 /**
 \author Yohei Kakiuchi
 @b ScanRangeFilter takes input scans and filters within indicated range.
 **/
 
+#include <limits>
 
 #include "filters/filter_base.hpp"
-#include <sensor_msgs/msg/laser_scan.hpp>
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 namespace laser_filters
 {
@@ -84,7 +85,6 @@ public:
 
   virtual ~LaserScanRangeFilter()
   {
-
   }
 
   bool update(
@@ -100,7 +100,6 @@ public:
       i < input_scan.ranges.size();
       i++)    // Need to check ever reading in the current scan
     {
-
       if (filtered_scan.ranges[i] <= lower_threshold_) {
         filtered_scan.ranges[i] = lower_replacement_value_;
 
@@ -113,6 +112,6 @@ public:
   }
 };
 
-}
+}  // namespace laser_filters
 
-#endif // LASER_SCAN_RANGE_FILTER_H
+#endif  // LASER_FILTERS__RANGE_FILTER_HPP_

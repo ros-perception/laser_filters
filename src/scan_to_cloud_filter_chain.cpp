@@ -37,17 +37,19 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <float.h>
+#include <string>
+#include <memory>
 
 // TF
-#include <tf2_ros/transform_listener.h>
+#include "tf2_ros/transform_listener.h"
 #include "tf2_ros/message_filter.h"
 #include "message_filters/subscriber.h"
-#include <float.h>
 
 // Laser projection
-#include <laser_geometry/laser_geometry.hpp>
+#include "laser_geometry/laser_geometry.hpp"
 
-//Filters
+// Filters
 #include "filters/filter_chain.hpp"
 
 
@@ -60,7 +62,7 @@ private:
 
 public:
   // ROS related
-  laser_geometry::LaserProjection projector_; // Used to project laser scans
+  laser_geometry::LaserProjection projector_;  // Used to project laser scans
 
   double laser_max_range_;           // Used in laser scan projection
   int window_;
@@ -97,7 +99,7 @@ public:
   bool using_cloud_filters_wrong_deprecated_;
   bool incident_angle_correction_;
 
-  ScanToCloudFilterChain(rclcpp::Node::SharedPtr node)
+  explicit ScanToCloudFilterChain(rclcpp::Node::SharedPtr node)
   : nh(node),
     laser_max_range_(DBL_MAX),
     sub_(nh, "scan"),
@@ -156,7 +158,7 @@ public:
       cloud_pub_ = nh->create_publisher<sensor_msgs::msg::PointCloud2>("cloud_filtered", 10);
     }
 
-    //std::string cloud_filter_xml;
+    // std::string cloud_filter_xml;
 
     if (using_cloud_filters_deprecated_) {
       cloud_filter_chain_.configure("cloud_filters/filter_chain", nh);
@@ -204,29 +206,38 @@ public:
 
     if (using_default_target_frame_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+        "Using '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      RCLCPP_WARN(laser_filters_logger,
+        "Default currently set to 'base_link' please set explicitly as appropriate.");
     }
 
     if (using_cloud_filters_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+        "'~cloud_filters/filter_chain' param in scan_to_cloud_filter_chain has been deprecated");
+      RCLCPP_WARN(laser_filters_logger,
+        "Replace with '~cloud_filter_chain'");
     }
 
     if (using_scan_filters_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+        "'~scan_filters/filter_chain' param in scan_to_cloud_filter_chain has been deprecated.");
+      RCLCPP_WARN(laser_filters_logger,
+        "Replace with '~scan_filter_chain'");
     }
 
     if (using_cloud_filters_wrong_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+        "'~cloud_filters/cloud_filter_chain' param in scan_to_cloud_filter_chain is incorrect.");
+      RCLCPP_WARN(laser_filters_logger,
+        "Please Replace with '~cloud_filter_chain'");
     }
 
     if (using_scan_filters_wrong_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+        "'~scan_filters/scan_filter_chain' param in scan_to_scan_filter_chain is incorrect.");
+      RCLCPP_WARN(laser_filters_logger,
+        "Please Replace with '~scan_filter_chain'");
     }
-
   }
 
   void scanCallback(const std::shared_ptr<const sensor_msgs::msg::LaserScan> & scan_msg)
@@ -239,8 +250,9 @@ public:
     // Project laser into point cloud
     sensor_msgs::msg::PointCloud2 scan_cloud;
 
-    //\TODO CLEAN UP HACK
-    // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
+    // TODO(Rohit): CLEAN UP HACK
+    // This is a trial at correcting for incident angles.
+    // It makes many assumptions that do not generalise
     if (incident_angle_correction_) {
       for (unsigned int i = 0; i < filtered_scan.ranges.size(); i++) {
         double angle = filtered_scan.angle_min + i * filtered_scan.angle_increment;
@@ -263,7 +275,7 @@ public:
           "High fidelity enabled, but TF returned a transform exception to frame %s: %s",
           target_frame_.c_str(), ex.what());
         return;
-        //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
+        // projector_.projectLaser(filtered_scan,scan_cloud,laser_max_range_,preservative_,mask);
       }
     } else {
       projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, buffer_,
@@ -275,7 +287,6 @@ public:
 
     cloud_pub_->publish(filtered_cloud);
   }
-
 };
 
 
@@ -288,10 +299,8 @@ main(int argc, char ** argv)
 
   rclcpp::WallRate loop_rate(200);
   while (rclcpp::ok()) {
-
     rclcpp::spin_some(nh);
     loop_rate.sleep();
-
   }
 
   return 0;

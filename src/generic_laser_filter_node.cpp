@@ -31,12 +31,13 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
+#include <iostream>
+#include <memory>
 // TF
-#include <tf2_ros/transform_listener.h>
+#include "tf2_ros/transform_listener.h"
 #include "tf2_ros/message_filter.h"
 #include "message_filters/subscriber.h"
 #include "filters/filter_chain.hpp"
-#include <iostream>
 
 typedef tf2::TransformException TransformException;
 typedef tf2_ros::TransformListener TransformListener;
@@ -72,7 +73,7 @@ private:
 
 public:
   // Constructor
-  GenericLaserScanFilterNode(rclcpp::Node::SharedPtr nh)
+  explicit GenericLaserScanFilterNode(rclcpp::Node::SharedPtr nh)
   : nh_(nh),
     scan_sub_(nh_, "scan"),
     buffer_(nh->get_clock()),
@@ -101,13 +102,12 @@ public:
     deprecation_timer_ =
       nh_->create_wall_timer(std::chrono::milliseconds(5000),
         std::bind(&GenericLaserScanFilterNode::deprecation_warn, this));
-
   }
 
   void deprecation_warn()
   {
     RCLCPP_WARN(laser_filters_logger,
-      "'generic_laser_filter_node' has been deprecated.  Please switch to 'scan_to_scan_filter_chain'.");
+      "'generic_laser_filter_node' has been deprecated. Please use 'scan_to_scan_filter_chain'.");
   }
 
   // Callback
@@ -129,10 +129,8 @@ int main(int argc, char ** argv)
 
   rclcpp::WallRate loop_rate(200);
   while (rclcpp::ok()) {
-
     rclcpp::spin_some(nh);
     loop_rate.sleep();
-
   }
 
   return 0;

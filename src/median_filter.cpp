@@ -45,7 +45,11 @@ bool LaserMedianFilter::configure()
     parameter_value_))
   {
     RCLCPP_ERROR(laser_filters_logger,
-      "Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
+      "Cannot Configure LaserMedianFilter: ");
+    RCLCPP_ERROR(laser_filters_logger,
+      "Didn't find \"internal_filter\" tag within LaserMedianFilter params.");
+    RCLCPP_ERROR(laser_filters_logger,
+      "Filter definitions needed inside for processing range and intensity");
     return false;
   }
 
@@ -80,30 +84,29 @@ bool LaserMedianFilter::update(
     return false;
   }
   boost::mutex::scoped_lock lock(data_lock);
-  scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
+  scan_out = scan_in;  // Quickly pass through all data \todo don't copy data too
 
 
-  if (scan_in.ranges.size() != num_ranges_) { //Reallocating
+  if (scan_in.ranges.size() != num_ranges_) {  // Reallocating
     RCLCPP_INFO(laser_filters_logger,
       "Laser filter clearning and reallocating due to larger scan size");
     delete range_filter_;
     delete intensity_filter_;
 
-    //TODO: verify node name
+    // TODO(Rohit): verify node name
     auto node = rclcpp::Node::make_shared("scan_filter_chain");
 
     num_ranges_ = scan_in.ranges.size();
 
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
-    //if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
+    // if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
     if (!range_filter_->configure(num_ranges_, node)) {return false;}
 
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
-    //if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
+    // if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
     if (!intensity_filter_->configure(num_ranges_, node)) {return false;}
-
   }
 
   /** \todo check for length of intensities too */
@@ -113,4 +116,4 @@ bool LaserMedianFilter::update(
 
   return true;
 }
-}
+}  // namespace laser_filters

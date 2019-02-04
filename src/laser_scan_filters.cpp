@@ -27,6 +27,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <builtin_interfaces/msg/time.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+
 #include "laser_filters/median_filter.hpp"
 #include "laser_filters/array_filter.hpp"
 #include "laser_filters/intensity_filter.hpp"
@@ -38,9 +41,6 @@
 #include "laser_filters/angular_bounds_filter.hpp"
 #include "laser_filters/angular_bounds_filter_in_place.hpp"
 #include "laser_filters/box_filter.hpp"
-
-#include <builtin_interfaces/msg/time.hpp>
-#include <sensor_msgs/msg/laser_scan.hpp>
 
 #include "filters/filter_base.hpp"
 #include <pluginlib/class_list_macros.hpp>  // NOLINT

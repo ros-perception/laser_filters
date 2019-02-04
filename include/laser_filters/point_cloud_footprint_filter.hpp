@@ -32,14 +32,15 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_FOOTPRINT_FILTER_H
-#define LASER_SCAN_FOOTPRINT_FILTER_H
+#ifndef LASER_FILTERS__POINT_CLOUD_FOOTPRINT_FILTER_HPP_
+#define LASER_FILTERS__POINT_CLOUD_FOOTPRINT_FILTER_HPP_
 /**
 \author Tully Foote
 @b ScanFootprintFilter takes input scans and corrects for footprint angle assuming a flat target.
 This is useful for ground plane extraction
 
 **/
+#include <memory>
 
 #include "laser_geometry/laser_geometry.hpp"
 #include "filters/filter_base.hpp"
@@ -58,7 +59,7 @@ public:
     buffer_(clock), tf_(buffer_)
   {
     RCLCPP_WARN(laser_filters_logger,
-      "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
+      "PointCloudFootprintFilter has been deprecated. Use PR2PointCloudFootprintFilter instead.");
   }
 
   bool configure()
@@ -74,7 +75,6 @@ public:
 
   virtual ~PointCloudFootprintFilter()
   {
-
   }
 
   bool update(
@@ -88,7 +88,7 @@ public:
     sensor_msgs::msg::PointCloud laser_cloud;
 
 #ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
-    // TODO: need to fix this ... implement transformPointClound
+    // TODO(Rohit): need to fix this ... implement transformPointClound
 
     try {
       tf_.transformPointCloud("base_link", input_scan, laser_cloud);
@@ -96,7 +96,7 @@ public:
       RCLCPP_ERROR(laser_filters_logger, "Transform unavailable %s", ex.what());
       return false;
     }
-#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
+#endif  // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
 
     filtered_scan.header = input_scan.header;
     filtered_scan.points.resize(input_scan.points.size());
@@ -149,6 +149,6 @@ private:
   rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
-}
+}  // namespace laser_filters
 
-#endif // LASER_SCAN_FOOTPRINT_FILTER_H
+#endif  // LASER_FILTERS__POINT_CLOUD_FOOTPRINT_FILTER_HPP_

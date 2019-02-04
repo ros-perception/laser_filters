@@ -29,10 +29,14 @@
 
 #include <gtest/gtest.h>
 #include <filters/filter_chain.hpp>
+
+#include <cmath>  // for isnan()
+#include <vector>
+#include <limits>
+
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
-#include <pluginlib/class_loader.hpp>
-#include <cmath> // for isnan()
+#include "pluginlib/class_loader.hpp"
 
 
 filters::FilterChain<sensor_msgs::msg::LaserScan> * filter_chain_;
@@ -152,7 +156,7 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   filter_chain_->clear();
 }
 
-//TODO ArrayFilter testcase
+// TODO(Rohit): ArrayFilter testcase
 #if 0
 TEST(ScanToScanFilterChain, ArrayFilter)
 {

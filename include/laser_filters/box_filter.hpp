@@ -43,11 +43,10 @@
  */
 
 
-#ifndef BOXFILTER_H
-#define BOXFILTER_H
+#ifndef LASER_FILTERS__BOX_FILTER_HPP_
+#define LASER_FILTERS__BOX_FILTER_HPP_
 
 #include <filters/filter_base.hpp>
-
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
@@ -56,6 +55,7 @@ typedef tf2::Vector3 Point;
 
 #include <laser_geometry/laser_geometry.hpp>
 
+#include <string>
 
 namespace laser_filters
 {
@@ -79,7 +79,7 @@ private:
 
   // tf listener to transform scans into the box_frame
   tf2_ros::TransformListener tf_;
-  //A clock to use for time and sleeping
+  // A clock to use for time and sleeping
   rclcpp::Clock::SharedPtr clock;
   tf2_ros::Buffer buffer_;
 
@@ -90,7 +90,6 @@ private:
   rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
-}
+}  // namespace laser_filters
 
-
-#endif /* box_filter.h */
+#endif  // LASER_FILTERS__BOX_FILTER_HPP_

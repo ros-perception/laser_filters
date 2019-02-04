@@ -30,9 +30,11 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <memory>
+#include <string>
 
 // TF
-#include <tf2_ros/transform_listener.h>
+#include "tf2_ros/transform_listener.h"
 #include "tf2_ros/message_filter.h"
 
 #include "message_filters/subscriber.h"
@@ -70,7 +72,7 @@ protected:
 
 public:
   // Constructor
-  ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
+  explicit ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
   : nh_(node),
     scan_sub_(nh_, "scan"),
     buffer_(node->get_clock()),
@@ -123,7 +125,6 @@ public:
     deprecation_timer_ =
       nh_->create_wall_timer(std::chrono::milliseconds(5000),
         std::bind(&ScanToScanFilterChain::deprecation_warn, this));
-
   }
 
   // Destructor
@@ -142,7 +143,9 @@ public:
   {
     if (using_filter_chain_deprecated_) {
       RCLCPP_WARN(laser_filters_logger,
-        "Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
+        "Using '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated.");
+      RCLCPP_WARN(laser_filters_logger,
+        "Please replace with '~scan_filter_chain'.");
     }
   }
 
@@ -151,7 +154,7 @@ public:
   {
     // Run the filter chain
     if (filter_chain_.update(*msg_in, msg_)) {
-      //only publish result if filter succeeded
+      // only publish result if filter succeeded
       output_pub_->publish(msg_);
     }
   }
@@ -165,10 +168,8 @@ int main(int argc, char ** argv)
 
   rclcpp::WallRate loop_rate(200);
   while (rclcpp::ok()) {
-
     rclcpp::spin_some(nh);
     loop_rate.sleep();
-
   }
 
   return 0;

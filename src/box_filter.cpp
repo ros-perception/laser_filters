@@ -42,13 +42,16 @@
  *  author: Sebastian Pütz <spuetz@uni-osnabrueck.de>
  */
 
+#include <memory>
+#include <string>
+#include <limits>
+
 #include "laser_filters/box_filter.hpp"
 
 laser_filters::LaserScanBoxFilter::LaserScanBoxFilter()
 : clock(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME)),
   buffer_(clock), tf_(buffer_)
 {
-
 }
 
 bool laser_filters::LaserScanBoxFilter::configure()
@@ -97,7 +100,6 @@ bool laser_filters::LaserScanBoxFilter::configure()
 
   return box_frame_set && x_max_set && y_max_set && z_max_set &&
          x_min_set && y_min_set && z_min_set;
-
 }
 
 bool laser_filters::LaserScanBoxFilter::update(
@@ -124,7 +126,7 @@ bool laser_filters::LaserScanBoxFilter::update(
       error_msg.c_str());
     return false;
   }
-#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
+#endif  // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
 
   try {
     projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, buffer_);
@@ -146,7 +148,6 @@ bool laser_filters::LaserScanBoxFilter::update(
 
   if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1) {
     RCLCPP_INFO(laser_filters_logger, "x, y, z and index fields are required, skipping scan");
-
   }
 
 
@@ -156,8 +157,8 @@ bool laser_filters::LaserScanBoxFilter::update(
   const int z_idx_offset = laser_cloud.fields[z_idx_c].offset;
 
   const int pstep = laser_cloud.point_step;
-  const long int pcount = laser_cloud.width * laser_cloud.height;
-  const long int limit = pstep * pcount;
+  const int64 pcount = laser_cloud.width * laser_cloud.height;
+  const int64 limit = pstep * pcount;
 
   int i_idx, x_idx, y_idx, z_idx;
   for (
@@ -173,13 +174,12 @@ bool laser_filters::LaserScanBoxFilter::update(
     y_idx += pstep,
     z_idx += pstep)
   {
-
-    // TODO works only for float data types and with an index field
+    // TODO(Rohit): works only for float data types and with an index field
     // I'm working on it, see https://github.com/ros/common_msgs/pull/78
-    float x = *((float *)(&laser_cloud.data[x_idx]));
-    float y = *((float *)(&laser_cloud.data[y_idx]));
-    float z = *((float *)(&laser_cloud.data[z_idx]));
-    int index = *((int *)(&laser_cloud.data[i_idx]));
+    float x = *(reinterpret_cast<float *>(&laser_cloud.data[x_idx]));
+    float y = *(reinterpret_cast<float *>(&laser_cloud.data[y_idx]));
+    float z = *(reinterpret_cast<float *>(&laser_cloud.data[z_idx]));
+    int index = *(reinterpret_cast<int *>(&laser_cloud.data[i_idx]));
 
     Point point(x, y, z);
 
@@ -187,7 +187,7 @@ bool laser_filters::LaserScanBoxFilter::update(
       output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
     }
   }
-#endif // SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
+#endif  // SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
   up_and_running_ = true;
   return true;
 }

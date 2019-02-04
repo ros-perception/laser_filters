@@ -32,19 +32,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_FILTERS_SCAN_MASK_FILTER_H
-#define LASER_FILTERS_SCAN_MASK_FILTER_H
+#ifndef LASER_FILTERS__SCAN_MASK_FILTER_HPP_
+#define LASER_FILTERS__SCAN_MASK_FILTER_HPP_
 /**
 \author Atsushi Watanabe (SEQSENSE, Inc.)
 \brief LaserScanMaskFilter removes points on directions defined in a mask from a laser scan.
 **/
 
-#include "filters/filter_base.hpp"
-#include <sensor_msgs/msg/laser_scan.hpp>
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
+
+#include "filters/filter_base.hpp"
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 namespace laser_filters
 {
@@ -87,7 +88,7 @@ public:
     }
 
 #ifdef ROS2_SUPPORTS_PARAMETER_ARRAYS
-    // TODO: support parameter array
+    // TODO(Rohit): support parameter array
 
     if (config.get_type() == rclcpp::parameter::ParameterType::TypeArray) {
       RCLCPP_ERROR(laser_filters_logger,
@@ -114,7 +115,7 @@ public:
         }
       }
     }
-#endif // ROS2_SUPPORTS_PARAMETER_ARRAYS
+#endif  // ROS2_SUPPORTS_PARAMETER_ARRAYS
 
     return true;
   }
@@ -143,4 +144,4 @@ public:
 
 }  // namespace laser_filters
 
-#endif  // LASER_FILTERS_SCAN_MASK_FILTER_H
+#endif  // LASER_FILTERS__SCAN_MASK_FILTER_HPP_

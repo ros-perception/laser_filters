@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LASER_SCAN_ARRAY_FILTER_H
-#define LASER_SCAN_ARRAY_FILTER_H
+#ifndef LASER_FILTERS__ARRAY_FILTER_HPP_
+#define LASER_FILTERS__ARRAY_FILTER_HPP_
 
 #include <map>
 #include <iostream>
@@ -36,11 +36,10 @@
 
 #include "boost/thread/mutex.hpp"
 #include "boost/scoped_ptr.hpp"
-#include <sensor_msgs/msg/laser_scan.hpp>
+#include "sensor_msgs/msg/laser_scan.hpp"
 #include "filters/median.hpp"
 #include "filters/mean.hpp"
 #include "filters/filter_chain.hpp"
-#include "boost/thread/mutex.hpp"
 
 namespace laser_filters
 {
@@ -64,14 +63,14 @@ public:
   bool update(const sensor_msgs::msg::LaserScan & scan_in, sensor_msgs::msg::LaserScan & scan_out);
 
 private:
-  unsigned int filter_length_; ///How many scans to average over
-  unsigned int num_ranges_; /// How many data point are in each row
+  unsigned int filter_length_;  // How many scans to average over
+  unsigned int num_ranges_;  // How many data point are in each row
 
   rclcpp::Parameter range_config_;
   rclcpp::Parameter intensity_config_;
 
-  boost::mutex data_lock; /// Protection from multi threaded programs
-  sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
+  boost::mutex data_lock;  // Protection from multi threaded programs
+  sensor_msgs::msg::LaserScan temp_scan_;  /** \todo cache only shallow info not full scan */
 
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;
@@ -80,7 +79,6 @@ private:
 };
 
 
-}
+}  // namespace laser_filters
 
-
-#endif //LASER_SCAN_UTILS_LASERSCAN_H
+#endif  // LASER_FILTERS__ARRAY_FILTER_HPP_

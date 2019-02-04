@@ -34,8 +34,8 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
-#define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
+#ifndef LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_
+#define LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_
 
 #include <filters/filter_base.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -79,9 +79,9 @@ public:
     double current_angle = input_scan.angle_min;
     builtin_interfaces::msg::Time start_time = input_scan.header.stamp;
     unsigned int count = 0;
-    //loop through the scan and truncate the beginning and the end of the scan as necessary
+    // loop through the scan and truncate the beginning and the end of the scan as necessary
     for (unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
-      //wait until we get to our desired starting angle
+      // wait until we get to our desired starting angle
       if (start_angle < lower_angle_) {
         start_angle += input_scan.angle_increment;
         current_angle += input_scan.angle_increment;
@@ -89,24 +89,24 @@ public:
       } else {
         filtered_scan.ranges[count] = input_scan.ranges[i];
 
-        //make sure  that we don't update intensity data if its not available
+        // make sure  that we don't update intensity data if its not available
         if (input_scan.intensities.size() > i) {
           filtered_scan.intensities[count] = input_scan.intensities[i];
         }
 
         count++;
 
-        //check if we need to break out of the loop, basically if the next increment will put us over the threshold
+        // check if we need to break out of the loop,
+        // basically if the next increment will put us over the threshold
         if (current_angle + input_scan.angle_increment > upper_angle_) {
           break;
         }
 
         current_angle += input_scan.angle_increment;
-
       }
     }
 
-    //make sure to set all the needed fields on the filtered scan
+    // make sure to set all the needed fields on the filtered scan
     filtered_scan.header.frame_id = input_scan.header.frame_id;
     filtered_scan.header.stamp = start_time;
     filtered_scan.angle_min = start_angle;
@@ -127,8 +127,7 @@ public:
       (int)input_scan.ranges.size() - (int)count);
 
     return true;
-
   }
 };
-}
-#endif
+}  // namespace laser_filters
+#endif  // LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_

@@ -34,8 +34,8 @@
 *
 * Author: Kevin Hallenbeck
 *********************************************************************/
-#ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
-#define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
+#ifndef LASER_FILTERS__ANGULAR_BOUNDS_FILTER_IN_PLACE_HPP_
+#define LASER_FILTERS__ANGULAR_BOUNDS_FILTER_IN_PLACE_HPP_
 
 #include <filters/filter_base.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
@@ -71,11 +71,11 @@ public:
     const sensor_msgs::msg::LaserScan & input_scan,
     sensor_msgs::msg::LaserScan & filtered_scan)
   {
-    filtered_scan = input_scan;     //copy entire message
+    filtered_scan = input_scan;     // copy entire message
 
     double current_angle = input_scan.angle_min;
     unsigned int count = 0;
-    //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
+    // loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
     for (unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
       if ((current_angle > lower_angle_) && (current_angle < upper_angle_)) {
         filtered_scan.ranges[i] = input_scan.range_max + 1.0;
@@ -90,8 +90,7 @@ public:
     RCLCPP_DEBUG(laser_filters_logger, "Filtered out %u points from the laser scan.", count);
 
     return true;
-
   }
 };
-}
-#endif
+}  // namespace laser_filters
+#endif  // LASER_FILTERS__ANGULAR_BOUNDS_FILTER_IN_PLACE_HPP_

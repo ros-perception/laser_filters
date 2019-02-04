@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_FOOTPRINT_FILTER_H
-#define LASER_SCAN_FOOTPRINT_FILTER_H
+#ifndef LASER_FILTERS__FOOTPRINT_FILTER_HPP_
+#define LASER_FILTERS__FOOTPRINT_FILTER_HPP_
 /**
 \author Tully Foote
 @b ScanFootprintFilter takes input scans and corrects for footprint angle assuming a flat target.
@@ -41,15 +41,16 @@ This is useful for ground plane extraction
 
 **/
 
-
-#include "filters/filter_base.hpp"
-
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <sensor_msgs/msg/point_cloud.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 
+#include <memory>
+#include <limits>
+
+#include "filters/filter_base.hpp"
 #include "laser_geometry/laser_geometry.hpp"
 
 namespace laser_filters
@@ -74,7 +75,6 @@ public:
 
   virtual ~LaserScanFootprintFilter()
   {
-
   }
 
   bool update(
@@ -139,7 +139,7 @@ public:
 
 private:
   tf2_ros::TransformListener tf_;
-  //A clock to use for time and sleeping
+  // A clock to use for time and sleeping
   rclcpp::Clock::SharedPtr clock;
   tf2_ros::Buffer buffer_;
   laser_geometry::LaserProjection projector_;
@@ -148,6 +148,6 @@ private:
   rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
-}
+}  // namespace laser_filters
 
-#endif // LASER_SCAN_FOOTPRINT_FILTER_H
+#endif  // LASER_FILTERS__FOOTPRINT_FILTER_HPP_

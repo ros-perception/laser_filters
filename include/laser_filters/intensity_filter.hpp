@@ -32,19 +32,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_INTENSITY_FILTER_H
-#define LASER_SCAN_INTENSITY_FILTER_H
+#ifndef LASER_FILTERS__INTENSITY_FILTER_HPP_
+#define LASER_FILTERS__INTENSITY_FILTER_HPP_
 /**
 \author Vijay Pradeep
 @b ScanIntensityFilter takes input scans and fiters out that are not within the specified range. The filtered out readings are set at >max_range in order to invalidate them.
 
 **/
 
-
+#include <cmath>  // for isnan()
+#include <limits>
 #include "filters/filter_base.hpp"
-#include <sensor_msgs/msg/laser_scan.hpp>
-#include <cmath> // for isnan()
+#include "sensor_msgs/msg/laser_scan.hpp"
 
+#define NUM_BUCKETS 24
 namespace laser_filters
 {
 
@@ -77,9 +78,10 @@ public:
     sensor_msgs::msg::LaserScan & filtered_scan)
   {
     const double hist_max = 4 * 12000.0;
-    const int num_buckets = 24;
-    int histogram[num_buckets];
-    for (int i = 0; i < num_buckets; i++) {
+    // const int num_buckets = 24;
+    // int histogram[num_buckets];
+    int histogram[NUM_BUCKETS];
+    for (int i = 0; i < NUM_BUCKETS; i++) {
       histogram[i] = 0;
     }
 
@@ -102,17 +104,17 @@ public:
       // Calculate histogram
       if (disp_hist_enabled_) {
         // If intensity value is inf or NaN, skip voting histogram
-        if (std::isinf((double)filtered_scan.intensities[i]) ||
-          std::isnan((double)filtered_scan.intensities[i]) )
+        if (std::isinf(static_cast<double>(filtered_scan.intensities[i])) ||
+          std::isnan(static_cast<double>(filtered_scan.intensities[i])) )
         {
           continue;
         }
 
         // Choose bucket to vote on histogram,
         // and check the index of bucket is in the histogram array
-        int cur_bucket = (int)(filtered_scan.intensities[i] / hist_max * num_buckets);
-        if (cur_bucket > num_buckets - 1) {
-          cur_bucket = num_buckets - 1;
+        int cur_bucket = static_cast<int>(filtered_scan.intensities[i] / hist_max * NUM_BUCKETS);
+        if (cur_bucket > NUM_BUCKETS - 1) {
+          cur_bucket = NUM_BUCKETS - 1;
         } else if (cur_bucket < 0) {cur_bucket = 0;}
         histogram[cur_bucket]++;
       }
@@ -121,15 +123,15 @@ public:
     // Display Histogram
     if (disp_hist_enabled_) {
       printf("********** SCAN **********\n");
-      for (int i = 0; i < num_buckets; i++) {
-        printf("%u - %u: %u\n", (unsigned int) hist_max / num_buckets * i,
-          (unsigned int) hist_max / num_buckets * (i + 1),
+      for (int i = 0; i < NUM_BUCKETS; i++) {
+        printf("%u - %u: %u\n", (unsigned int) hist_max / NUM_BUCKETS * i,
+          (unsigned int) hist_max / NUM_BUCKETS * (i + 1),
           histogram[i]);
       }
     }
     return true;
   }
 };
-}
+}  // namespace laser_filters
 
-#endif // LASER_SCAN_INTENSITY_FILTER_H
+#endif  // LASER_FILTERS__INTENSITY_FILTER_HPP_
