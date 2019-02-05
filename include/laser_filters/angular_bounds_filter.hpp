@@ -34,8 +34,8 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
-#define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
+#ifndef LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_
+#define LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_
 
 #include <filters/filter_base.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -43,81 +43,91 @@
 
 namespace laser_filters
 {
-  class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+{
+private:
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
+
+public:
+  double lower_angle_;
+  double upper_angle_;
+
+  bool configure()
   {
-    public:
-      double lower_angle_;
-      double upper_angle_;
+    // Get the parameter value, If the parameter was not set, then assign default value.
+    if (!node_->get_parameter_or("lower_angle", lower_angle_,
+      0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0))
+    {
+      RCLCPP_ERROR(laser_filters_logger,
+        "Both the lower_angle and upper_angle parameters must be set to use this filter.");
+      return false;
+    }
 
-      bool configure()
-      {
-    	// Get the parameter value, If the parameter was not set, then assign default value.
-        if(!node_->get_parameter_or("lower_angle", lower_angle_, 0.0) || !node_->get_parameter_or("upper_angle", upper_angle_, 0.0)){
-          ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
-          return false;
+    return true;
+  }
+
+  virtual ~LaserScanAngularBoundsFilter() {}
+
+  bool update(
+    const sensor_msgs::msg::LaserScan & input_scan,
+    sensor_msgs::msg::LaserScan & filtered_scan)
+  {
+    filtered_scan.ranges.resize(input_scan.ranges.size());
+    filtered_scan.intensities.resize(input_scan.intensities.size());
+
+    double start_angle = input_scan.angle_min;
+    double current_angle = input_scan.angle_min;
+    builtin_interfaces::msg::Time start_time = input_scan.header.stamp;
+    unsigned int count = 0;
+    // loop through the scan and truncate the beginning and the end of the scan as necessary
+    for (unsigned int i = 0; i < input_scan.ranges.size(); ++i) {
+      // wait until we get to our desired starting angle
+      if (start_angle < lower_angle_) {
+        start_angle += input_scan.angle_increment;
+        current_angle += input_scan.angle_increment;
+        start_time.set__sec(start_time.sec + input_scan.time_increment);
+      } else {
+        filtered_scan.ranges[count] = input_scan.ranges[i];
+
+        // make sure  that we don't update intensity data if its not available
+        if (input_scan.intensities.size() > i) {
+          filtered_scan.intensities[count] = input_scan.intensities[i];
         }
 
-        return true;
-      }
+        count++;
 
-      virtual ~LaserScanAngularBoundsFilter(){}
-
-      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
-        filtered_scan.ranges.resize(input_scan.ranges.size());
-        filtered_scan.intensities.resize(input_scan.intensities.size());
-
-        double start_angle = input_scan.angle_min;
-        double current_angle = input_scan.angle_min;
-        builtin_interfaces::msg::Time start_time = input_scan.header.stamp;
-        unsigned int count = 0;
-        //loop through the scan and truncate the beginning and the end of the scan as necessary
-        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-          //wait until we get to our desired starting angle
-          if(start_angle < lower_angle_){
-            start_angle += input_scan.angle_increment;
-            current_angle += input_scan.angle_increment;
-            start_time.set__sec(start_time.sec + input_scan.time_increment);
-          }
-          else{
-            filtered_scan.ranges[count] = input_scan.ranges[i];
-
-            //make sure  that we don't update intensity data if its not available
-            if(input_scan.intensities.size() > i)
-              filtered_scan.intensities[count] = input_scan.intensities[i];
-
-            count++;
-
-            //check if we need to break out of the loop, basically if the next increment will put us over the threshold
-            if(current_angle + input_scan.angle_increment > upper_angle_){
-              break;
-            }
-
-            current_angle += input_scan.angle_increment;
-
-          }
+        // check if we need to break out of the loop,
+        // basically if the next increment will put us over the threshold
+        if (current_angle + input_scan.angle_increment > upper_angle_) {
+          break;
         }
 
-        //make sure to set all the needed fields on the filtered scan
-        filtered_scan.header.frame_id = input_scan.header.frame_id;
-        filtered_scan.header.stamp = start_time;
-        filtered_scan.angle_min = start_angle;
-        filtered_scan.angle_max = current_angle;
-        filtered_scan.angle_increment = input_scan.angle_increment;
-        filtered_scan.time_increment = input_scan.time_increment;
-        filtered_scan.scan_time = input_scan.scan_time;
-        filtered_scan.range_min = input_scan.range_min;
-        filtered_scan.range_max = input_scan.range_max;
-
-        filtered_scan.ranges.resize(count);
-
-        if(input_scan.intensities.size() >= count)
-          filtered_scan.intensities.resize(count);
-
-        ROS_DEBUG("Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
-
-        return true;
-
+        current_angle += input_scan.angle_increment;
       }
-  };
+    }
+
+    // make sure to set all the needed fields on the filtered scan
+    filtered_scan.header.frame_id = input_scan.header.frame_id;
+    filtered_scan.header.stamp = start_time;
+    filtered_scan.angle_min = start_angle;
+    filtered_scan.angle_max = current_angle;
+    filtered_scan.angle_increment = input_scan.angle_increment;
+    filtered_scan.time_increment = input_scan.time_increment;
+    filtered_scan.scan_time = input_scan.scan_time;
+    filtered_scan.range_min = input_scan.range_min;
+    filtered_scan.range_max = input_scan.range_max;
+
+    filtered_scan.ranges.resize(count);
+
+    if (input_scan.intensities.size() >= count) {
+      filtered_scan.intensities.resize(count);
+    }
+
+    RCLCPP_DEBUG(laser_filters_logger, "Filtered out %d points from the laser scan.",
+      (int)input_scan.ranges.size() - (int)count);
+
+    return true;
+  }
 };
-#endif
+}  // namespace laser_filters
+#endif  // LASER_FILTERS__ANGULAR_BOUNDS_FILTER_HPP_

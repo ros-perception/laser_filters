@@ -32,16 +32,17 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_RANGE_FILTER_H
-#define LASER_SCAN_RANGE_FILTER_H
+#ifndef LASER_FILTERS__RANGE_FILTER_HPP_
+#define LASER_FILTERS__RANGE_FILTER_HPP_
 /**
 \author Yohei Kakiuchi
 @b ScanRangeFilter takes input scans and filters within indicated range.
 **/
 
+#include <limits>
 
 #include "filters/filter_base.hpp"
-#include <sensor_msgs/msg/laser_scan.hpp>
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 namespace laser_filters
 {
@@ -49,67 +50,68 @@ namespace laser_filters
 class LaserScanRangeFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-
-  double lower_threshold_ ;
-  double upper_threshold_ ;
-  bool use_message_range_limits_ ;
-  float lower_replacement_value_ ;
-  float upper_replacement_value_ ;
+  double lower_threshold_;
+  double upper_threshold_;
+  bool use_message_range_limits_;
+  float lower_replacement_value_;
+  float upper_replacement_value_;
 
   bool configure()
   {
     // Get the parameter value, If the parameter was not set, then assign default value.
-    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("use_message_range_limits", use_message_range_limits_, false);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("use_message_range_limits",
+      use_message_range_limits_,
+      false);
 
     // work around the not implemented getParam(std::string name, float& value) method
     double temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("lower_replacement_value", temp_replacement_value);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("lower_replacement_value",
+      temp_replacement_value);
     lower_replacement_value_ = static_cast<float>(temp_replacement_value);
 
     // work around the not implemented getParam(std::string name, float& value) method
     temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("upper_replacement_value", temp_replacement_value);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter("upper_replacement_value",
+      temp_replacement_value);
     upper_replacement_value_ = static_cast<float>(temp_replacement_value);
 
     // Get the parameter value, If the parameter was not set, then assign default value.
-    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("lower_threshold", lower_threshold_, 0.0);
-    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("upper_threshold", upper_threshold_, 100000.0) ;
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("lower_threshold",
+      lower_threshold_, 0.0);
+    FilterBase<sensor_msgs::msg::LaserScan>::node_->get_parameter_or("upper_threshold",
+      upper_threshold_, 100000.0);
     return true;
   }
 
   virtual ~LaserScanRangeFilter()
   {
-
   }
 
-  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
+  bool update(
+    const sensor_msgs::msg::LaserScan & input_scan,
+    sensor_msgs::msg::LaserScan & filtered_scan)
   {
-    if (use_message_range_limits_)
-    {
+    if (use_message_range_limits_) {
       lower_threshold_ = input_scan.range_min;
       upper_threshold_ = input_scan.range_max;
     }
     filtered_scan = input_scan;
-    for (unsigned int i=0;
-         i < input_scan.ranges.size();
-         i++) // Need to check ever reading in the current scan
+    for (unsigned int i = 0;
+      i < input_scan.ranges.size();
+      i++)    // Need to check ever reading in the current scan
     {
-
-      if (filtered_scan.ranges[i] <= lower_threshold_)
-      {
+      if (filtered_scan.ranges[i] <= lower_threshold_) {
         filtered_scan.ranges[i] = lower_replacement_value_;
 
-      }
-      else if (filtered_scan.ranges[i] >= upper_threshold_)
-      {
+      } else if (filtered_scan.ranges[i] >= upper_threshold_) {
         filtered_scan.ranges[i] = upper_replacement_value_;
       }
     }
 
     return true;
   }
-} ;
+};
 
-}
+}  // namespace laser_filters
 
-#endif // LASER_SCAN_RANGE_FILTER_H
+#endif  // LASER_FILTERS__RANGE_FILTER_HPP_

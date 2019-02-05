@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LASER_SCAN_MEDIAN_FILTER_H
-#define LASER_SCAN_MEDIAN_FILTER_H
+#ifndef LASER_FILTERS__MEDIAN_FILTER_HPP_
+#define LASER_FILTERS__MEDIAN_FILTER_HPP_
 
 #include <map>
 #include <iostream>
@@ -37,16 +37,16 @@
 #include "boost/thread/mutex.hpp"
 #include "boost/scoped_ptr.hpp"
 
-#include <sensor_msgs/msg/laser_scan.hpp>
+#include "sensor_msgs/msg/laser_scan.hpp"
 #include "filters/median.hpp"
 #include "filters/mean.hpp"
 #include "filters/filter_chain.hpp"
-#include "boost/thread/mutex.hpp"
 
-namespace laser_filters{
+namespace laser_filters
+{
 
 /** \brief A class to provide median filtering of laser scans in time*/
-class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
+class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   /** \brief Constructor
@@ -61,27 +61,25 @@ public:
    * \param scan_in The new scan to filter
    * \param scan_out The filtered scan
    */
-  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
-
+  bool update(const sensor_msgs::msg::LaserScan & scan_in, sensor_msgs::msg::LaserScan & scan_out);
 
 private:
-  unsigned int filter_length_; ///How many scans to average over
-  unsigned int num_ranges_; /// How many data point are in each row
+  unsigned int filter_length_;  // How many scans to average over
+  unsigned int num_ranges_;  // How many data point are in each row
 
-  boost::mutex data_lock; /// Protection from multi threaded programs
+  boost::mutex data_lock;  // Protection from multi threaded programs
   sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
 
   rclcpp::Parameter parameter_value_;
   filters::MultiChannelFilterChain<float> * range_filter_;
   filters::MultiChannelFilterChain<float> * intensity_filter_;
   using FilterBase<sensor_msgs::msg::LaserScan>::node_;
+
+  rclcpp::Logger laser_filters_logger = rclcpp::get_logger("laser_filters");
 };
 
 
+}  // namespace laser_filters
 
 
-
-}
-
-
-#endif //LASER_SCAN_UTILS_LASERSCAN_H
+#endif  // LASER_FILTERS__MEDIAN_FILTER_HPP_
