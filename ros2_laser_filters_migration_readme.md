@@ -67,19 +67,20 @@
   2. The yaml file is redesigned so as to configure multiple laser_filters in sequence.
       Refer below extract of as a sample yaml file:
 	
-        intensity_filter_chain:
-          ros__parameters:
-          name: intensity_threshold
-          type: laser_filters/LaserScanIntensityFilter
-          params: 
-            lower_threshold: 0.5
-            upper_threshold: 3.0
-            disp_histogram: 1
+	intensity_filter_chain:
+	  ros__parameters:
+            name: intensity_threshold
+            type: laser_filters/LaserScanIntensityFilter
+            params: 
+              lower_threshold: 0.5
+              upper_threshold: 3.0
+              disp_histogram: 1
 
         interp_filter_chain:
           ros__parameters:
-          name: interpolation
-          type: laser_filters/InterpolationFilter
+            name: interpolation
+            type: laser_filters/InterpolationFilter
+
 
   3. Xmlrpc variables replaced by string types variables and required modification/changes incorporated.
 
@@ -103,10 +104,12 @@
 
   Here launch files are used independently. Following are the steps to run the test cases independently:
   1. Set the path:
-      cd ~/laser_filters_ws/src/laser_filters
-      source ./install/setup.bash 
+  
+    $ cd ~/laser_filters_ws/src/laser_filters
+    $ source ./install/setup.bash 
 
   2. To run Test cases related to the laser_filters use following command:
-	   $ ros2 launch laser_filters test_scan_filter_chain.launch.py
+    
+    $ ros2 launch laser_filters test_scan_filter_chain.launch.py
 
 
