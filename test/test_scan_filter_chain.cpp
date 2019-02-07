@@ -156,8 +156,6 @@ TEST(ScanToScanFilterChain, ShadowFilter)
   filter_chain_->clear();
 }
 
-// TODO(Rohit): ArrayFilter testcase
-#if 0
 TEST(ScanToScanFilterChain, ArrayFilter)
 {
   // node handle is created as per ros2
@@ -187,7 +185,6 @@ TEST(ScanToScanFilterChain, ArrayFilter)
 
   filter_chain_->clear();
 }
-#endif
 
 TEST(ScanToScanFilterChain, MaskFilter)
 {
