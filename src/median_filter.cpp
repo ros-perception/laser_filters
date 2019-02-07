@@ -28,6 +28,7 @@
  *
  */
 
+#include <string>
 #include "laser_filters/median_filter.hpp"
 
 namespace laser_filters
@@ -53,17 +54,22 @@ bool LaserMedianFilter::configure()
     return false;
   }
 
+  std::string param_name = "";
   if (range_filter_) {delete range_filter_;}
   range_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
-  if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) {
+  if (!range_filter_->configure(param_name, num_ranges_,
+    FilterBase<sensor_msgs::msg::LaserScan>::node_))
+  {
     return false;
   }
 
   if (intensity_filter_) {delete intensity_filter_;}
   intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
-  if (!intensity_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) {
+  if (!intensity_filter_->configure(param_name, num_ranges_,
+    FilterBase<sensor_msgs::msg::LaserScan>::node_))
+  {
     return false;
   }
   return true;
@@ -97,16 +103,16 @@ bool LaserMedianFilter::update(
     auto node = rclcpp::Node::make_shared("scan_filter_chain");
 
     num_ranges_ = scan_in.ranges.size();
-
+    std::string param_name = "";
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
     // if (!range_filter_->configure(num_ranges_, parameter_value_)) return false;
-    if (!range_filter_->configure(num_ranges_, node)) {return false;}
+    if (!range_filter_->configure(param_name, num_ranges_, node)) {return false;}
 
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
 
     // if (!intensity_filter_->configure(num_ranges_, parameter_value_)) return false;
-    if (!intensity_filter_->configure(num_ranges_, node)) {return false;}
+    if (!intensity_filter_->configure(param_name, num_ranges_, node)) {return false;}
   }
 
   /** \todo check for length of intensities too */

@@ -28,6 +28,9 @@
  *
  */
 
+#include <string>
+#include <map>
+
 #include "laser_filters/array_filter.hpp"
 
 namespace laser_filters
@@ -39,19 +42,6 @@ LaserArrayFilter::LaserArrayFilter()
 
 bool LaserArrayFilter::configure()
 {
-  bool found_range_config = node_->get_parameter("range_filter_chain", range_config_);
-  bool found_intensity_config = node_->get_parameter("intensity_filter_chain", intensity_config_);
-
-  if (!found_range_config && !found_intensity_config) {
-    RCLCPP_ERROR(laser_filters_logger,
-      "Cannot Configure LaserArrayFilter: ");
-    RCLCPP_ERROR(laser_filters_logger,
-      "Didn't find \"range_filter\" or \"intensity _filter\" tag within LaserArrayFilter params.");
-    RCLCPP_ERROR(laser_filters_logger,
-      "Filter definitions needed inside for processing range and intensity");
-    return false;
-  }
-
   if (range_filter_) {
     delete range_filter_;
   }
@@ -60,23 +50,55 @@ bool LaserArrayFilter::configure()
     delete intensity_filter_;
   }
 
-  if (found_range_config) {
-    range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    // TODO(Rohit): verify configure param to filters pkg
-    // if (!range_filter_->configure(num_ranges_, range_config_))
-    if (!range_filter_->configure(num_ranges_, FilterBase<sensor_msgs::msg::LaserScan>::node_)) {
-      return false;
+  rcl_interfaces::msg::ListParametersResult parameters_and_prefixes;
+  std::stringstream ss1;
+  std::map<std::string, std::string> filter_param;
+  parameters_and_prefixes = node_->list_parameters({}, 10);
+  for (auto & name : parameters_and_prefixes.names) {
+    for (auto & parameter : node_->get_parameters({name})) {
+      ss1 << "\nParameter name: " << parameter.get_name();
+      ss1 << "\nParameter data_type: " << parameter.get_type();
+      ss1 << "\nParameter value (" << parameter.get_type_name() <<
+        "): " << parameter.value_to_string();
+      filter_param[parameter.get_name()] = parameter.value_to_string();
     }
   }
-
-  if (found_intensity_config) {
-    intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    // TODO(Rohit): verify configure param to filters pkg
-    // if (!intensity_filter_->configure(num_ranges_, intensity_config_))
-    if (!intensity_filter_->configure(num_ranges_,
-      FilterBase<sensor_msgs::msg::LaserScan>::node_))
-    {
-      return false;
+  std::string p_name, param_name;
+  for (std::map<std::string, std::string>::iterator filter_it = filter_param.begin();
+    filter_it != filter_param.end(); ++filter_it)
+  {
+    std::string filter_name = filter_it->first;
+    std::string filter_type = filter_it->second;
+    if (std::string::npos != filter_name.find("type")) {
+      if (std::string::npos != filter_name.find("intensity_filter_chain")) {
+        std::string str2 = "intensity_filter_chain";
+        std::size_t found = filter_name.find(str2);
+        p_name = filter_name.substr(found + str2.length());
+        int pos = filter_name.length() - p_name.length();
+        param_name = filter_name.erase(pos, filter_name.length() + 1);
+        RCLCPP_INFO(laser_filters_logger, "1. In LaserArrayFilter for intensity ");
+        intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
+        if (!intensity_filter_->configure(param_name, num_ranges_,
+          FilterBase<sensor_msgs::msg::LaserScan>::node_))
+        {
+          RCLCPP_INFO(laser_filters_logger, "2. In LaserArrayFilter for intensity ");
+          return false;
+        }
+      } else if (std::string::npos != filter_name.find("range_filter_chain")) {
+        std::string str2 = "range_filter_chain";
+        std::size_t found = filter_name.find(str2);
+        p_name = filter_name.substr(found + str2.length());
+        int pos = filter_name.length() - p_name.length();
+        param_name = filter_name.erase(pos, filter_name.length() + 1);
+        RCLCPP_INFO(laser_filters_logger, "1. In LaserArrayFilter for range ");
+        range_filter_ = new filters::MultiChannelFilterChain<float>("float");
+        if (!range_filter_->configure(param_name, num_ranges_,
+          FilterBase<sensor_msgs::msg::LaserScan>::node_))
+        {
+          RCLCPP_INFO(laser_filters_logger, "2. In LaserArrayFilter for range ");
+          return false;
+        }
+      }
     }
   }
 

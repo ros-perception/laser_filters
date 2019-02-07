@@ -87,8 +87,6 @@
 **Future Work:-**
 
   1. Migrate laser_filters python tests to ros2.
-  2. Migrate laser_filters:ArrayFilter test case to ros2.
-  3. Make Cpp & python code for laser_filters package to be cosmetic rules compliant.
 
 
 **Limitations:**
