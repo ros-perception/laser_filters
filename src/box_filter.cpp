@@ -45,14 +45,13 @@
 #include "laser_filters/box_filter.h"
 #include <ros/ros.h>
 
-laser_filters::LaserScanBoxFilter::LaserScanBoxFilter(){
-
-}
+laser_filters::LaserScanBoxFilter::LaserScanBoxFilter(){}
 
 bool laser_filters::LaserScanBoxFilter::configure(){
   up_and_running_ = true;
   double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
   bool box_frame_set = getParam("box_frame", box_frame_);
+  bool segment = getParam("segment", segment_);
   bool x_max_set = getParam("max_x", max_x);
   bool y_max_set = getParam("max_y", max_y);
   bool z_max_set = getParam("max_z", max_z);
@@ -69,6 +68,9 @@ bool laser_filters::LaserScanBoxFilter::configure(){
   
   if(!box_frame_set){
     ROS_ERROR("box_frame is not set!");
+  }
+  if(!segment){
+    ROS_ERROR("segment is not set!");
   }
   if(!x_max_set){
     ROS_ERROR("max_x is not set!");
@@ -89,7 +91,7 @@ bool laser_filters::LaserScanBoxFilter::configure(){
     ROS_ERROR("min_z is not set!");
   }
 
-  return box_frame_set && x_max_set && y_max_set && z_max_set &&
+  return box_frame_set && segment && x_max_set && y_max_set && z_max_set &&
     x_min_set && y_min_set && z_min_set;
 
 }
@@ -174,8 +176,15 @@ bool laser_filters::LaserScanBoxFilter::update(
 
     tf::Point point(x, y, z);
 
+    if(segment_ == "inside"){
+      if(!inBox(point)){
+        output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+    else if (segment_ == "outside"){
     if(inBox(point)){
       output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
+      }
     }
   }
   up_and_running_ = true;

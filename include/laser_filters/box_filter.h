@@ -74,7 +74,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 
   private:
     bool inBox(tf::Point &point);
-    std::string box_frame_;
+    std::string box_frame_, segment_;
     laser_geometry::LaserProjection projector_;
     
     // tf listener to transform scans into the box_frame
