@@ -1,6 +1,10 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1.8.6 (2019-05-08)
+------------------
+* Changed names LaserScanAngularBound and LaserScanAngularFilterInPlace to fix a plugin bug on how it autocompletes.
+* Included an inversion for the BoxFilter to include scans within a box
 
 1.8.6 (2018-04-11)
 ------------------
