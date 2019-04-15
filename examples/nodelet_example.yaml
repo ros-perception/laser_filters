@@ -1,0 +1,17 @@
+scan_filter_chain:
+- name: angle_1
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: -3.14
+    upper_angle: -1.57
+- name: angle_2
+  type: laser_filters/LaserScanAngularBoundsFilterInPlace
+  params:
+    lower_angle: 1.57
+    upper_angle: 3.14
+- name: intensity
+  type: laser_filters/LaserScanIntensityFilter
+  params:
+    lower_threshold: 1000
+    upper_threshold: 2000
+    disp_histogram: 0

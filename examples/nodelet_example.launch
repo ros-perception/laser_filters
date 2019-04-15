@@ -1,0 +1,9 @@
+<launch>
+    <arg name="manager" value="r2000_nodelet_manager"/>
+
+    <node pkg="nodelet" type="nodelet" name="laser_filters"
+        args="load laser_filters/ScanToScanFilterChain $(arg manager)">
+        <rosparam command="load" file="$(find laser_filters)/examples/nodelet_example.yaml" />
+        <remap from="/laser_filters/scan" to="/r2000_driver_nodelet/scan"/>
+    </node>
+</launch>
