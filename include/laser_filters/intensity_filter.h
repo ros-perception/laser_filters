@@ -89,7 +89,7 @@ public:
     {
       // Is this reading below our lower threshold?
       // Is this reading above our upper threshold?
-      if (filtered_scan.intensities[i] <= lower_threshold_ ||
+      if (filtered_scan.intensities[i] <= lower_threshold_ * ((30 - filtered_scan.ranges[i])/30)||
           filtered_scan.intensities[i] >= upper_threshold_)
       {
         // If so, then make it an invalid value (NaN)
