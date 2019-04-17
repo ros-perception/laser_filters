@@ -33,9 +33,6 @@ target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
 add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_filter.cpp src/array_filter.cpp src/box_filter.cpp)
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
-target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -55,8 +52,7 @@ endif()
 # Install
 ##############################################################################
 
-install(TARGETS pointcloud_filters laser_scan_filters 
-  scan_to_cloud_filter_chain
+install(TARGETS pointcloud_filters laser_scan_filters
   generic_laser_filter_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -70,6 +66,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(FILES laser_filters_plugins.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
 # Nodelet
 add_library(scan_to_scan_filter_chain
     src/scan_to_scan_filter_chain.cpp
@@ -85,3 +82,20 @@ install(TARGETS scan_to_scan_filter_chain
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
+
+# Nodelet
+add_library(scan_to_cloud_filter_chain
+    src/scan_to_cloud_filter_chain.cpp
+)
+target_link_libraries(scan_to_cloud_filter_chain
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
+)
+
+add_dependencies(scan_to_cloud_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+install(TARGETS scan_to_cloud_filter_chain
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+

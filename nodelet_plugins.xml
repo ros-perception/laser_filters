@@ -1,3 +1,4 @@
+<class_libraries>
 <library path="lib/libscan_to_scan_filter_chain">
   <class name="laser_filters/ScanToScanFilterChain"
       type="laser_filters::ScanToScanFilterChain"
@@ -7,3 +8,14 @@
   </description>
   </class>
 </library>
+
+<library path="lib/libscan_to_cloud_filter_chain">
+  <class name="laser_filters/ScanToCloudFilterChain"
+      type="laser_filters::ScanToCloudFilterChain"
+      base_class_type="nodelet::Nodelet">
+  <description>
+  This is my nodelet.
+  </description>
+  </class>
+</library>
+</class_libraries>
