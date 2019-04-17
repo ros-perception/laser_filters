@@ -43,8 +43,9 @@ namespace laser_filters {
     tf_filter_(NULL),
     filter_chain_("sensor_msgs::LaserScan")*/
   {
+		nh_= getNodeHandle();
     private_nh_ = getPrivateNodeHandle();
-    scan_sub_.subscribe(private_nh_, "scan", 50);
+		scan_sub_.subscribe(nh_, "scan", 50);
     filter_chain_ = new filters::FilterChain<sensor_msgs::LaserScan>("sensor_msgs::LaserScan");
     private_nh_.param("filter_chain", using_filter_chain_deprecated_);
 
