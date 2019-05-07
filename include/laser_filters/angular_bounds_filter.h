@@ -37,6 +37,8 @@
 #ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
+#include "ros/ros.h"
+
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
 
@@ -50,9 +52,12 @@ namespace laser_filters
     public:
       double lower_angle_;
       double upper_angle_;
+      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> * server;
+      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
 
       bool configure()
       {
+        ros::NodeHandle nh_("~");
         lower_angle_ = 0;
         upper_angle_ = 0;
 
@@ -61,12 +66,10 @@ namespace laser_filters
           return false;
         }
 
-        dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> server;
-        dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
-
+        server = new dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>(nh_);
         cb = boost::bind(&LaserScanAngularBoundsFilter::dynamicReconfigureCB, this,  _1, _2);
-        server.setCallback(cb);
-
+        server->setCallback(cb);
+        std::cerr << "Callback should be created" << std::endl;
         return true;
       }
 
