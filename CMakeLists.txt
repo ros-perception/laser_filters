@@ -6,12 +6,13 @@ project(laser_filters)
 ##############################################################################
 
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
-  laser_geometry pluginlib angles)
+  laser_geometry pluginlib angles dynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system signals)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
+generate_dynamic_reconfigure_options(config/angular_bounds_filter.cfg)
 ##############################################################################
 # Define package
 ##############################################################################
@@ -76,7 +77,7 @@ target_link_libraries(scan_to_scan_filter_chain
     ${Boost_LIBRARIES}
 )
 
-add_dependencies(scan_to_scan_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(scan_to_scan_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 install(TARGETS scan_to_scan_filter_chain
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -92,10 +93,13 @@ target_link_libraries(scan_to_cloud_filter_chain
     ${Boost_LIBRARIES}
 )
 
-add_dependencies(scan_to_cloud_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(scan_to_cloud_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 install(TARGETS scan_to_cloud_filter_chain
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
+install(DIRECTORY config
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
+)

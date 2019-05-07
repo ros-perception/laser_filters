@@ -40,6 +40,9 @@
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <laser_filters/AngularBoundsFilterConfig.h>
+
 namespace laser_filters
 {
   class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::LaserScan>
@@ -57,6 +60,12 @@ namespace laser_filters
           ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
+
+        dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> server;
+        dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
+
+        cb = boost::bind(&LaserScanAngularBoundsFilter::dynamicReconfigureCB, this,  _1, _2);
+        server.setCallback(cb);
 
         return true;
       }
@@ -119,6 +128,12 @@ namespace laser_filters
         return true;
 
       }
+
+      void dynamicReconfigureCB(laser_filters::AngularBoundsFilterConfig &config, uint32_t level) {
+        lower_angle_ = config.lower_angle;
+        upper_angle_ = config.upper_angle;
+      }
+
   };
 };
 #endif
