@@ -50,12 +50,13 @@ namespace laser_filters
     public:
       double lower_angle_;
       double upper_angle_;
+      std::string filter_id_;
       dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> * server;
       dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
 
       bool configure()
       {
-        ros::NodeHandle nh_("~");
+        ros::NodeHandle nh_("AngularBoundsFilter");
         lower_angle_ = 0;
         upper_angle_ = 0;
 
@@ -80,16 +81,30 @@ namespace laser_filters
         double current_angle = input_scan.angle_min;
         unsigned int count = 0;
         //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
-        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-          if((current_angle > lower_angle_) && (current_angle < upper_angle_)){
-            filtered_scan.ranges[i] = input_scan.range_max + 1.0;
-            if(i < filtered_scan.intensities.size()){
-              filtered_scan.intensities[i] = 0.0;
+        if(lower_angle_ < upper_angle_) {
+            for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
+              if((current_angle > lower_angle_) && (current_angle < upper_angle_)){
+                filtered_scan.ranges[i] = input_scan.range_max + 1.0;
+                if(i < filtered_scan.intensities.size()){
+                  filtered_scan.intensities[i] = 0.0;
+                }
+                count++;
+              }
+              current_angle += input_scan.angle_increment;
             }
-            count++;
-          }
-          current_angle += input_scan.angle_increment;
+        } else if (lower_angle_ > upper_angle_) {
+            for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
+              if(((current_angle > lower_angle_) && (current_angle < 3.14)) || ((current_angle < upper_angle_) && (current_angle > -3.14))){
+                filtered_scan.ranges[i] = input_scan.range_max + 1.0;
+                if(i < filtered_scan.intensities.size()){
+                  filtered_scan.intensities[i] = 0.0;
+                }
+                count++;
+              }
+              current_angle += input_scan.angle_increment;
+            }
         }
+
 
         ROS_DEBUG("Filtered out %u points from the laser scan.", count);
 
