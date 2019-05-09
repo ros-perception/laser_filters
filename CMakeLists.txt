@@ -12,7 +12,9 @@ find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system signals)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-generate_dynamic_reconfigure_options(config/angular_bounds_filter.cfg)
+generate_dynamic_reconfigure_options(
+    config/angular_bounds_filter.cfg
+    config/intensity_filter.cfg)
 ##############################################################################
 # Define package
 ##############################################################################

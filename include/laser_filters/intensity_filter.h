@@ -44,6 +44,10 @@
 #include "filters/filter_base.h"
 #include "sensor_msgs/LaserScan.h"
 
+#include <dynamic_reconfigure/server.h>
+#include <laser_filters/IntensityFilterConfig.h>
+
+
 namespace laser_filters
 {
 
@@ -56,11 +60,21 @@ public:
   int disp_hist_ ;
   bool disp_hist_enabled_;
 
+  dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig> * server;
+  dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig>::CallbackType cb;
+
   bool configure()
   {
+    ros::NodeHandle nh_("~/IntensityFilter");
+
     lower_threshold_ = 8000.0;
     upper_threshold_ = 100000.0;
     disp_hist_ = 1;
+
+    server = new dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig>(nh_);
+    cb = boost::bind(&LaserScanIntensityFilter::dynamicReconfigureCB, this,  _1, _2);
+    server->setCallback(cb);
+
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
@@ -125,6 +139,11 @@ public:
       }
     }
     return true;
+  }
+
+  void dynamicReconfigureCB(laser_filters::IntensityFilterConfig &config, uint32_t level) {
+    lower_threshold_ = config.lower_intensity;
+    upper_threshold_ = config.upper_intensity;
   }
 };
 }
