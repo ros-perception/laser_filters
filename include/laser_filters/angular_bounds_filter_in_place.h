@@ -50,13 +50,13 @@ namespace laser_filters
     public:
       double lower_angle_;
       double upper_angle_;
-      std::string filter_id_;
+
       dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> * server;
       dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
 
       bool configure()
       {
-        ros::NodeHandle nh_("AngularBoundsFilter");
+        ros::NodeHandle nh_("~/AngularBoundsFilter");
         lower_angle_ = 0;
         upper_angle_ = 0;
 
