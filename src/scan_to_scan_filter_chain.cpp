@@ -130,6 +130,8 @@ public:
     {
       //only publish result if filter succeeded
       output_pub_.publish(msg_);
+    } else {
+      ROS_ERROR_THROTTLE(1, "Filtering the scan from time %i.%i failed.", msg_in->header.stamp.sec, msg_in->header.stamp.nsec);
     }
   }
 };
