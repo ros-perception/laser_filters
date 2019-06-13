@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.7 (2019-06-13)
+------------------
 * Merge pull request `#77 <https://github.com/ros-perception/laser_filters/issues/77>`_ from bionade24/indigo-devel
   Removed boost signals from CMakeLists.txt
 * Removed boost signals from CMakeLists.txt
