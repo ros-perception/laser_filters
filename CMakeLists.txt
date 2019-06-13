@@ -9,7 +9,7 @@ set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
   laser_geometry pluginlib angles)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
-find_package(Boost REQUIRED COMPONENTS system signals)
+find_package(Boost REQUIRED COMPONENTS system)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ##############################################################################
