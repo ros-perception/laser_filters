@@ -2,6 +2,32 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#77 <https://github.com/ros-perception/laser_filters/issues/77>`_ from bionade24/indigo-devel
+  Removed boost signals from CMakeLists.txt
+* Removed boost signals from CMakeLists.txt
+  With boost=>1.69 there `signals` isn't available anymore. As it's not necessary, it should be removed to be compatible to all boost versions.
+* Merge pull request `#76 <https://github.com/ros-perception/laser_filters/issues/76>`_ from peci1/fix_travis
+  Fix Travis and move on to Kinetic and Lunar.
+* Fix Travis and move on to Kinetic and Lunar.
+* Merge pull request `#73 <https://github.com/ros-perception/laser_filters/issues/73>`_ from peci1/patch-1
+  Added error message when the filter chain failed.
+* Added error message when the filter chain failed.
+* Merge pull request `#62 <https://github.com/ros-perception/laser_filters/issues/62>`_ from at-wat/optimize-shadows-filter
+  Reduce computation cost of ScanShadowsFilter
+* Merge pull request `#63 <https://github.com/ros-perception/laser_filters/issues/63>`_ from procopiostein/indigo-devel
+  set values for variables that could be used uninitialized
+* Add some comments to ScanShadowDetector
+* set values for variables that could be used uninitialized
+* Reduce computation cost of ScanShadowsFilter
+  ScanShadowsFilter required a lot of CPU power mainly due to atan2.
+  This commit reduces computation cost of the filter.
+  * Remove atan2 and directly compare tangent values
+  * Add a test to check geometric calculation
+* Apply ROS recommended indent style to ScanShadowsFilter
+* Contributors: Atsushi Watanabe, Jonathan Binney, Martin Pecka, Oskar Roesler, Procópio Stein
+
 1.8.6 (2018-04-11)
 ------------------
 * Updated deprecated pluginlib macros to avoid warning messages
