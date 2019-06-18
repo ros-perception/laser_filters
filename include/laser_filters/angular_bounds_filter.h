@@ -42,8 +42,7 @@
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
 
-#include <dynamic_reconfigure/server.h>
-#include <laser_filters/AngularBoundsFilterConfig.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 
 namespace laser_filters
 {
@@ -52,8 +51,7 @@ namespace laser_filters
     public:
       double lower_angle_;
       double upper_angle_;
-      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> * server;
-      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
+      ddynamic_reconfigure::DDynamicReconfigure ddr;
 
       bool configure()
       {
@@ -66,9 +64,10 @@ namespace laser_filters
           return false;
         }
 
-        server = new dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>(nh_);
-        cb = boost::bind(&LaserScanAngularBoundsFilter::dynamicReconfigureCB, this,  _1, _2);
-        server->setCallback(cb);
+        ddr.registerVariable<double>("Lower_angle", &lower_angle_, "Lower angle of the filter", -3.14, 3.14);
+        ddr.registerVariable<double>("Upper_angle", &upper_angle_, "Upper angle of the filter", -3.14, 3.14);
+        ddr.publishServicesTopics();
+
         std::cerr << "Callback should be created" << std::endl;
         return true;
       }
@@ -130,11 +129,6 @@ namespace laser_filters
 
         return true;
 
-      }
-
-      void dynamicReconfigureCB(laser_filters::AngularBoundsFilterConfig &config, uint32_t level) {
-        lower_angle_ = config.lower_angle;
-        upper_angle_ = config.upper_angle;
       }
 
   };

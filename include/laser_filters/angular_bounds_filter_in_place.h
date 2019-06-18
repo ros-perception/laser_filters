@@ -40,8 +40,7 @@
 #include <filters/filter_base.h>
 #include <sensor_msgs/LaserScan.h>
 
-#include <dynamic_reconfigure/server.h>
-#include <laser_filters/AngularBoundsFilterConfig.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 
 namespace laser_filters
 {
@@ -51,8 +50,7 @@ namespace laser_filters
       double lower_angle_;
       double upper_angle_;
 
-      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig> * server;
-      dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>::CallbackType cb;
+      ddynamic_reconfigure::DDynamicReconfigure ddr;
 
       bool configure()
       {
@@ -60,14 +58,15 @@ namespace laser_filters
         lower_angle_ = 0;
         upper_angle_ = 0;
 
-        server = new dynamic_reconfigure::Server<laser_filters::AngularBoundsFilterConfig>(nh_);
-        cb = boost::bind(&LaserScanAngularBoundsFilterInPlace::dynamicReconfigureCB, this,  _1, _2);
-        server->setCallback(cb);
 
         if(!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_)){
           ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
+
+        ddr.registerVariable<double>("Lower_angle", &lower_angle_, "Lower angle of the filter", -3.14, 3.14);
+        ddr.registerVariable<double>("Upper_angle", &upper_angle_, "Upper angle of the filter", -3.14, 3.14);
+        ddr.publishServicesTopics();
 
 
         return true;
@@ -105,6 +104,9 @@ namespace laser_filters
             }
         }
 
+        // For an unknown reason needs to clean the first scan data
+        filtered_scan.intensities[0] = 0.0;
+        filtered_scan.ranges[0] = 31.0;
 
         ROS_DEBUG("Filtered out %u points from the laser scan.", count);
 
@@ -112,10 +114,10 @@ namespace laser_filters
 
       }
 
-      void dynamicReconfigureCB(laser_filters::AngularBoundsFilterConfig &config, uint32_t level) {
+      /*void dynamicReconfigureCB(laser_filters::AngularBoundsFilterConfig &config, uint32_t level) {
         lower_angle_ = config.lower_angle;
         upper_angle_ = config.upper_angle;
-      }
+      }*/
   };
 };
 #endif

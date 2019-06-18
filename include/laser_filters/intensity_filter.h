@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2008, Willow Garage, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -44,9 +44,7 @@
 #include "filters/filter_base.h"
 #include "sensor_msgs/LaserScan.h"
 
-#include <dynamic_reconfigure/server.h>
-#include <laser_filters/IntensityFilterConfig.h>
-
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 
 namespace laser_filters
 {
@@ -59,9 +57,7 @@ public:
   double upper_threshold_ ;
   int disp_hist_ ;
   bool disp_hist_enabled_;
-
-  dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig> * server;
-  dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig>::CallbackType cb;
+  ddynamic_reconfigure::DDynamicReconfigure ddr;
 
   bool configure()
   {
@@ -71,13 +67,14 @@ public:
     upper_threshold_ = 100000.0;
     disp_hist_ = 1;
 
-    server = new dynamic_reconfigure::Server<laser_filters::IntensityFilterConfig>(nh_);
-    cb = boost::bind(&LaserScanIntensityFilter::dynamicReconfigureCB, this,  _1, _2);
-    server->setCallback(cb);
-
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
+
+
+    ddr.registerVariable<double>("Lower_intensity", &lower_threshold_, "Lower intensity threshold", 0, 3000);
+    ddr.registerVariable<double>("Upper_intensity", &upper_threshold_, "Upper intensity threshold", 0, 3000);
+    ddr.publishServicesTopics();
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
@@ -141,10 +138,6 @@ public:
     return true;
   }
 
-  void dynamicReconfigureCB(laser_filters::IntensityFilterConfig &config, uint32_t level) {
-    lower_threshold_ = config.lower_intensity;
-    upper_threshold_ = config.upper_intensity;
-  }
 };
 }
 
