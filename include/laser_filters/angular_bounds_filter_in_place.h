@@ -54,7 +54,7 @@ namespace laser_filters
 
       bool configure()
       {
-        ros::NodeHandle nh_("~/AngularBoundsFilter");
+        ros::NodeHandle nh_("~/AngularBoundsInPlaceFilter");
         lower_angle_ = 0;
         upper_angle_ = 0;
 
