@@ -9,3 +9,4 @@ scan_filter_chain:
     min_x: -0.45
     min_y: -0.34
     min_z: -0.28
+    invert: false

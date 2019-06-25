@@ -82,6 +82,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
     
     // defines two opposite corners of the box
     tf::Point min_, max_; 
+    bool invert_filter;
     bool up_and_running_;
 };
 
