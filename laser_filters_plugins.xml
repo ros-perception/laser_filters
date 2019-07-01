@@ -66,6 +66,13 @@
 	DEPRECATED: This is a filter which filters points out of a laser scan which are inside the inscribed radius.
       </description>
     </class>
+    <class name="laser_filters/ScanBlobFilter"
+           type="laser_filters::ScanBlobFilter"
+               base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+        This is a filter which extract blob object (human's foot, chair's foot) from a laser.
+      </description>
+    </class>
   </library>
   <library path="lib/libpointcloud_filters">
     <class name="laser_filters/PointCloudFootprintFilter" type="laser_filters::PointCloudFootprintFilter" 
