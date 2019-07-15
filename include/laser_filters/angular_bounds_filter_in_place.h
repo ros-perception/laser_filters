@@ -50,7 +50,7 @@ namespace laser_filters
       double lower_angle_;
       double upper_angle_;
 
-      ddynamic_reconfigure::DDynamicReconfigure ddr;
+      std::shared_ptr<ddynamic_reconfigure::DDynamicReconfigure> ddr;
 
       bool configure()
       {
@@ -64,9 +64,10 @@ namespace laser_filters
           return false;
         }
 
-        ddr.registerVariable<double>("Lower_angle", &lower_angle_, "Lower angle of the filter", -3.14, 3.14);
-        ddr.registerVariable<double>("Upper_angle", &upper_angle_, "Upper angle of the filter", -3.14, 3.14);
-        ddr.publishServicesTopics();
+        ddr = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(nh_);
+        ddr->registerVariable<double>("Lower_angle", &lower_angle_, "Lower angle of the filter", -3.14, 3.14);
+        ddr->registerVariable<double>("Upper_angle", &upper_angle_, "Upper angle of the filter", -3.14, 3.14);
+        ddr->publishServicesTopics();
 
 
         return true;

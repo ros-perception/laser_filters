@@ -57,7 +57,7 @@ public:
   double upper_threshold_ ;
   int disp_hist_ ;
   bool disp_hist_enabled_;
-  ddynamic_reconfigure::DDynamicReconfigure ddr;
+  std::shared_ptr<ddynamic_reconfigure::DDynamicReconfigure> ddr;
 
   bool configure()
   {
@@ -67,14 +67,15 @@ public:
     upper_threshold_ = 100000.0;
     disp_hist_ = 1;
 
+    ddr = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(nh_);
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
 
 
-    ddr.registerVariable<double>("Lower_intensity", &lower_threshold_, "Lower intensity threshold", 0, 3000);
-    ddr.registerVariable<double>("Upper_intensity", &upper_threshold_, "Upper intensity threshold", 0, 3000);
-    ddr.publishServicesTopics();
+    ddr->registerVariable<double>("Lower_intensity", &lower_threshold_, "Lower intensity threshold", 0, 3000);
+    ddr->registerVariable<double>("Upper_intensity", &upper_threshold_, "Upper intensity threshold", 0, 3000);
+    ddr->publishServicesTopics();
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
