@@ -63,8 +63,7 @@ public:
   double laser_max_range_;           // Used in laser scan projection
   int window_;
     
-  bool high_fidelity_;                    // High fidelity (interpolating time across scan)
-  std::string target_frame_;                   // Target frame for high fidelity result
+  std::string target_frame_;
   std::string scan_topic_, cloud_topic_;
 
   ros::NodeHandle nh;
@@ -98,7 +97,6 @@ public:
   ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
                    cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
   {
-    private_nh.param("high_fidelity", high_fidelity_, false);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
     private_nh.param("target_frame", target_frame_, std::string ("base_link"));
 
@@ -194,8 +192,6 @@ public:
   void
   scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_msg)
   {
-    //    sensor_msgs::LaserScan scan_msg = *scan_in;
-
     sensor_msgs::LaserScan filtered_scan;
     scan_filter_chain_.update (*scan_msg, filtered_scan);
 
@@ -218,8 +214,11 @@ public:
       laser_geometry::channel_option::Distance |
       laser_geometry::channel_option::Index |
       laser_geometry::channel_option::Timestamp;
-      
-    if (high_fidelity_)
+     
+    // wait for max 0.1 second for transform to be available and output arror otherwise
+    if (tf_.waitForTransform(filtered_scan.header.frame_id, target_frame_, 
+       filtered_scan.header.stamp + ros::Duration(filtered_scan.ranges.size() * filtered_scan.time_increment), 
+       ros::Duration(0.1)))
     {
       try
       {
@@ -227,14 +226,14 @@ public:
       }
       catch (tf::TransformException &ex)
       {
-        ROS_WARN("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
+        ROS_WARN("TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
         return;
-        //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
       }
     }
     else
     {
-      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
+      ROS_WARN("Transform %s to %s not available at this time.", target_frame_.c_str (), filtered_scan.header.frame_id.c_str());
+      return;
     }
       
     sensor_msgs::PointCloud2 filtered_cloud;
@@ -243,7 +242,7 @@ public:
     cloud_pub_.publish(filtered_cloud);
   }
 
-} ;
+};
 
 
 
