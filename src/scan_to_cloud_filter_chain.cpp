@@ -223,7 +223,7 @@ public:
     {
       try
       {
-        projector_.transformLaserScanToPointCloud (target_frame_, filtered_scan, scan_cloud, tf_, mask);
+        projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
       }
       catch (tf::TransformException &ex)
       {
