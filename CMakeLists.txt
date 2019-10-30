@@ -9,7 +9,7 @@ set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
   laser_geometry pluginlib angles ddynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
-find_package(Boost REQUIRED COMPONENTS system signals)
+find_package(Boost REQUIRED COMPONENTS system)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 generate_dynamic_reconfigure_options(
@@ -48,7 +48,7 @@ target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBR
 if (CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
-  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} gtest)
+  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} ${GTEST_LIBRARIES})
   add_dependencies(test_scan_filter_chain gtest)
 
   add_rostest(test/test_scan_filter_chain.launch)
