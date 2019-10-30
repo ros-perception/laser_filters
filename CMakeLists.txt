@@ -79,33 +79,33 @@ install(FILES laser_filters_plugins.xml
 )
 
 # Nodelet
-add_library(scan_to_scan_filter_chain
-    src/scan_to_scan_filter_chain.cpp
+add_library(scan_to_scan_filter_chain_nodelet
+    src/scan_to_scan_filter_chain_nodelet.cpp
 )
-target_link_libraries(scan_to_scan_filter_chain
+target_link_libraries(scan_to_scan_filter_chain_nodelet
     ${catkin_LIBRARIES}
     ${Boost_LIBRARIES}
 )
 
-add_dependencies(scan_to_scan_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(scan_to_scan_filter_chain_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
-install(TARGETS scan_to_scan_filter_chain
+install(TARGETS scan_to_scan_filter_chain_nodelet
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 # Nodelet
-add_library(scan_to_cloud_filter_chain
-    src/scan_to_cloud_filter_chain.cpp
+add_library(scan_to_cloud_filter_chain_nodelet
+    src/scan_to_cloud_filter_chain_nodelet.cpp
 )
-target_link_libraries(scan_to_cloud_filter_chain
+target_link_libraries(scan_to_cloud_filter_chain_nodelet
     ${catkin_LIBRARIES}
     ${Boost_LIBRARIES}
 )
 
-add_dependencies(scan_to_cloud_filter_chain ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(scan_to_cloud_filter_chain_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
-install(TARGETS scan_to_cloud_filter_chain
+install(TARGETS scan_to_cloud_filter_chain_nodelet
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
