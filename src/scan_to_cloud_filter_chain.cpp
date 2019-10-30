@@ -34,26 +34,70 @@
 
  */
 
-#include <laser_filters/scan_to_cloud_filter_chain.h>
-#include <pluginlib/class_list_macros.hpp>
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/LaserScan.h>
 
-PLUGINLIB_EXPORT_CLASS(laser_filters::ScanToCloudFilterChain, nodelet::Nodelet)
+#include <float.h>
 
+// Laser projection
+#include <laser_geometry/laser_geometry.h>
+
+// TF
+#include <tf/transform_listener.h>
+#include "tf/message_filter.h"
+#include "message_filters/subscriber.h"
+
+//Filters
+#include "filters/filter_chain.h"
 
 /** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
  */
-namespace laser_filters {
+class ScanToCloudFilterChain
+{
+public:
+
+  // ROS related
+  laser_geometry::LaserProjection projector_; // Used to project laser scans
+
+  double laser_max_range_;           // Used in laser scan projection
+  int window_;
+    
+  bool high_fidelity_;                    // High fidelity (interpolating time across scan)
+  std::string target_frame_;                   // Target frame for high fidelity result
+  std::string scan_topic_, cloud_topic_;
+
+  ros::NodeHandle nh;
+  ros::NodeHandle private_nh;
+    
+  // TF
+  tf::TransformListener tf_;
+
+  message_filters::Subscriber<sensor_msgs::LaserScan> sub_;
+  tf::MessageFilter<sensor_msgs::LaserScan> filter_;
+
+  double tf_tolerance_;
+  filters::FilterChain<sensor_msgs::PointCloud2> cloud_filter_chain_;
+  filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
+  ros::Publisher cloud_pub_;
+
+  // Timer for displaying deprecation warnings
+  ros::Timer deprecation_timer_;
+  bool  using_scan_topic_deprecated_;
+  bool  using_cloud_topic_deprecated_;
+  bool  using_default_target_frame_deprecated_;
+  bool  using_laser_max_range_deprecated_;
+  bool  using_filter_window_deprecated_;
+  bool  using_scan_filters_deprecated_;
+  bool  using_cloud_filters_deprecated_;
+  bool  using_scan_filters_wrong_deprecated_;
+  bool  using_cloud_filters_wrong_deprecated_;
+  bool  incident_angle_correction_;
 
   ////////////////////////////////////////////////////////////////////////////////
-  void ScanToCloudFilterChain::onInit () {
-    laser_max_range_ = DBL_MAX;
-    nh = getNodeHandle();
-    private_nh = getPrivateNodeHandle();
-    filter_ = new tf::MessageFilter<sensor_msgs::LaserScan>(tf_, "", 50);
-    cloud_filter_chain_ = new filters::FilterChain<sensor_msgs::PointCloud2>("sensor_msgs::PointCloud2");
-    scan_filter_chain_ = new filters::FilterChain<sensor_msgs::LaserScan>("sensor_msgs::LaserScan");
-
-
+  ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
+                   cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
+  {
     private_nh.param("high_fidelity", high_fidelity_, false);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
     private_nh.param("target_frame", target_frame_, std::string ("base_link"));
@@ -78,16 +122,16 @@ namespace laser_filters {
     private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
     private_nh.param("incident_angle_correction", incident_angle_correction_, true);
 
-    filter_->setTargetFrame(target_frame_);
-    filter_->registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
-    filter_->setTolerance(ros::Duration(tf_tolerance_));
+    filter_.setTargetFrame(target_frame_);
+    filter_.registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
+    filter_.setTolerance(ros::Duration(tf_tolerance_));
 
     if (using_scan_topic_deprecated_)
       sub_.subscribe(nh, scan_topic_, 50);
     else
       sub_.subscribe(nh, "scan", 50);
 
-    filter_->connectInput(sub_);
+    filter_.connectInput(sub_);
 
     if (using_cloud_topic_deprecated_)
       cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_, 10);
@@ -97,32 +141,24 @@ namespace laser_filters {
     std::string cloud_filter_xml;
 
     if (using_cloud_filters_deprecated_)
-      cloud_filter_chain_->configure("cloud_filters/filter_chain", private_nh);
+      cloud_filter_chain_.configure("cloud_filters/filter_chain", private_nh);
     else if (using_cloud_filters_wrong_deprecated_)
-      cloud_filter_chain_->configure("cloud_filters/cloud_filter_chain", private_nh);
+      cloud_filter_chain_.configure("cloud_filters/cloud_filter_chain", private_nh);
     else
-      cloud_filter_chain_->configure("cloud_filter_chain", private_nh);
+      cloud_filter_chain_.configure("cloud_filter_chain", private_nh);
 
     if (using_scan_filters_deprecated_)
-      scan_filter_chain_->configure("scan_filter/filter_chain", private_nh);
+      scan_filter_chain_.configure("scan_filter/filter_chain", private_nh);
     else if (using_scan_filters_wrong_deprecated_)
-      scan_filter_chain_->configure("scan_filters/scan_filter_chain", private_nh);
+      scan_filter_chain_.configure("scan_filters/scan_filter_chain", private_nh);
     else
-      scan_filter_chain_->configure("scan_filter_chain", private_nh);
+      scan_filter_chain_.configure("scan_filter_chain", private_nh);
 
     deprecation_timer_ = nh.createTimer(ros::Duration(5.0), boost::bind(&ScanToCloudFilterChain::deprecation_warn, this, _1));
   }
 
-  ScanToCloudFilterChain::ScanToCloudFilterChain() {
-
-  }
-
-  ScanToCloudFilterChain::~ScanToCloudFilterChain() {
-
-  }
-
   // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
-  void ScanToCloudFilterChain::deprecation_warn(const ros::TimerEvent& e)
+  void deprecation_warn(const ros::TimerEvent& e)
   {
     if (using_scan_topic_deprecated_)
       ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
@@ -155,12 +191,13 @@ namespace laser_filters {
 
 
   ////////////////////////////////////////////////////////////////////////////////
-  void ScanToCloudFilterChain::scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_msg)
+  void
+  scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_msg)
   {
     //    sensor_msgs::LaserScan scan_msg = *scan_in;
 
     sensor_msgs::LaserScan filtered_scan;
-    scan_filter_chain_->update (*scan_msg, filtered_scan);
+    scan_filter_chain_.update (*scan_msg, filtered_scan);
 
     // Project laser into point cloud
     sensor_msgs::PointCloud2 scan_cloud;
@@ -186,7 +223,7 @@ namespace laser_filters {
     {
       try
       {
-        projector_.transformLaserScanToPointCloud (target_frame_, filtered_scan, scan_cloud, tf_, mask);
+        projector_.transformLaserScanToPointCloud (target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
       }
       catch (tf::TransformException &ex)
       {
@@ -201,11 +238,25 @@ namespace laser_filters {
     }
       
     sensor_msgs::PointCloud2 filtered_cloud;
-    cloud_filter_chain_->update (scan_cloud, filtered_cloud);
+    cloud_filter_chain_.update (scan_cloud, filtered_cloud);
 
     cloud_pub_.publish(filtered_cloud);
   }
 
+} ;
+
+
+
+int
+main (int argc, char** argv)
+{
+  ros::init (argc, argv, "scan_to_cloud_filter_chain");
+  ros::NodeHandle nh;
+  ScanToCloudFilterChain f;
+
+  ros::spin();
+
+  return (0);
 }
 
 

@@ -30,6 +30,12 @@ catkin_package(
 # Build
 ##############################################################################
 
+add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
+target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
+target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 add_library(pointcloud_filters src/pointcloud_filters.cpp)
 target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
 
@@ -56,6 +62,8 @@ endif()
 ##############################################################################
 
 install(TARGETS pointcloud_filters laser_scan_filters
+  scan_to_cloud_filter_chain
+  scan_to_scan_filter_chain
   generic_laser_filter_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
