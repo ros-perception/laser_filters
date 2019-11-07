@@ -1,0 +1,12 @@
+<library path="lib/liblaser_scan_filters">
+  <class name="laser_filters/ScanToScanFilterChainNodelet" type="laser_filters::ScanToScanFilterChainNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      Nodelet to run a laser scan to laser scan filter chain.
+    </description>
+  </class>
+  <class name="laser_filters/ScanToCloudFilterChainNodelet" type="laser_filters::ScanToCloudFilterChainNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      Nodelet to run a laser scan to point cloud filter chain.
+    </description>
+  </class>
+</library>

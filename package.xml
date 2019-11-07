@@ -22,6 +22,7 @@
   <build_depend>pluginlib</build_depend>
   <build_depend>rostest</build_depend>
   <build_depend>angles</build_depend>
+  <build_depend>nodelet</build_depend>
 
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
@@ -31,9 +32,11 @@
   <run_depend>laser_geometry</run_depend>
   <run_depend>pluginlib</run_depend>
   <run_depend>angles</run_depend>
+  <run_depend>nodelet</run_depend>
 
   <export>
     <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
     <filters plugin="${prefix}/laser_filters_plugins.xml"/>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml"/>
   </export>
 </package>
