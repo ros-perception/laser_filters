@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.8 (2019-11-07)
+------------------
 * Merge pull request `#83 <https://github.com/ros-perception/laser_filters/issues/83>`_ from remco-r/indigo-devel
   [fix] when high fidelity true added laser_max_range\_ to projection
 * [fix] when high fidelity true added laser_max_range\_ to projection
