@@ -63,7 +63,7 @@ public:
   // Constructor
   CloudToCloudFilterChain() :
     private_nh_("~"),
-    scan_sub_(nh_, "/camera/depth/color/pointsFilteredFinal", 50),
+    scan_sub_(nh_, "cloud_in", 50),
     tf_(NULL),
     tf_filter_(NULL),
     filter_chain_("sensor_msgs::PointCloud2")
