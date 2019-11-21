@@ -100,7 +100,7 @@ public:
     }
 
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("pointcloud_filtered", 1000);
+    output_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("cloud_out", 1000);
 
     // Set up deprecation printout
     deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&CloudToCloudFilterChain::deprecation_warn, this, _1));
