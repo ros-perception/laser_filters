@@ -51,8 +51,6 @@ public:
             absolute_mean_difference = absolute_mean_difference/window_size_;
             double delta_treshold = current_max_range * percent_max_dist_;
 
-            ROS_INFO_STREAM("AMD = " << absolute_mean_difference);
-            ROS_INFO_STREAM("delta_treshold = " << delta_treshold);
             if(absolute_mean_difference < delta_treshold) {
                 for(unsigned int j=i; j < i+window_size_; j++) {
                     filtered_scan.ranges[j] = input_scan.ranges[j];
