@@ -10,28 +10,26 @@ namespace laser_filters {
 
 class LaserScanMeanShadowFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
 public:
-    unsigned int window_size_;
+    int window_size_;
     double percent_max_dist_;
     std::shared_ptr<ddynamic_reconfigure::DDynamicReconfigure> ddr;
 
 
     bool configure() {
         ros::NodeHandle nh_("~/scan_median_shadow_filter");
-        ROS_INFO("Configuring filter");
-//        ddr = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(nh_);
+
+        ddr = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(nh_);
 
         getParam("window_size", window_size_);
         getParam("percent_max_dist", percent_max_dist_);
 
-//        ddr->registerVariable<unsigned int>("Window size", &window_size_, "Filter window size", 0, 16);
-//        ddr->registerVariable<double>("Percent max dist", &percent_max_dist_, "Percentage of the max distance in the window that will create the threshold", 0, 1);
-//        ROS_INFO("Filter configured");
+        ddr->registerVariable<int>("window_size", &window_size_, "Filter window size", 0, 16);
+        ddr->registerVariable<double>("percent_max_dist", &percent_max_dist_, "Percentage of the max distance in the window that will create the threshold", 0, 1);
+        ddr->publishServicesTopics();
         return true;
     }
 
-    virtual ~LaserScanMeanShadowFilter() {
-
-    }
+    virtual ~LaserScanMeanShadowFilter() {}
 
     bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) {
         double current_max_range;
@@ -48,11 +46,13 @@ public:
                 if(input_scan.ranges[j] > current_max_range) {
                     current_max_range = input_scan.ranges[j];
                 }
-                absolute_mean_difference = abs(input_scan.ranges[j+1] - input_scan.ranges[j]);
+                absolute_mean_difference = absolute_mean_difference + abs(input_scan.ranges[j+1] - input_scan.ranges[j]);
             }
             absolute_mean_difference = absolute_mean_difference/window_size_;
             double delta_treshold = current_max_range * percent_max_dist_;
 
+            ROS_INFO_STREAM("AMD = " << absolute_mean_difference);
+            ROS_INFO_STREAM("delta_treshold = " << delta_treshold);
             if(absolute_mean_difference < delta_treshold) {
                 for(unsigned int j=i; j < i+window_size_; j++) {
                     filtered_scan.ranges[j] = input_scan.ranges[j];
