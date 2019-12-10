@@ -12,6 +12,12 @@
 	This is a filter which filters sensor_msgs::LaserScan messages based on intensity
       </description>
     </class>
+    <class name="laser_filters/LaserScanMeanShadowFilter" type="laser_filters::LaserScanMeanShadowFilter"
+            base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+        This is a filter which filters sensor_msgs::LaserScan messages based on mean shadow
+      </description>
+    </class>
     <class name="laser_filters/LaserScanRangeFilter" type="laser_filters::LaserScanRangeFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
