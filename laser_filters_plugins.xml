@@ -18,6 +18,12 @@
         This is a filter which filters sensor_msgs::LaserScan messages based on mean shadow
       </description>
     </class>
+    <class name="laser_filters/LaserScanStdDeviationFilter" type="laser_filters::LaserScanStdDeviationFilter"
+            base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+        This is a filter which filters sensor_msgs::LaserScan messages based on mean shadow
+      </description>
+    </class>
     <class name="laser_filters/LaserScanRangeFilter" type="laser_filters::LaserScanRangeFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
