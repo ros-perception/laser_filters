@@ -113,6 +113,23 @@ install(TARGETS scan_to_cloud_filter_chain_nodelet
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
+# Nodelet
+add_library(cloud_to_cloud_filter_chain_nodelet
+    src/cloud_to_cloud_filter_chain_nodelet.cpp
+)
+target_link_libraries(cloud_to_cloud_filter_chain_nodelet
+    ${catkin_LIBRARIES}
+    ${Boost_LIBRARIES}
+)
+
+add_dependencies(cloud_to_cloud_filter_chain_nodelet ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+install(TARGETS cloud_to_cloud_filter_chain_nodelet
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+
 install(DIRECTORY config
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config
 )

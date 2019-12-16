@@ -18,4 +18,14 @@
   </description>
   </class>
 </library>
+
+<library path="lib/libcloud_to_cloud_filter_chain">
+  <class name="laser_filters/CloudToCloudFilterChain"
+      type="laser_filters::CloudToCloudFilterChain"
+      base_class_type="nodelet::Nodelet">
+  <description>
+  This is my nodelet.
+  </description>
+  </class>
+</library>
 </class_libraries>
