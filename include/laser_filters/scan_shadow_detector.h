@@ -75,6 +75,24 @@ public:
     }
     return false;
   }
+
+  void reconfigure_min_angle(double min_angle) {
+      min_angle_tan_ = tanf(min_angle);
+
+      std::cout << "New min angle : " << min_angle << std::endl;
+      // Correct sign of tan around singularity points
+      if (min_angle_tan_ < 0.0)
+        min_angle_tan_ = -min_angle_tan_;
+  }
+
+  void reconfigure_max_angle(double max_angle) {
+      max_angle_tan_ = tanf(max_angle);
+
+      std::cout << "New max angle : " << max_angle << std::endl;
+      // Correct sign of tan around singularity points
+      if (max_angle_tan_ > 0.0)
+        max_angle_tan_ = -max_angle_tan_;
+  }
 };
 }
 

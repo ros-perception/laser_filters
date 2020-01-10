@@ -44,6 +44,8 @@
 #include <sensor_msgs/LaserScan.h>
 #include <angles/angles.h>
 
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
+
 namespace laser_filters
 {
 /** @b ScanShadowsFilter is a simple filter that filters shadow points in a laser scan line 
@@ -57,6 +59,7 @@ public:
   int window_, neighbors_;
 
   ScanShadowDetector shadow_detector_;
+  std::shared_ptr<ddynamic_reconfigure::DDynamicReconfigure> ddr;
 
   ////////////////////////////////////////////////////////////////////////////////
   ScanShadowsFilter()
@@ -66,6 +69,8 @@ public:
   /**@b Configure the filter from XML */
   bool configure()
   {
+    ros::NodeHandle nh_("~/ScanShadowFilter");
+
     if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("min_angle"), min_angle_))
     {
       ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
@@ -107,11 +112,27 @@ public:
       ROS_ERROR("max_angle must be max_angle <= 180. Forcing max_angle = 180.\n");
       max_angle_ = 180.0;
     }
+
+    ddr = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(nh_);
+    ddr->registerVariable<double>("Min_angle", min_angle_, boost::bind(&ScanShadowsFilter::reconfigure_min_angle, this, _1), "Minimum angle of shadow filter", 0, 180);
+    ddr->registerVariable<double>("Max_angle", max_angle_, boost::bind(&ScanShadowsFilter::reconfigure_max_angle, this, _1), "Maximum angle of shadow filter", 0, 180);
+    ddr->registerVariable<int>("Neighbors", &neighbors_, "Neighbors of shadow filter", 0, 40);
+    ddr->registerVariable<int>("Window", &window_, "Window of shadow filter", 0, 20);
+    ddr->publishServicesTopics();
+
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
         angles::from_degrees(max_angle_));
 
     return true;
+  }
+
+  void reconfigure_min_angle(double min_angle) {
+      shadow_detector_.reconfigure_min_angle(min_angle);
+  }
+
+  void reconfigure_max_angle(double max_angle) {
+      shadow_detector_.reconfigure_max_angle(max_angle);
   }
 
   ////////////////////////////////////////////////////////////////////////////////
