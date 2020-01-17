@@ -73,8 +73,8 @@ public:
     getParam("disp_histogram",  disp_hist_) ;
 
 
-    ddr->registerVariable<double>("Lower_intensity", &lower_threshold_, "Lower intensity threshold", 0, 3000);
-    ddr->registerVariable<double>("Upper_intensity", &upper_threshold_, "Upper intensity threshold", 0, 3000);
+    ddr->registerVariable<double>("Lower_intensity", &lower_threshold_, "Lower intensity threshold", 0, 10000);
+    ddr->registerVariable<double>("Upper_intensity", &upper_threshold_, "Upper intensity threshold", 0, 10000);
     ddr->publishServicesTopics();
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
