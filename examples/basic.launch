@@ -1,0 +1,6 @@
+<launch>
+<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter">
+      <rosparam command="load" file="$(find pepperl_fuchs_r2000)/config/elodie_config_r2000.yaml" />
+      <remap from="scan" to="scan/r2000" />
+</node>
+</launch>

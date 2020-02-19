@@ -105,9 +105,15 @@ namespace laser_filters
             }
         }
 
-        // For an unknown reason needs to clean the first scan data
+        // For an unknown reason needs to clean the first scan data, Need to investigate this more !!!
+        filtered_scan.intensities[filtered_scan.ranges.size()-1] = 0.0;
+        filtered_scan.ranges[filtered_scan.ranges.size()-1] = 31.0;
         filtered_scan.intensities[0] = 0.0;
         filtered_scan.ranges[0] = 31.0;
+        filtered_scan.intensities[1] = 0.0;
+        filtered_scan.ranges[1] = 31.0;
+        filtered_scan.intensities[2] = 0.0;
+        filtered_scan.ranges[2] = 31.0;
 
         ROS_DEBUG("Filtered out %u points from the laser scan.", count);
 
