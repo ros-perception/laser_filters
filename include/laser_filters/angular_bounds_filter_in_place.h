@@ -41,6 +41,7 @@
 #include <sensor_msgs/LaserScan.h>
 
 #include <ddynamic_reconfigure/ddynamic_reconfigure.h>
+#include <math.h>
 
 namespace laser_filters
 {
@@ -94,7 +95,8 @@ namespace laser_filters
             }
         } else if (lower_angle_ > upper_angle_) {
             for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-              if(((current_angle > lower_angle_) && (current_angle < 3.14)) || ((current_angle < upper_angle_) && (current_angle > -3.14))){
+              // Need to add 0.001 to PI for the index 0
+              if(((current_angle > lower_angle_) && (current_angle < M_PI+0.001)) || ((current_angle < upper_angle_) && (current_angle > -M_PI-0.001))){
                 filtered_scan.ranges[i] = input_scan.range_max + 1.0;
                 if(i < filtered_scan.intensities.size()){
                   filtered_scan.intensities[i] = 0.0;
@@ -105,26 +107,12 @@ namespace laser_filters
             }
         }
 
-        // For an unknown reason needs to clean the first scan data, Need to investigate this more !!!
-        filtered_scan.intensities[filtered_scan.ranges.size()-1] = 0.0;
-        filtered_scan.ranges[filtered_scan.ranges.size()-1] = 31.0;
-        filtered_scan.intensities[0] = 0.0;
-        filtered_scan.ranges[0] = 31.0;
-        filtered_scan.intensities[1] = 0.0;
-        filtered_scan.ranges[1] = 31.0;
-        filtered_scan.intensities[2] = 0.0;
-        filtered_scan.ranges[2] = 31.0;
-
         ROS_DEBUG("Filtered out %u points from the laser scan.", count);
 
         return true;
 
       }
 
-      /*void dynamicReconfigureCB(laser_filters::AngularBoundsFilterConfig &config, uint32_t level) {
-        lower_angle_ = config.lower_angle;
-        upper_angle_ = config.upper_angle;
-      }*/
   };
 };
 #endif
