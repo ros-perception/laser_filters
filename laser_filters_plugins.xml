@@ -48,6 +48,12 @@
 	 This is a filter that removes points in a laser scan inside of a cartesian box.
       </description>
     </class>
+      <class name="laser_filters/LaserScanPolygonFilter" type="laser_filters::LaserScanPolygonFilter"
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	This is a filter that removes points in a laser scan inside of a polygon.
+      </description>
+    </class>
     <class name="laser_filters/LaserScanMaskFilter" type="laser_filters::LaserScanMaskFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
