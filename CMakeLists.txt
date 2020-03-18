@@ -6,7 +6,7 @@ project(laser_filters)
 ##############################################################################
 
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
-  laser_geometry pluginlib angles)
+  laser_geometry pluginlib angles dynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system)
@@ -15,6 +15,11 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 ##############################################################################
 # Define package
 ##############################################################################
+
+# dynamic reconfigure
+generate_dynamic_reconfigure_options(
+  cfg/ScanShadowsFilter.cfg
+)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -41,6 +46,8 @@ target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBR
 
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_dependencies(laser_scan_filters ${PROJECT_NAME}_gencfg)
 
 if (CATKIN_ENABLE_TESTING)
   find_package(rostest)
