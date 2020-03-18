@@ -58,6 +58,7 @@ public:
   double laser_max_range_;        // Used in laser scan projection
   double min_angle_, max_angle_;  // Filter angle threshold
   int window_, neighbors_;
+  bool remove_shadow_start_point_;  // Whether to also remove the start point of the shadow
 
   ScanShadowDetector shadow_detector_;
 
@@ -99,6 +100,9 @@ public:
     {
       ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
     }
+    remove_shadow_start_point_ = false;  // default value
+    filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("remove_shadow_start_point"), remove_shadow_start_point_);
+    ROS_INFO("Remove shadow start point: %s", remove_shadow_start_point_ ? "true" : "false");
 
     if (min_angle_ < 0)
     {
@@ -184,6 +188,10 @@ public:
             {  // delete neighbor if they are farther away (note not self)
               indices_to_delete.insert(index);
             }
+          }
+          if (remove_shadow_start_point_)
+          {
+            indices_to_delete.insert(i);
           }
         }
       }
