@@ -133,6 +133,7 @@ public:
     param_config.max_angle = max_angle_;
     param_config.window = window_;
     param_config.neighbors = neighbors_;
+    param_config.remove_shadow_start_point = remove_shadow_start_point_;
     dyn_server_->updateConfig(param_config);
 
     return true;
@@ -147,6 +148,7 @@ public:
         angles::from_degrees(max_angle_));
     neighbors_ = config.neighbors;
     window_ = config.window;
+    remove_shadow_start_point_ = config.remove_shadow_start_point;
   }
 
   ////////////////////////////////////////////////////////////////////////////////
