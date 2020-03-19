@@ -50,6 +50,23 @@
 #include <sstream>
 #include <vector>
 
+/** @brief Same as sign(x) but returns 0 if x is 0. */
+inline double sign0(double x)
+{
+  return x < 0.0 ? -1.0 : (x > 0.0 ? 1.0 : 0.0);
+}
+
+void padPolygon(geometry_msgs::Polygon& polygon, double padding)
+{
+  // pad polygon in place
+  for (unsigned int i = 0; i < polygon.points.size(); i++)
+  {
+    geometry_msgs::Point32& pt = polygon.points[ i ];
+    pt.x += sign0(pt.x) * padding;
+    pt.y += sign0(pt.y) * padding;
+  }
+}
+
 double getNumberFromXMLRPC(XmlRpc::XmlRpcValue& value, const std::string& full_param_name)
 {
   // Make sure that the value we're looking at is either a double or an int.
@@ -252,8 +269,12 @@ bool LaserScanPolygonFilter::configure()
   bool invert_set = getParam("invert", invert_filter_);
   polygon_ = makePolygonFromXMLRPC(polygon_xmlrpc, "polygon");
 
+  double polygon_padding = 0;
+  getParam("polygon_padding", polygon_padding);
+
   polygon_string = polygonToString(polygon_);
   param_config.polygon = polygon_string;
+  param_config.polygon_padding = polygon_padding;
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
 
@@ -386,5 +407,6 @@ void LaserScanPolygonFilter::reconfigureCB(laser_filters::PolygonFilterConfig& c
 {
   invert_filter_ = config.invert;
   polygon_ = makePolygonFromString(config.polygon);
+  padPolygon(polygon_, config.polygon_padding);
 }
 }

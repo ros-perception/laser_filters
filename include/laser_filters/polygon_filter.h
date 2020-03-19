@@ -77,6 +77,7 @@ private:
   boost::recursive_mutex own_mutex_;
   std::string polygon_frame_;
   geometry_msgs::Polygon polygon_;
+  double polygon_padding_;
   bool invert_filter_;
 
   // checks if points in polygon
