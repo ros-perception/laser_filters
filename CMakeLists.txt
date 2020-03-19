@@ -23,6 +23,7 @@ generate_dynamic_reconfigure_options(
   cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
   cfg/RadiusOutlierFilter.cfg
+  cfg/SpeckleFilter.cfg
 )
 
 catkin_package(
@@ -45,6 +46,7 @@ add_library(laser_scan_filters
   src/array_filter.cpp
   src/box_filter.cpp
   src/polygon_filter.cpp
+  src/speckle_filter.cpp
 )
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -67,6 +69,7 @@ if (CATKIN_ENABLE_TESTING)
 
   add_rostest(test/test_scan_filter_chain.launch)
   add_rostest(test/test_polygon_filter.launch)
+  add_rostest(test/test_speckle_filter.launch)
 
   catkin_add_gtest(test_shadow_detector test/test_shadow_detector.cpp)
   target_link_libraries(test_shadow_detector ${catkin_LIBRARIES} ${rostest_LIBRARIES})
