@@ -208,7 +208,7 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, 
     if (vvf.size() < 3 && vvf.size() > 0)
     {
       ROS_WARN("You must specify at least three points for the robot polygon");
-      return empty_polygon;
+      return last_polygon;
     }
 
     for (unsigned int i = 0; i < vvf.size(); i++)
