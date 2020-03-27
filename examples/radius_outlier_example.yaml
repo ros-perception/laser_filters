@@ -1,0 +1,7 @@
+scan_filter_chain:
+- name: radiusoutlier
+  type: laser_filters/RadiusOutlierFilter
+  params:
+    radius_search: 0.4
+    min_neighbors: 10
+    window: 10
