@@ -189,17 +189,16 @@ std::vector<std::vector<float> > parseVVF(const std::string& input, std::string&
   return result;
 }
 
-geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string)
+geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, const geometry_msgs::Polygon& last_polygon)
 {
   std::string error;
   std::vector<std::vector<float> > vvf = parseVVF(polygon_string, error);
-  geometry_msgs::Polygon empty_polygon;
 
     if (error != "")
     {
       ROS_ERROR("Error parsing polygon parameter: '%s'", error.c_str());
       ROS_ERROR(" Polygon string was '%s'.", polygon_string.c_str());
-      return empty_polygon;
+      return last_polygon;
     }
 
     geometry_msgs::Polygon polygon;
@@ -225,7 +224,7 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string)
       {
         ROS_ERROR("Points in the polygon specification must be pairs of numbers. Found a point with %d numbers.",
                    int(vvf[ i ].size()));
-        return empty_polygon;
+        return last_polygon;
       }
     }
 
@@ -300,6 +299,8 @@ bool LaserScanPolygonFilter::configure()
 bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
                                                    sensor_msgs::LaserScan& output_scan)
 {
+  boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
   geometry_msgs::PolygonStamped polygon_stamped;
   polygon_stamped.header.frame_id = polygon_frame_;
   polygon_stamped.header.stamp = ros::Time::now();
@@ -406,7 +407,7 @@ bool LaserScanPolygonFilter::inPolygon(tf::Point& point) const
 void LaserScanPolygonFilter::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level)
 {
   invert_filter_ = config.invert;
-  polygon_ = makePolygonFromString(config.polygon);
+  polygon_ = makePolygonFromString(config.polygon, polygon_);
   padPolygon(polygon_, config.polygon_padding);
 }
 }
