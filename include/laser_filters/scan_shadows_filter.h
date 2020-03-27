@@ -166,6 +166,8 @@ public:
    */
   bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
   {
+    boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
     // copy across all data first
     scan_out = scan_in;
 
