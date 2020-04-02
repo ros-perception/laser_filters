@@ -20,6 +20,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # dynamic reconfigure
 generate_dynamic_reconfigure_options(
+  cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
 )
 
@@ -37,7 +38,13 @@ catkin_package(
 add_library(pointcloud_filters src/pointcloud_filters.cpp)
 target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
 
-add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_filter.cpp src/array_filter.cpp src/box_filter.cpp)
+add_library(laser_scan_filters
+  src/laser_scan_filters.cpp
+  src/median_filter.cpp
+  src/array_filter.cpp
+  src/box_filter.cpp
+  src/polygon_filter.cpp
+)
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
@@ -58,6 +65,7 @@ if (CATKIN_ENABLE_TESTING)
   add_dependencies(test_scan_filter_chain gtest)
 
   add_rostest(test/test_scan_filter_chain.launch)
+  add_rostest(test/test_polygon_filter.launch)
 
   catkin_add_gtest(test_shadow_detector test/test_shadow_detector.cpp)
   target_link_libraries(test_shadow_detector ${catkin_LIBRARIES} ${rostest_LIBRARIES})

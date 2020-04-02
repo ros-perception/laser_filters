@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2020, Eurotec, Netherlands
+# All rights reserved.
+#
+# \author Rein Appeldoorn
+
+import math
+import unittest
+
+import rospy
+import rostest
+from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Header
+
+
+class TestPolygonFilter(unittest.TestCase):
+    rospy.init_node('test_polygon_filter')
+    num_beams = 11
+    rospy.Publisher("scan", LaserScan, queue_size=1, latch=True).publish(LaserScan(
+        header=Header(
+            frame_id="laser",
+            stamp=rospy.Time.now()
+        ),
+        angle_min=-math.pi / 2,
+        angle_max=math.pi / 2,
+        angle_increment=math.pi / (num_beams - 1),
+        ranges=[1] * num_beams,
+        range_max=100
+    ))
+
+    def test_polygon_filter(self):
+        msg = rospy.wait_for_message("scan_filtered", LaserScan, 10.)  # type: LaserScan
+        expected_scan_ranges = [1.0, 1.0, 1.0, 1.0, float('nan'), float('nan'), float('nan'), 1, 1, 1, 1]
+        for scan_range, expected_scan_range in zip(msg.ranges, expected_scan_ranges):
+            if math.isnan(expected_scan_range) or math.isnan(scan_range):
+                self.assertEqual(math.isnan(expected_scan_range), math.isnan(scan_range))
+            else:
+                self.assertEqual(scan_range, expected_scan_range)
+
+
+PKG = 'laser_filters'
+NAME = 'test_polygon_filter'
+if __name__ == '__main__':
+    rostest.unitrun(PKG, NAME, TestPolygonFilter)
