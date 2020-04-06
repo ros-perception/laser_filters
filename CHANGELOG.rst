@@ -2,6 +2,14 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Bump CMake version to avoid CMP0048 warning
+* Polygon filter
+* Add dynamic reconfigure for scan shadows filter
+* Parameter to remove shadow start point in scan shadows filter
+* Contributors: Jonathan Binney, Rein Appeldoorn, Yannick_de_Hoop, ahcorde
+
 1.8.8 (2019-11-07)
 ------------------
 * Merge pull request `#83 <https://github.com/ros-perception/laser_filters/issues/83>`_ from remco-r/indigo-devel
