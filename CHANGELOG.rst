@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.9 (2020-04-05)
+------------------
 * Bump CMake version to avoid CMP0048 warning
 * Polygon filter
 * Add dynamic reconfigure for scan shadows filter
