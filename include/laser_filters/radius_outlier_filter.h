@@ -64,7 +64,6 @@ public:
   boost::recursive_mutex own_mutex_;
   RadiusOutlierFilterConfig param_config;
 
-  ////////////////////////////////////////////////////////////////////////////////
   RadiusOutlierFilter()
   {
   }
@@ -124,12 +123,10 @@ public:
     radius_detector_.configure(radius_search_);
   }
 
-  ////////////////////////////////////////////////////////////////////////////////
   virtual ~RadiusOutlierFilter()
   {
   }
 
-  ////////////////////////////////////////////////////////////////////////////////
   /** \brief Filter points based on 3 global parameters: radius_search, min_neighbors and
    * window. The radius_search specifies the maximum allowed distance for
    * points to be neighbors. The min_neighbors specifies how many neighboring points
@@ -183,7 +180,6 @@ public:
     return true;
   }
 
-  ////////////////////////////////////////////////////////////////////////////////
 };
 }
 
