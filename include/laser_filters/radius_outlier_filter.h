@@ -144,7 +144,7 @@ public:
 
     std::set<int> indices_to_delete;
     // For each point in the current line scan
-    for (unsigned int i = 0; i < scan_in.ranges.size(); i++)
+    for (int i = 0; i < static_cast<int>(scan_in.ranges.size()); i++)
     {
       int num_neighbors = 0;
 
@@ -154,7 +154,7 @@ public:
       {
         int j = i + y;
 
-        if (j < 0 || j >= (int)scan_in.ranges.size() || (int)i == j || std::isnan(scan_in.ranges[j]))
+        if (j < 0 || j >= static_cast<int>(scan_in.ranges.size()) || i == j || std::isnan(scan_in.ranges[j]))
         {  // Out of scan bounds or itself or infinity
           continue;
         }
@@ -172,7 +172,7 @@ public:
     }
 
     ROS_DEBUG("RadiusOutlierFilter removing %d/%d Points from scan",
-              (int)indices_to_delete.size(), (int) scan_in.ranges.size());
+              static_cast<int>(indices_to_delete.size()), static_cast<int>(scan_in.ranges.size()));
     for (std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
     {
       scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value
