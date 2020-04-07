@@ -2,6 +2,13 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* radius_outlier_filter: new filter for radius based outlier removal
+  Add a new filter to remove measurements that do not have a number of
+  neighbors within a certain range.
+* Contributors: Jonathan Binney, Nicolas Limpert
+
 1.8.9 (2020-04-05)
 ------------------
 * Bump CMake version to avoid CMP0048 warning
