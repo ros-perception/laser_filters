@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.10 (2020-04-07)
+-------------------
 * radius_outlier_filter: new filter for radius based outlier removal
   Add a new filter to remove measurements that do not have a number of
   neighbors within a certain range.
