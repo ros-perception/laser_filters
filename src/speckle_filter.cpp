@@ -55,7 +55,7 @@ bool LaserScanSpeckleFilter::configure()
   dyn_server_->setCallback(f);
 
   getParam("max_range", config_.max_range);
-  getParam("filter_max_range_difference", config_.filter_max_range_difference);
+  getParam("max_range_difference", config_.max_range_difference);
   getParam("filter_window", config_.filter_window);
   dyn_server_->updateConfig(config_);
   return true;
@@ -89,7 +89,7 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
   for (size_t idx = 0; idx < output_scan.ranges.size() - config_.filter_window + 1; ++idx)
   {
-    bool window_valid = checkWindowValid(output_scan, idx, config_.filter_window, config_.filter_max_range_difference);
+    bool window_valid = checkWindowValid(output_scan, idx, config_.filter_window, config_.max_range_difference);
 
     // Actually set the valid ranges (do not set to false if it was already valid or out of range)
     for (size_t neighbor_idx_or_self_nr = 0; neighbor_idx_or_self_nr < config_.filter_window; ++neighbor_idx_or_self_nr)
