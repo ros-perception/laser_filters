@@ -74,7 +74,7 @@ bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t win
     if (neighbor_idx < scan.ranges.size())  // Out of bound check
     {
       const float& neighbor_range = scan.ranges[neighbor_idx];
-      if (range != range || neighbor_range != neighbor_range || fabs(neighbor_range - range) > max_range_difference)
+      if (neighbor_range != neighbor_range || fabs(neighbor_range - range) > max_range_difference)
       {
         return false;
       }
