@@ -47,6 +47,38 @@
 
 namespace laser_filters
 {
+
+class WindowValidator
+{
+public:
+  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference) = 0;
+};
+
+class DistanceWindowValidator : public WindowValidator
+{
+  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference)
+  {
+    const float& range = scan.ranges[idx];
+    if (range != range) {
+      return false;
+    }
+
+    for (size_t neighbor_idx_nr = 1; neighbor_idx_nr < window; ++neighbor_idx_nr)
+    {
+      size_t neighbor_idx = idx + neighbor_idx_nr;
+      if (neighbor_idx < scan.ranges.size())  // Out of bound check
+      {
+        const float& neighbor_range = scan.ranges[neighbor_idx];
+        if (neighbor_range != neighbor_range || fabs(neighbor_range - range) > max_range_difference)
+        {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+};
+
 /**
  * @brief This is a filter that removes speckle points in a laser scan based on consecutive ranges
  */
@@ -54,6 +86,7 @@ class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::LaserScan
 {
 public:
   LaserScanSpeckleFilter();
+  ~LaserScanSpeckleFilter();
   bool configure();
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
 
@@ -63,6 +96,7 @@ private:
   boost::recursive_mutex own_mutex_;
 
   SpeckleFilterConfig config_ = SpeckleFilterConfig::__getDefault__();
+  WindowValidator* validator_;
 };
 }
 #endif /* speckle_filter.h */
