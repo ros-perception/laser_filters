@@ -44,6 +44,15 @@ namespace laser_filters
 {
 LaserScanSpeckleFilter::LaserScanSpeckleFilter()
 {
+  validator_ = 0;
+}
+
+LaserScanSpeckleFilter::~LaserScanSpeckleFilter()
+{
+  if (validator_)
+  {
+    delete validator_;
+  }
 }
 
 bool LaserScanSpeckleFilter::configure()
@@ -54,32 +63,11 @@ bool LaserScanSpeckleFilter::configure()
   f = boost::bind(&laser_filters::LaserScanSpeckleFilter::reconfigureCB, this, _1, _2);
   dyn_server_->setCallback(f);
 
+  getParam("filter_type", config_.filter_type);
   getParam("max_range", config_.max_range);
   getParam("max_range_difference", config_.max_range_difference);
   getParam("filter_window", config_.filter_window);
   dyn_server_->updateConfig(config_);
-  return true;
-}
-
-bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference)
-{
-  const float& range = scan.ranges[idx];
-  if (range != range) {
-    return false;
-  }
-
-  for (size_t neighbor_idx_nr = 1; neighbor_idx_nr < window; ++neighbor_idx_nr)
-  {
-    size_t neighbor_idx = idx + neighbor_idx_nr;
-    if (neighbor_idx < scan.ranges.size())  // Out of bound check
-    {
-      const float& neighbor_range = scan.ranges[neighbor_idx];
-      if (neighbor_range != neighbor_range || fabs(neighbor_range - range) > max_range_difference)
-      {
-        return false;
-      }
-    }
-  }
   return true;
 }
 
@@ -89,7 +77,8 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
   for (size_t idx = 0; idx < output_scan.ranges.size() - config_.filter_window + 1; ++idx)
   {
-    bool window_valid = checkWindowValid(output_scan, idx, config_.filter_window, config_.max_range_difference);
+    bool window_valid = validator_->checkWindowValid(
+          output_scan, idx, config_.filter_window, config_.max_range_difference);
 
     // Actually set the valid ranges (do not set to false if it was already valid or out of range)
     for (size_t neighbor_idx_or_self_nr = 0; neighbor_idx_or_self_nr < config_.filter_window; ++neighbor_idx_or_self_nr)
@@ -117,5 +106,20 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
 void LaserScanSpeckleFilter::reconfigureCB(laser_filters::SpeckleFilterConfig& config, uint32_t level)
 {
   config_ = config;
+
+  switch (config_.filter_type) {
+
+    case laser_filters::SpeckleFilter_Distance:
+      if (validator_)
+      {
+        delete validator_;
+      }
+      validator_ = new laser_filters::DistanceWindowValidator();
+      break;
+
+    default:
+      break;
+  }
+
 }
 }
