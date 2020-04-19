@@ -49,7 +49,7 @@ LaserScanSpeckleFilter::LaserScanSpeckleFilter()
 
 LaserScanSpeckleFilter::~LaserScanSpeckleFilter()
 {
-  if (validator_)
+  if (!validator_)
   {
     delete validator_;
   }
