@@ -1,0 +1,7 @@
+scan_filter_chain:
+- name: speckle_filter
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    filter_type: 1
+    max_distance: 0.1
+    filter_window: 2
