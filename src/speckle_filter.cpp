@@ -108,6 +108,13 @@ void LaserScanSpeckleFilter::reconfigureCB(laser_filters::SpeckleFilterConfig& c
   config_ = config;
 
   switch (config_.filter_type) {
+    case laser_filters::SpeckleFilter_RadiusOutlier:
+      if (validator_)
+      {
+        delete validator_;
+      }
+      validator_ = new laser_filters::RadiusOutlierWindowValidator();
+      break;
 
     case laser_filters::SpeckleFilter_Distance:
       if (validator_)
