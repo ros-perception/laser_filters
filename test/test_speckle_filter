@@ -37,13 +37,13 @@ class TestSpeckleFilter(unittest.TestCase):
 
     def dist_cb(self, msg):
         self.msg_dist = msg
-	print "received dist"
-	print self.msg_dist
+        print ("received dist")
+        print (self.msg_dist)
 
     def euclid_cb(self, msg):
         self.msg_euclid = msg
-	print "received euclid"
-	print self.msg_euclid
+        print ("received euclid")
+        print (self.msg_euclid)
 
     def test_speckle_filter(self):
         rospy.Subscriber("scan_filtered_distance", LaserScan, self.dist_cb)
@@ -54,8 +54,8 @@ class TestSpeckleFilter(unittest.TestCase):
             rospy.sleep(0.1)
 
             if (rospy.Time.now() - now) > rospy.Duration(10):
-		print "Error: did not receive messages within 10 seconds"
-		self.assert_(False, "Error: did not receive messages within 10 seconds")
+                print ("Error: did not receive messages within 10 seconds")
+                self.assert_(False, "Error: did not receive messages within 10 seconds")
 
         expected_scan_ranges = [1, 1, 1, 1, float('nan'), 1, 1, 1, 1, 1, 1]
         for scan_range, expected_scan_range in zip(self.msg_dist.ranges, expected_scan_ranges):
