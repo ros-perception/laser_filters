@@ -20,6 +20,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # dynamic reconfigure
 generate_dynamic_reconfigure_options(
+  cfg/IntensityFilter.cfg
   cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
   cfg/RadiusOutlierFilter.cfg
@@ -45,6 +46,7 @@ add_library(laser_scan_filters
   src/array_filter.cpp
   src/box_filter.cpp
   src/polygon_filter.cpp
+  src/intensity_filter.cpp
 )
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
