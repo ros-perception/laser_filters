@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+#
+# Copyright (c) 2020, Eurotec, Netherlands
+# All rights reserved.
+#
+# \author Rein Appeldoorn
+#         Nicolas Limpert
+
+import math
+import unittest
+
+import rospy
+import rostest
+from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Header
+
+
+class TestSpeckleFilter(unittest.TestCase):
+    def __init__(self, *args, **kwargs):
+        super(TestSpeckleFilter, self).__init__(*args, **kwargs)
+        self.msg_euclid = 0
+        self.msg_dist = 0
+
+        rospy.init_node('test_speckle_filter_distance')
+        num_beams = 11
+        rospy.Publisher("scan", LaserScan, queue_size=1, latch=True).publish(LaserScan(
+            header=Header(
+                frame_id="laser",
+                stamp=rospy.Time.now()
+            ),
+            angle_min=-math.pi / 2,
+            angle_max=math.pi / 2,
+            angle_increment=math.pi / (num_beams - 1),
+            ranges=[1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1],
+            range_max=100
+        ))
+
+    def dist_cb(self, msg):
+        self.msg_dist = msg
+        print ("received dist")
+        print (self.msg_dist)
+
+    def euclid_cb(self, msg):
+        self.msg_euclid = msg
+        print ("received euclid")
+        print (self.msg_euclid)
+
+    def test_speckle_filter(self):
+        rospy.Subscriber("scan_filtered_distance", LaserScan, self.dist_cb)
+        rospy.Subscriber("scan_filtered_euclidean", LaserScan, self.euclid_cb)
+
+        now = rospy.Time.now()
+        while (self.msg_euclid == 0 or self.msg_dist == 0):
+            rospy.sleep(0.1)
+
+            if (rospy.Time.now() - now) > rospy.Duration(10):
+                print ("Error: did not receive messages within 10 seconds")
+                self.assert_(False, "Error: did not receive messages within 10 seconds")
+
+        expected_scan_ranges = [1, 1, 1, 1, float('nan'), 1, 1, 1, 1, 1, 1]
+        for scan_range, expected_scan_range in zip(self.msg_dist.ranges, expected_scan_ranges):
+            if math.isnan(expected_scan_range) or math.isnan(scan_range):
+                self.assertEqual(math.isnan(expected_scan_range), math.isnan(scan_range))
+            else:
+                self.assertEqual(scan_range, expected_scan_range)
+
+        expected_scan_ranges = [1, 1, 1, 1, float('nan'), 1, 1, 1, 1, 1, 1]
+        for scan_range, expected_scan_range in zip(self.msg_euclid.ranges, expected_scan_ranges):
+            if math.isnan(expected_scan_range) or math.isnan(scan_range):
+                self.assertEqual(math.isnan(expected_scan_range), math.isnan(scan_range))
+            else:
+                self.assertEqual(scan_range, expected_scan_range)
+
+
+PKG = 'laser_filters'
+NAME = 'test_speckle_filter'
+if __name__ == '__main__':
+    rostest.unitrun(PKG, NAME, TestSpeckleFilter)

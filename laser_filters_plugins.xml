@@ -18,12 +18,6 @@
 	This is a filter which filters sensor_msgs::LaserScan messages based on range
       </description>
     </class>
-    <class name="laser_filters/RadiusOutlierFilter" type="laser_filters::RadiusOutlierFilter"
-	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
-      <description>
-	This is a filter which removes points that do not have a user defined number of neighbors in a certain radius around the particular point.
-      </description>
-    </class>
     <class name="laser_filters/ScanShadowsFilter" type="laser_filters::ScanShadowsFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
@@ -58,6 +52,12 @@
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>
 	This is a filter that removes points in a laser scan inside of a polygon.
+      </description>
+    </class>
+    <class name="laser_filters/LaserScanSpeckleFilter" type="laser_filters::LaserScanSpeckleFilter"
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+ 	This is a filter that removes speckle points in a laser scan by looking at neighbor points.
       </description>
     </class>
     <class name="laser_filters/LaserScanMaskFilter" type="laser_filters::LaserScanMaskFilter" 
