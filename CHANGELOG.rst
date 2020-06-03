@@ -2,6 +2,15 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#97 <https://github.com/ros-perception/laser_filters/issues/97>`_ from eurogroep/feat/speckle-filter-for-noise-removal
+* Merge pull request `#96 <https://github.com/ros-perception/laser_filters/issues/96>`_ from eurogroep/feat/intensity-filter-dynamic-reconfigure-and-optionally-override-intensity-values
+  feat(IntensityFilter): Dynamic reconfigure and optionally override intensity
+* Merge pull request `#3 <https://github.com/ros-perception/laser_filters/issues/3>`_ from nlimpert/nlimpert/speckle-filter-radius-outlier-merge
+  Merge distance based speckle filter with RadiusOutlier removal
+* Contributors: Jonathan Binney, Nicolas Limpert, Rein Appeldoorn
+
 1.8.10 (2020-04-07)
 -------------------
 * radius_outlier_filter: new filter for radius based outlier removal
