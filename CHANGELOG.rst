@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.11 (2020-06-03)
+-------------------
 * Merge pull request `#97 <https://github.com/ros-perception/laser_filters/issues/97>`_ from eurogroep/feat/speckle-filter-for-noise-removal
 * Merge pull request `#96 <https://github.com/ros-perception/laser_filters/issues/96>`_ from eurogroep/feat/intensity-filter-dynamic-reconfigure-and-optionally-override-intensity-values
   feat(IntensityFilter): Dynamic reconfigure and optionally override intensity
