@@ -48,7 +48,7 @@ namespace laser_filters {
     scan_sub_.subscribe(nh_, "scan", 50);
 
     filter_chain_ = new filters::FilterChain<sensor_msgs::LaserScan>("sensor_msgs::LaserScan");
-    private_nh_.param("filter_chain", using_filter_chain_deprecated_);
+    using_filter_chain_deprecated_ = private_nh_.hasParam("filter_chain");
 
     if (using_filter_chain_deprecated_) {
       filter_chain_->configure("filter_chain", private_nh_);
