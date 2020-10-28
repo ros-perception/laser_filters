@@ -129,7 +129,6 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
 
       std::string error_msg;
 
-#ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
       bool success = buffer_.canTransform(
           box_frame_,
           input_scan.header.frame_id,
@@ -141,7 +140,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
         RCLCPP_WARN(get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
         return false;
       }
-#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
+
       rclcpp::Clock steady_clock(RCL_STEADY_TIME);
       try
       {
@@ -161,56 +160,36 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
         return false;
       }
 
-#ifdef SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
-      const int i_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "index");
-      const int x_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "x");
-      const int y_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "y");
-      const int z_idx_c = sensor_msgs::getPointCloud2FieldIndex(laser_cloud, "z");
-
-      if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1)
+      sensor_msgs::PointCloud2ConstIterator<int> iter_i(laser_cloud, "index");
+      sensor_msgs::PointCloud2ConstIterator<float> iter_x(laser_cloud, "x");
+      sensor_msgs::PointCloud2ConstIterator<float> iter_y(laser_cloud, "y");
+      sensor_msgs::PointCloud2ConstIterator<float> iter_z(laser_cloud, "z");      
+      
+      if (
+        !(iter_i != iter_i.end()) || 
+        !(iter_x != iter_x.end()) || 
+        !(iter_y != iter_y.end()) || 
+        !(iter_z != iter_z.end()))
       {
         RCLCPP_INFO_THROTTLE(get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");
       }
 
-      const int i_idx_offset = laser_cloud.fields[i_idx_c].offset;
-      const int x_idx_offset = laser_cloud.fields[x_idx_c].offset;
-      const int y_idx_offset = laser_cloud.fields[y_idx_c].offset;
-      const int z_idx_offset = laser_cloud.fields[z_idx_c].offset;
-
-      const int pstep = laser_cloud.point_step;
-      const long int pcount = laser_cloud.width * laser_cloud.height;
-      const long int limit = pstep * pcount;
-
-      int i_idx, x_idx, y_idx, z_idx;
-      for (
-          i_idx = i_idx_offset,
-         x_idx = x_idx_offset,
-         y_idx = y_idx_offset,
-         z_idx = z_idx_offset;
-
-          x_idx < limit;
-
-          i_idx += pstep,
-         x_idx += pstep,
-         y_idx += pstep,
-         z_idx += pstep)
-      {
-
-        // TODO works only for float data types and with an index field
-        // I'm working on it, see https://github.com/ros/common_msgs/pull/78
-        float x = *((float *)(&laser_cloud.data[x_idx]));
-        float y = *((float *)(&laser_cloud.data[y_idx]));
-        float z = *((float *)(&laser_cloud.data[z_idx]));
-        int index = *((int *)(&laser_cloud.data[i_idx]));
-
-        Point point(x, y, z);
+    for (;
+         iter_x != iter_x.end() &&
+         iter_y != iter_y.end() &&
+         iter_z != iter_z.end() &&
+         iter_i != iter_i.end();
+         ++iter_x, ++iter_y, ++iter_z, ++iter_i)
+    {
+        Point point(*iter_x, *iter_y, *iter_z);
 
         if (inBox(point))
         {
-          output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
+          output_scan.ranges[*iter_i] = std::numeric_limits<float>::quiet_NaN();
         }
-      }
-#endif // SENSOR_MSGS_POINT_CLOUD_CONVERSION_H
+    }
+
+
       up_and_running_ = true;
       return true;
     }
