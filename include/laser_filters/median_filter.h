@@ -39,55 +39,106 @@
 
 #include <sensor_msgs/msg/laser_scan.hpp>
 
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
-
-#include "filters/median.h"
-#include "filters/mean.h"
-#include "filters/filter_chain.h"
+#include "filters/median.hpp"
+#include "filters/mean.hpp"
+#include "filters/filter_chain.hpp"
 #include "boost/thread/mutex.hpp"
 
-namespace laser_filters{
-
-/** \brief A class to provide median filtering of laser scans in time*/
-class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
+namespace laser_filters
 {
-public:
-  /** \brief Constructor
+
+  /** \brief A class to provide median filtering of laser scans in time*/
+  class LaserMedianFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+  {
+  public:
+    /** \brief Constructor
    * \param averaging_length How many scans to average over.
    */
-  LaserMedianFilter();
-  ~LaserMedianFilter();
+    LaserMedianFilter()
+        : num_ranges_(1), /*parameter_value_(),*/ range_filter_(NULL), intensity_filter_(NULL)
+    {
+      RCLCPP_WARN(logging_interface_->get_logger(), "LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");
+    };
+    ~LaserMedianFilter()
+    {
+      delete range_filter_;
+      delete intensity_filter_;
+    };
 
-  bool configure();
+    bool configure()
+    {
 
-  /** \brief Update the filter and get the response
+      // if (!getParam(, parameter_value_))
+      // {
+      //   RCLCPP_ERROR(get_logger(), "Cannot Configure LaserMedianFilter: Didn't find \"internal_filter\" tag within LaserMedianFilter params. Filter definitions needed inside for processing range and intensity");
+      //   return false;
+      // }
+
+      if (range_filter_)
+        delete range_filter_;
+      range_filter_ = new filters::MultiChannelFilterChain<float>("float");
+      if (!range_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+        return false;
+
+      if (intensity_filter_)
+        delete intensity_filter_;
+      intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
+      if (!intensity_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+        return false;
+      return true;
+    };
+
+    /** \brief Update the filter and get the response
    * \param scan_in The new scan to filter
    * \param scan_out The filtered scan
    */
-  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
+    bool update(const sensor_msgs::msg::LaserScan &scan_in, sensor_msgs::msg::LaserScan &scan_out)
+    {
+      if (!this->configured_)
+      {
+        RCLCPP_ERROR(logging_interface_->get_logger(), "LaserMedianFilter not configured");
+        return false;
+      }
+      boost::mutex::scoped_lock lock(data_lock);
+      scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
+      if (scan_in.ranges.size() != num_ranges_) //Reallocating
+      {
+        RCLCPP_INFO(logging_interface_->get_logger(), "Laser filter clearning and reallocating due to larger scan size");
+        delete range_filter_;
+        delete intensity_filter_;
 
-private:
-  unsigned int filter_length_; ///How many scans to average over
-  unsigned int num_ranges_; /// How many data point are in each row
+        num_ranges_ = scan_in.ranges.size();
 
-  boost::mutex data_lock; /// Protection from multi threaded programs
-  sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
+        range_filter_ = new filters::MultiChannelFilterChain<float>("float");
+        if (!range_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+          return false;
 
-  rclcpp::parameter::ParameterVariant parameter_value_;
-  
-  filters::MultiChannelFilterChain<float> * range_filter_;
-  filters::MultiChannelFilterChain<float> * intensity_filter_;
-  
-};
+        intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
+        if (!intensity_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+          return false;
+      }
 
+      /** \todo check for length of intensities too */
+      range_filter_->update(scan_in.ranges, scan_out.ranges);
+      intensity_filter_->update(scan_in.intensities, scan_out.intensities);
 
+      return true;
+    }
 
+  private:
+    unsigned int filter_length_; ///How many scans to average over
+    unsigned int num_ranges_;    /// How many data point are in each row
 
+    boost::mutex data_lock;                 /// Protection from multi threaded programs
+    sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
 
-}
+    // rclcpp::parameter::ParameterVariant parameter_value_;
 
+    filters::MultiChannelFilterChain<float> *range_filter_;
+    filters::MultiChannelFilterChain<float> *intensity_filter_;
+  };
+
+} // namespace laser_filters
 
 #endif //LASER_SCAN_UTILS_LASERSCAN_H
