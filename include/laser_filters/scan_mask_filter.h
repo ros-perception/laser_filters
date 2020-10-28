@@ -39,14 +39,8 @@
 \brief LaserScanMaskFilter removes points on directions defined in a mask from a laser scan.
 **/
 
-
-#include "filters/filter_base.h"
-
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
-
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
 
 #include <limits>
 #include <map>
@@ -63,46 +57,34 @@ public:
 
   bool configure()
   {
-    rclcpp::parameter::ParameterVariant config;
-    if (!getParam("masks", config))
+    std::string key_masks = param_prefix_ + "masks";
+    for (auto i : params_interface_->get_parameter_overrides())
     {
-      ROS_ERROR("LaserScanMaskFilter: masks is not defined in the config.");
-      return false;
-    }
-
-#ifdef ROS2_SUPPORTS_PARAMETER_ARRAYS
-    // TODO: support parameter array
-
-    if (config.get_type() == rclcpp::parameter::ParameterType::TypeArray)
-    {
-      ROS_ERROR("LaserScanMaskFilter: masks must be an array of frame_ids with direction list.");
-      return false;
-    }
-    for (rclcpp::parameter::ParameterIterator it = config.begin();
-        it != config.end(); ++it)
-    {
-      if (it->second.get_type() == rclcpp::parameter::ParameterType::TypeArray)
+      if (i.first.find(key_masks) == 0)
       {
-        std::string frame_id = (std::string)(it->first);
-        masks_[frame_id] = std::vector<size_t>();
-        try
+        auto frame_id = i.first.substr(key_masks.size() + 1);
+        std::vector<double> values;
+        getParam("masks." + frame_id, values);
+        masks_[frame_id].clear();
+        for (size_t i = 0; i < values.size(); ++i)
         {
-          for (size_t i = 0; i < it->second.size(); ++i)
-          {
-            size_t id = static_cast<int>(it->second[i]);
-            masks_[frame_id].push_back(id);
-          }
-          ROS_INFO("LaserScanMaskFilter: %s: %d directions will be masked.",
-              frame_id.c_str(), (int)masks_[frame_id].size());
+          size_t id = static_cast<int>(values[i]);
+          masks_[frame_id].push_back(id);
         }
-        catch(rclcpp::parameter::ParameterException &e)
-        {
-          ROS_ERROR("LaserScanMaskFilter: %s", e.get_message().c_str());
-          return false;
-        }
+        RCLCPP_INFO(
+            logging_interface_->get_logger(),
+            "LaserScanMaskFilter: %s: %d directions will be masked.",
+            frame_id.c_str(), (int)masks_[frame_id].size());
       }
     }
-#endif // ROS2_SUPPORTS_PARAMETER_ARRAYS
+
+    if (masks_.empty())
+    {
+      RCLCPP_ERROR(
+          logging_interface_->get_logger(),
+          "LaserScanMaskFilter: masks is not defined in the config.");
+      return false;
+    }
 
     return true;
   }
@@ -116,7 +98,9 @@ public:
     data_out = data_in;
     if (masks_.find(data_out.header.frame_id) == masks_.end())
     {
-      ROS_WARN("LaserScanMaskFilter: frame_id %s is not registered.",
+      RCLCPP_WARN(
+          logging_interface_->get_logger(),
+          "LaserScanMaskFilter: frame_id %s is not registered.",
           data_out.header.frame_id.c_str());
       return true;
     }
