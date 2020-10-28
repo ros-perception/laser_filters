@@ -37,8 +37,8 @@
 #ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
-#include <filters/filter_base.h>
-#include <builtin_interfaces/msg/Time.hpp>
+#include <filters/filter_base.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -54,8 +54,9 @@ namespace laser_filters
         lower_angle_ = 0;
         upper_angle_ = 0;
 
-        if(!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_)){
-          ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
+        if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
+        {
+          RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -115,7 +116,7 @@ namespace laser_filters
         if(input_scan.intensities.size() >= count)
           filtered_scan.intensities.resize(count);
 
-        ROS_DEBUG("Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
+        RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
 
         return true;
 

@@ -39,17 +39,13 @@
 
 #include <set>
 
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 #ifdef _WIN32
 #define _USE_MATH_DEFINES // for C  
 #include <math.h>  
 #endif // _WIN32
-
-#ifndef ROS_INFO
-#define ROS_INFO(...)
-#endif // !ROS_INFO
 
 #include <angles/angles.h>
 
@@ -79,23 +75,23 @@ public:
   {
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
     {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
       return false;
     }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_angle"), max_angle_))
     {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
       return false;
     }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("window"), window_))
     {
-      ROS_ERROR("Error: ShadowsFilter was not given window.\n");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given window.\n");
       return false;
     }
     neighbors_ = 0;//default value
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("neighbors"), neighbors_))
     {
-      ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given neighbors.\n");
     }
 
     return true;
@@ -149,7 +145,7 @@ public:
       }
     }
 
-    ROS_DEBUG("ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d", (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
+    RCLCPP_DEBUG(logging_interface_->get_logger(), "ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d", (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
     for ( std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
       {
           scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value
