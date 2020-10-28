@@ -71,12 +71,7 @@ public:
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
-
-    rclcpp::Parameter variant;
-    if (!nh_->get_parameter("filter_chain", variant))
-      filter_chain_.configure("filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
-    else
-      filter_chain_.configure("scan_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
+    filter_chain_.configure("scan_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
 
     std::string tf_message_filter_target_frame;
     if (nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame))
