@@ -71,7 +71,7 @@ public:
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
-    filter_chain_.configure("scan_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
+    filter_chain_.configure("", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
 
     std::string tf_message_filter_target_frame;
     if (nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame))
