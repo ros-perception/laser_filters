@@ -37,10 +37,7 @@
 
 #include "message_filters/subscriber.h"
 
-// TODO: fix this
-#define NO_TIMER
-
-#include "filters/filter_chain.h"
+#include "filters/filter_chain.hpp"
 
 class ScanToScanFilterChain
 {
@@ -63,43 +60,34 @@ protected:
   sensor_msgs::msg::LaserScan msg_;
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr output_pub_;
 
-  // Deprecation helpers
-#ifndef NO_TIMER
-  ros::Timer deprecation_timer_;
-#endif // !NO_TIMER
-  bool  using_filter_chain_deprecated_;
-
 public:
   // Constructor
-  ScanToScanFilterChain(rclcpp::Node::SharedPtr node) :
-    nh_(node),
-    scan_sub_(nh_, "scan", 50),
-    tf_(NULL),
-    tf_filter_(NULL),
-    filter_chain_("sensor_msgs::msg::LaserScan")
+  ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
+      : nh_(node),
+        tf_(NULL),
+        buffer_(nh_->get_clock()),
+        scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data),
+        tf_filter_(NULL),
+        filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
-    
-    rclcpp::parameter::ParameterVariant variant;
-    using_filter_chain_deprecated_ = !nh_->get_parameter("filter_chain", variant);
 
-    if (using_filter_chain_deprecated_)
-      filter_chain_.configure("filter_chain", nh_);
+    rclcpp::Parameter variant;
+    if (!nh_->get_parameter("filter_chain", variant))
+      filter_chain_.configure("filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
     else
-      filter_chain_.configure("scan_filter_chain", nh_);
-    
-    std::string tf_message_filter_target_frame;
+      filter_chain_.configure("scan_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
 
-    if (nh_->get_parameter("tf_message_filter_target_frame", variant))
+    std::string tf_message_filter_target_frame;
+    if (nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame))
     {
-      nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame);
 
       nh_->get_parameter_or("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
 
       tf_.reset(new tf2_ros::TransformListener(buffer_));
-      tf_filter_.reset(new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, buffer_, "", 50));
+      tf_filter_.reset(new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, buffer_, "", 50, nh_));
       tf_filter_->setTargetFrame(tf_message_filter_target_frame);
-      tf_filter_->setTolerance(tf2::Duration(ros::Duration(tf_filter_tolerance_).toNSec()));
+      tf_filter_->setTolerance(std::chrono::duration<double>(tf_filter_tolerance_));
 
       // Setup tf::MessageFilter generates callback
       tf_filter_->registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
@@ -112,11 +100,6 @@ public:
     
     // Advertise output
     output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
-
-#ifndef NO_TIMER
-    // Set up deprecation printout
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, _1));
-#endif // !NO_TIMER
   }
 
   // Destructor
@@ -127,15 +110,6 @@ public:
     if (tf_)
       tf_.reset();
   }
-  
-#ifndef NO_TIMER
-  // Deprecation warning callback
-  void deprecation_warn(const ros::TimerEvent& e)
-  {
-    if (using_filter_chain_deprecated_)
-      ROS_WARN("Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
-  }
-#endif // !NO_TIMER
 
   // Callback
   void callback(const std::shared_ptr<const sensor_msgs::msg::LaserScan>& msg_in)
@@ -151,7 +125,6 @@ public:
 
 int main(int argc, char **argv)
 {
-  ros::Time::init();
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_to_scan_filter_chain");
   ScanToScanFilterChain t(nh);
