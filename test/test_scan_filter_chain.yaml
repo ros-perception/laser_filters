@@ -61,7 +61,7 @@ mask_filter_chain:
       type: laser_filters/LaserScanMaskFilter
       params:
         masks:
-          - laser
-        laser:
+          laser:
           - 1.
           - 5.
+
