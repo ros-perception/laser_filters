@@ -1,15 +1,18 @@
-scan_filter_chain:
-- name: shadows
-  type: ScanShadowsFilter
-  params:
-    min_angle: 10
-    max_angle: 170
-    neighbors: 20
-    window: 1
-- name: dark_shadows
-  type: LaserScanIntensityFilter
-  params: 
-    lower_threshold: 100
-    upper_threshold: 10000
-    disp_histogram: 0
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      name: shadows
+      type: laser_filters/ScanShadowsFilter
+      params:
+        min_angle: 10.
+        max_angle: 170.
+        neighbors: 20
+        window: 1
+    filter2:
+      name: dark_shadows
+      type: laser_filters/LaserScanIntensityFilter
+      params: 
+        lower_threshold: 100.
+        upper_threshold: 10000.
+        disp_histogram: 0
 
