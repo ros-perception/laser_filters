@@ -56,17 +56,18 @@
 typedef tf2::Vector3 Point;
 
 #include <laser_geometry/laser_geometry.hpp>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 namespace laser_filters
 {
 /**
  * @brief This is a filter that removes points in a laser scan inside of a cartesian box.
  */
-class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp::Node
+class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode
 {
   public:
-    LaserScanBoxFilter() : rclcpp::Node("laser_scan_box_filter"), buffer_(get_clock()), tf_(buffer_){};
-    
+    LaserScanBoxFilter() : rclcpp_lifecycle::LifecycleNode("laser_scan_box_filter"), buffer_(get_clock()), tf_(buffer_){};
+
     bool configure()
     {
       up_and_running_ = true;

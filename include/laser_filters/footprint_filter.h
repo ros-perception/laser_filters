@@ -49,17 +49,19 @@ This is useful for ground plane extraction
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp> // PointCloud2ConstIterator
 #include <geometry_msgs/msg/point32.hpp>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 #include "laser_geometry/laser_geometry.hpp"
 
 namespace laser_filters
 {
 
-class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp::Node
+class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode
 {
 public:
   LaserScanFootprintFilter()
-      : rclcpp::Node("laser_scan_footprint_filter"), buffer_(get_clock()), tf_(buffer_), up_and_running_(false) {}
+      : rclcpp_lifecycle::LifecycleNode("laser_scan_footprint_filter"), 
+        buffer_(get_clock()), tf_(buffer_), up_and_running_(false) {}
 
   bool configure()
   {

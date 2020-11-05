@@ -48,14 +48,15 @@ This is useful for ground plane extraction
 #include "geometry_msgs/msg/point32.hpp"
 #include "sensor_msgs/point_cloud2_iterator.hpp"
 #include "pcl_ros/transforms.hpp"
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 namespace laser_filters
 {
 
-class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud2>, public rclcpp::Node
+class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud2>, public rclcpp_lifecycle::LifecycleNode
 {
 public:
-  PointCloudFootprintFilter() : rclcpp::Node("point_cloud_footprint_filter"), buffer_(get_clock()), tf_(buffer_)
+  PointCloudFootprintFilter() : rclcpp_lifecycle::LifecycleNode("point_cloud_footprint_filter"), buffer_(get_clock()), tf_(buffer_)
   {
     RCLCPP_WARN(get_logger(), "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
   }
