@@ -30,7 +30,7 @@ endforeach()
 ##############################################################################
 
 pluginlib_export_plugin_description_file(filters laser_filters_plugins.xml)
-ament_auto_package()
+ament_auto_package(INSTALL_TO_SHARE examples)
 
 ##############################################################################
 # Test
