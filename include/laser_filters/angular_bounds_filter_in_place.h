@@ -37,7 +37,7 @@
 #ifndef LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -53,8 +53,9 @@ namespace laser_filters
         lower_angle_ = 0;
         upper_angle_ = 0;
 
-        if(!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_)){
-          ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
+        if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
+        {
+          RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -80,7 +81,7 @@ namespace laser_filters
           current_angle += input_scan.angle_increment;
         }
 
-        ROS_DEBUG("Filtered out %u points from the laser scan.", count);
+        RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
 
         return true;
 

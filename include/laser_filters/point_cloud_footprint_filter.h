@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef LASER_SCAN_FOOTPRINT_FILTER_H
-#define LASER_SCAN_FOOTPRINT_FILTER_H
+#ifndef POINT_CLOUD_FOOTPRINT_FILTER_H
+#define POINT_CLOUD_FOOTPRINT_FILTER_H
 /**
 \author Tully Foote
 @b ScanFootprintFilter takes input scans and corrects for footprint angle assuming a flat target.  
@@ -41,27 +41,31 @@ This is useful for ground plane extraction
 
 **/
 
-#include "laser_geometry/laser_geometry.h"
-#include "filters/filter_base.h"
+#include "laser_geometry/laser_geometry.hpp"
+#include "filters/filter_base.hpp"
 #include "tf2_ros/transform_listener.h"
-#include "sensor_msgs/msg/Point_Cloud.hpp"
-#include "geometry_msgs/msg/Point32.hpp"
+#include "sensor_msgs/msg/point_cloud2.hpp"
+#include "geometry_msgs/msg/point32.hpp"
+#include "sensor_msgs/point_cloud2_iterator.hpp"
+#include "pcl_ros/transforms.hpp"
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 namespace laser_filters
 {
 
-class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud>
+class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud2>, public rclcpp_lifecycle::LifecycleNode
 {
 public:
-  PointCloudFootprintFilter() : tf_(buffer_) {
-    ROS_WARN("PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
+  PointCloudFootprintFilter() : rclcpp_lifecycle::LifecycleNode("point_cloud_footprint_filter"), buffer_(get_clock()), tf_(buffer_)
+  {
+    RCLCPP_WARN(get_logger(), "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
   }
 
   bool configure()
   {
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
-      ROS_ERROR("PointCloudFootprintFilter needs inscribed_radius to be set");
+      RCLCPP_ERROR(get_logger(), "PointCloudFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
@@ -72,53 +76,57 @@ public:
 
   }
 
-  bool update(const sensor_msgs::msg::PointCloud& input_scan, sensor_msgs::msg::PointCloud& filtered_scan)
+  bool update(const sensor_msgs::msg::PointCloud2 &input_scan, sensor_msgs::msg::PointCloud2 &filtered_scan)
   {
-    if(&input_scan == &filtered_scan){
-      ROS_ERROR("This filter does not currently support in place copying");
-      return false;
-    }
-    sensor_msgs::msg::PointCloud laser_cloud;
-
-#ifndef TRANSFORM_LISTENER_NOT_IMPLEMENTED
-    // TODO: need to fix this ... implement transformPointClound
-
-    try{
-      tf_.transformPointCloud("base_link", input_scan, laser_cloud);
-    }
-    catch(tf2::TransformException& ex){
-      ROS_ERROR("Transform unavailable %s", ex.what());
-      return false;
-    }
-#endif // !TRANSFORM_LISTENER_NOT_IMPLEMENTED
-
-    filtered_scan.header = input_scan.header;
-    filtered_scan.points.resize (input_scan.points.size());
-    filtered_scan.channels.resize (input_scan.channels.size());
-    for (unsigned int d = 0; d < input_scan.channels.size (); d++){
-      filtered_scan.channels[d].values.resize  (input_scan.points.size());
-      filtered_scan.channels[d].name = input_scan.channels[d].name;
-    }
-
-    int num_pts = 0;
-    for (unsigned int i=0; i < laser_cloud.points.size(); i++)  
+    if (&input_scan == &filtered_scan)
     {
-      if (!inFootprint(laser_cloud.points[i])){
-        filtered_scan.points[num_pts] = input_scan.points[i];
-        for (unsigned int d = 0; d < filtered_scan.channels.size (); d++)
-          filtered_scan.channels[d].values[num_pts] = input_scan.channels[d].values[i];
-        num_pts++;
-      }
+      RCLCPP_ERROR(get_logger(), "This filter does not currently support in place copying");
+      return false;
+    }
+    sensor_msgs::msg::PointCloud2 laser_cloud;
+
+    try
+    {
+      pcl_ros::transformPointCloud("base_link", input_scan, laser_cloud, buffer_);
+    }
+    catch (tf2::TransformException &ex)
+    {
+      RCLCPP_ERROR(get_logger(), "Transform unavailable %s", ex.what());
+      return false;
     }
 
-    // Resize output vectors
-    filtered_scan.points.resize (num_pts);
-    for (unsigned int d = 0; d < filtered_scan.channels.size (); d++)
-      filtered_scan.channels[d].values.resize (num_pts);
+    filtered_scan.header = laser_cloud.header;
+    filtered_scan.height = 1;
+    // filtered_scan.width = 0;
+    filtered_scan.fields = laser_cloud.fields;
+    filtered_scan.is_bigendian = laser_cloud.is_bigendian;
+    filtered_scan.point_step = laser_cloud.point_step;
+    // filtered_scan.row_step = 0;
+    filtered_scan.data.reserve(laser_cloud.data.size());
+    filtered_scan.is_dense = laser_cloud.is_dense;
 
-    return true;
+    int index = 0;
+    auto iter_x = sensor_msgs::PointCloud2ConstIterator<float>(laser_cloud, "x");
+    for (; iter_x != iter_x.end(); ++index, ++iter_x)
+    {
+      geometry_msgs::msg::Point32 point;
+      point.x = (&*iter_x)[0];
+      point.y = (&*iter_x)[1];
+      point.z = (&*iter_x)[2];
+
+      if (inFootprint(point))
+      {
+        filtered_scan.data.insert(
+            filtered_scan.data.end(),
+            laser_cloud.data.begin() + (index + 0) * laser_cloud.point_step,
+            laser_cloud.data.begin() + (index + 1) * laser_cloud.point_step);
+      }
+      filtered_scan.row_step = filtered_scan.data.size();
+      filtered_scan.width = filtered_scan.row_step / filtered_scan.point_step;
+    }
+
+      return true;
   }
-
 
   bool inFootprint(const geometry_msgs::msg::Point32& scan_pt){
     if(scan_pt.x < -1.0 * inscribed_radius_ || scan_pt.x > inscribed_radius_ || scan_pt.y < -1.0 * inscribed_radius_ || scan_pt.y > inscribed_radius_)

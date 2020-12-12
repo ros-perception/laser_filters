@@ -39,8 +39,7 @@
 @b ScanRangeFilter takes input scans and filters within indicated range.
 **/
 
-
-#include "filters/filter_base.h"
+#include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters

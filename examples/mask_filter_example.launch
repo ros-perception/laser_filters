@@ -1,6 +1,0 @@
-<launch>
-<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen" name="laser_filter">
-      <remap from="scan" to="base_scan" />
-      <rosparam command="load" file="$(find laser_filters)/examples/mask_filter_example.yaml" />
-</node>
-</launch>

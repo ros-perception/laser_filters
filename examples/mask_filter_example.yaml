@@ -1,15 +1,16 @@
-scan_filter_chain:
-- name: mask
-  type: laser_filters/LaserScanMaskFilter
-  params:
-    masks:
-      laser:
-      - 100
-      - 101
-      - 102
-      - 103
-      - 104
-      - 1000
-      - 1001
-      - 1002
-      laser2: []
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      name: mask
+      type: laser_filters/LaserScanMaskFilter
+      params:
+        masks:
+          laser:
+          - 100.
+          - 101.
+          - 102.
+          - 103.
+          - 104.
+          - 1000.
+          - 1001.
+          - 1002.
