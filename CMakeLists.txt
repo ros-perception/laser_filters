@@ -6,7 +6,6 @@ project(laser_filters)
 ##############################################################################
 
 find_package(ament_cmake_auto REQUIRED)
-
 ament_auto_find_build_dependencies()
 
 ##############################################################################
