@@ -124,6 +124,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
         const sensor_msgs::msg::LaserScan &input_scan,
         sensor_msgs::msg::LaserScan &output_scan)
     {
+      RCLCPP_ERROR(get_logger(), "In update box");
       using namespace std::chrono_literals;
       output_scan = input_scan;
       sensor_msgs::msg::PointCloud2 laser_cloud;
