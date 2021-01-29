@@ -28,7 +28,7 @@
  */
 
 #include "sensor_msgs/msg/point_cloud2.hpp"
-//#include "laser_filters/point_cloud_footprint_filter.h"
+#include "laser_filters/point_cloud_footprint_filter.h"
 #include <pluginlib/class_list_macros.hpp>  // NOLINT
 
-//PLUGINLIB_EXPORT_CLASS(laser_filters::PointCloudFootprintFilter, filters::FilterBase<sensor_msgs::msg::PointCloud2>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::PointCloudFootprintFilter, filters::FilterBase<sensor_msgs::msg::PointCloud2>)

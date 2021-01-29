@@ -94,7 +94,6 @@ public:
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given neighbors.\n");
     }
 
-    RCLCPP_INFO(logging_interface_->get_logger(), "In shadow configure done");
     return true;
   }
 
