@@ -40,10 +40,8 @@
 #ifndef SPECKLE_FILTER_H
 #define SPECKLE_FILTER_H
 
-#include <dynamic_reconfigure/server.h>
 #include <filters/filter_base.h>
-#include <laser_filters/SpeckleFilterConfig.h>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {
@@ -51,12 +49,12 @@ namespace laser_filters
 class WindowValidator
 {
 public:
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference) = 0;
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan & scan, size_t idx, size_t window, double max_range_difference) = 0;
 };
 
 class DistanceWindowValidator : public WindowValidator
 {
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference)
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan & scan, size_t idx, size_t window, double max_range_difference)
   {
     const float& range = scan.ranges[idx];
     if (range != range) {
@@ -81,7 +79,7 @@ class DistanceWindowValidator : public WindowValidator
 
 class RadiusOutlierWindowValidator : public WindowValidator
 {
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_distance)
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan& scan, size_t idx, size_t window, double max_distance)
   {
     int num_neighbors = 0;
     const float& r1 = scan.ranges[idx];
@@ -152,20 +150,78 @@ class RadiusOutlierWindowValidator : public WindowValidator
 /**
  * @brief This is a filter that removes speckle points in a laser scan based on consecutive ranges
  */
-class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-  LaserScanSpeckleFilter();
-  ~LaserScanSpeckleFilter();
-  bool configure();
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
+  std::string filter_type;
+  double max_range, max_range_difference, filter_window;
+  LaserScanSpeckleFilter() {
+
+  }
+
+  ~LaserScanSpeckleFilter() {};
+
+  bool configure()
+  {
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
+    {
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+      return false;
+    }
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_window"), filter_window))
+    {
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+      return false;
+    }
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range"), max_range))
+    {
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+      return false;
+    }
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range_difference"), max_range_difference))
+    {
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan)
+  {
+    output_scan = input_scan;
+    std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
+    for (size_t idx = 0; idx < output_scan.ranges.size() -filter_window + 1; ++idx)
+    {
+      bool window_valid = validator_->checkWindowValid(
+            output_scan, idx, filter_window, max_range_difference);
+
+      // Actually set the valid ranges (do not set to false if it was already valid or out of range)
+      for (size_t neighbor_idx_or_self_nr = 0; neighbor_idx_or_self_nr < filter_window; ++neighbor_idx_or_self_nr)
+      {
+        size_t neighbor_idx_or_self = idx + neighbor_idx_or_self_nr;
+        if (neighbor_idx_or_self < output_scan.ranges.size())  // Out of bound check
+        {
+          bool out_of_range = output_scan.ranges[neighbor_idx_or_self] > max_range;
+          valid_ranges[neighbor_idx_or_self] = valid_ranges[neighbor_idx_or_self] || window_valid || out_of_range;
+        }
+      }
+    }
+
+    for (size_t idx = 0; idx < valid_ranges.size(); ++idx)
+    {
+      if (!valid_ranges[idx])
+      {
+        output_scan.ranges[idx] = std::numeric_limits<float>::quiet_NaN();
+      }
+    }
+
+    return true;
+  }
 
 private:
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>> dyn_server_;
-  void reconfigureCB(laser_filters::SpeckleFilterConfig& config, uint32_t level);
-  boost::recursive_mutex own_mutex_;
+//  boost::recursive_mutex own_mutex_;
 
-  SpeckleFilterConfig config_ = SpeckleFilterConfig::__getDefault__();
   WindowValidator* validator_;
 };
 }
