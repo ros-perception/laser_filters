@@ -163,6 +163,7 @@ public:
 
   bool configure()
   {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "In speckle configure");
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
     {
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
@@ -189,6 +190,7 @@ public:
 
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan)
   {
+    RCLCPP_INFO(logging_interface_->get_logger(), "In speckle update");
     output_scan = input_scan;
     std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
     for (size_t idx = 0; idx < output_scan.ranges.size() -filter_window + 1; ++idx)

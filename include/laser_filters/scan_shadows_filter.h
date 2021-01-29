@@ -73,6 +73,7 @@ public:
   /**@b Configure the filter from XML */
   bool configure()
   {
+    RCLCPP_INFO(logging_interface_->get_logger(), "In shadow configure");
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
     {
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
@@ -94,6 +95,7 @@ public:
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given neighbors.\n");
     }
 
+    RCLCPP_INFO(logging_interface_->get_logger(), "In shadow configure done");
     return true;
   }
 
@@ -118,6 +120,7 @@ public:
    */
   bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
   {
+    RCLCPP_INFO(logging_interface_->get_logger(), "In shadow update");
     //copy across all data first
     scan_out = scan_in;
 
