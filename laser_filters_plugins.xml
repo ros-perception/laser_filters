@@ -42,6 +42,12 @@
 	 This is a filter that removes points in a laser scan inside of certain angular bounds.
       </description>
     </class>
+    <class name="laser_filters/LaserScanSectorFilter" type="laser_filters::LaserScanSectorFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+        This is a filter that removes points in a laser scan inside/outside of a circle sector.
+      </description>
+    </class>
      <class name="laser_filters/LaserScanBoxFilter" type="laser_filters::LaserScanBoxFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
       <description>

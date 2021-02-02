@@ -24,6 +24,7 @@ generate_dynamic_reconfigure_options(
   cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
   cfg/SpeckleFilter.cfg
+  cfg/SectorFilter.cfg
 )
 
 catkin_package(
@@ -48,6 +49,7 @@ add_library(laser_scan_filters
   src/polygon_filter.cpp
   src/speckle_filter.cpp
   src/intensity_filter.cpp
+  src/sector_filter.cpp
 )
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
