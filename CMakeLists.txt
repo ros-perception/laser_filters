@@ -24,6 +24,7 @@ generate_dynamic_reconfigure_options(
   cfg/PolygonFilter.cfg
   cfg/ScanShadowsFilter.cfg
   cfg/SpeckleFilter.cfg
+  cfg/AngularIntervalFilter.cfg
 )
 
 catkin_package(

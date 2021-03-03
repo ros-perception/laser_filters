@@ -31,6 +31,7 @@
 #include "laser_filters/array_filter.h"
 #include "laser_filters/intensity_filter.h"
 #include "laser_filters/range_filter.h"
+#include "laser_filters/angular_interval_filter.h"
 #include "laser_filters/scan_mask_filter.h"
 #include "laser_filters/scan_shadows_filter.h"
 #include "laser_filters/footprint_filter.h"
@@ -51,6 +52,7 @@ PLUGINLIB_EXPORT_CLASS(laser_filters::LaserMedianFilter, filters::FilterBase<sen
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserArrayFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanRangeFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanAngularIntervalFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanAngularBoundsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanAngularBoundsFilterInPlace, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
