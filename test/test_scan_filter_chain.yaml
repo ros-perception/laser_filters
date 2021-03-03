@@ -50,3 +50,9 @@ mask_filter_chain:
       laser:
       - 1
       - 5
+
+angular_interval_chain:
+- name: angular_interval
+  type: laser_filters/LaserScanAngularIntervalFilter
+  params:
+    interval_sets: "[[0,0.5],[2,3.2],[5,6.5]]"
