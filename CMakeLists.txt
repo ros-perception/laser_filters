@@ -22,6 +22,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 generate_dynamic_reconfigure_options(
   cfg/IntensityFilter.cfg
   cfg/PolygonFilter.cfg
+  cfg/RangeFilter.cfg
   cfg/ScanShadowsFilter.cfg
   cfg/SpeckleFilter.cfg
 )
