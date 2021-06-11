@@ -40,6 +40,8 @@
 **/
 
 
+#include <dynamic_reconfigure/server.h>
+#include <laser_filters/RangeFilterConfig.h>
 #include "filters/filter_base.h"
 #include "sensor_msgs/LaserScan.h"
 
@@ -48,34 +50,27 @@ namespace laser_filters
 
 class LaserScanRangeFilter : public filters::FilterBase<sensor_msgs::LaserScan>
 {
+  std::shared_ptr<dynamic_reconfigure::Server<RangeFilterConfig>> dyn_server_;
+  boost::recursive_mutex own_mutex_;
+
+  RangeFilterConfig config_ = RangeFilterConfig::__getDefault__();
+
 public:
-
-  double lower_threshold_ ;
-  double upper_threshold_ ;
-  bool use_message_range_limits_ ;
-  float lower_replacement_value_ ;
-  float upper_replacement_value_ ;
-
   bool configure()
   {
-    use_message_range_limits_ = false;
-    getParam("use_message_range_limits", use_message_range_limits_);
+    ros::NodeHandle private_nh("~" + getName());
+    dyn_server_.reset(new dynamic_reconfigure::Server<RangeFilterConfig>(own_mutex_, private_nh));
+    dynamic_reconfigure::Server<RangeFilterConfig>::CallbackType f;
+    f = boost::bind(&LaserScanRangeFilter::reconfigureCB, this, _1, _2);
+    dyn_server_->setCallback(f);
 
-    // work around the not implemented getParam(std::string name, float& value) method
-    double temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    getParam("lower_replacement_value", temp_replacement_value);
-    lower_replacement_value_ = static_cast<float>(temp_replacement_value);
+    getParam("lower_threshold", config_.lower_threshold);
+    getParam("upper_threshold", config_.upper_threshold);
+    getParam("use_message_range_limits", config_.use_message_range_limits);
+    getParam("lower_replacement_value", config_.lower_replacement_value);
+    getParam("upper_replacement_value", config_.upper_replacement_value);
 
-    // work around the not implemented getParam(std::string name, float& value) method
-    temp_replacement_value = std::numeric_limits<double>::quiet_NaN();
-    getParam("upper_replacement_value", temp_replacement_value);
-    upper_replacement_value_ = static_cast<float>(temp_replacement_value);
-
-
-    lower_threshold_ = 0.0;
-    upper_threshold_ = 100000.0;
-    getParam("lower_threshold", lower_threshold_);
-    getParam("upper_threshold", upper_threshold_) ;
+    dyn_server_->updateConfig(config_);
     return true;
   }
 
@@ -86,10 +81,13 @@ public:
 
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
   {
-    if (use_message_range_limits_)
+    double lower_threshold = config_.lower_threshold;
+    double upper_threshold = config_.upper_threshold;
+
+    if (config_.use_message_range_limits)
     {
-      lower_threshold_ = input_scan.range_min;
-      upper_threshold_ = input_scan.range_max;
+      lower_threshold = input_scan.range_min;
+      upper_threshold = input_scan.range_max;
     }
     filtered_scan = input_scan;
     for (unsigned int i=0;
@@ -97,18 +95,23 @@ public:
          i++) // Need to check ever reading in the current scan
     {
 
-      if (filtered_scan.ranges[i] <= lower_threshold_)
+      if (filtered_scan.ranges[i] <= lower_threshold)
       {
-        filtered_scan.ranges[i] = lower_replacement_value_;
+        filtered_scan.ranges[i] = config_.lower_replacement_value;
 
       }
-      else if (filtered_scan.ranges[i] >= upper_threshold_)
+      else if (filtered_scan.ranges[i] >= upper_threshold)
       {
-        filtered_scan.ranges[i] = upper_replacement_value_;
+        filtered_scan.ranges[i] = config_.upper_replacement_value;
       }
     }
 
     return true;
+  }
+
+  void reconfigureCB(RangeFilterConfig& config, uint32_t level)
+  {
+    config_ = config;
   }
 } ;
 
