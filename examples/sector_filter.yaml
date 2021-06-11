@@ -1,0 +1,10 @@
+scan_filter_chain:
+- name: scan_filter
+  type: laser_filters/LaserScanSectorFilter
+  params:
+    angle_min: 2.54                     # if not specified defaults to 0.0
+    angle_max: -2.54                    # if not specified defaults to 0.0
+    range_min: 0.2                      # if not specified defaults to 0.0
+    range_max: 2.0                      # if not specified defaults to 100000.0
+    clear_inside: true                  # if not specified defaults to true
+    invert: false                       # (!clear_inside) if not specified defaults to false

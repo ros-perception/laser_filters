@@ -41,6 +41,7 @@
 #include "laser_filters/polygon_filter.h"
 #include "laser_filters/speckle_filter.h"
 #include "laser_filters/scan_blob_filter.h"
+#include "laser_filters/sector_filter.h"
 #include "sensor_msgs/LaserScan.h"
 #include "filters/filter_base.h"
 
@@ -61,4 +62,4 @@ PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanPolygonFilter, filters::FilterBas
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanSpeckleFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanMaskFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::ScanBlobFilter, filters::FilterBase<sensor_msgs::LaserScan>)
-
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanSectorFilter, filters::FilterBase<sensor_msgs::LaserScan>)
