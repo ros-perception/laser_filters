@@ -51,7 +51,7 @@
 //Filters
 #include "filters/filter_chain.h"
 
-/** @b ScanShadowsFilter is a simple node that filters shadow points in a laser scan line and publishes the results in a cloud.
+/** @b ScanToCloudFilterChain combines scan filtering, scan->cloud conversion and cloud filtering.
  */
 class ScanToCloudFilterChain
 {
@@ -80,6 +80,7 @@ public:
   filters::FilterChain<sensor_msgs::PointCloud2> cloud_filter_chain_;
   filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
   ros::Publisher cloud_pub_;
+  unsigned int channel_options_;
 
   // Timer for displaying deprecation warnings
   ros::Timer deprecation_timer_;
@@ -121,6 +122,24 @@ public:
     private_nh.param("scan_topic", scan_topic_, std::string("tilt_scan"));
     private_nh.param("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
     private_nh.param("incident_angle_correction", incident_angle_correction_, true);
+
+    channel_options_ = laser_geometry::channel_option::None;
+    bool hasChannel;
+    private_nh.param("cloud_channel_intensity", hasChannel, true);
+    if (hasChannel)
+      channel_options_ |= laser_geometry::channel_option::Intensity;
+    private_nh.param("cloud_channel_index", hasChannel, true);
+    if (hasChannel)
+      channel_options_ |= laser_geometry::channel_option::Index;
+    private_nh.param("cloud_channel_distance", hasChannel, true);
+    if (hasChannel)
+      channel_options_ |= laser_geometry::channel_option::Distance;
+    private_nh.param("cloud_channel_timestamp", hasChannel, true);
+    if (hasChannel)
+      channel_options_ |= laser_geometry::channel_option::Timestamp;
+    private_nh.param("cloud_channel_viewpoint", hasChannel, false);
+    if (hasChannel)
+      channel_options_ |= laser_geometry::channel_option::Viewpoint;
 
     filter_.setTargetFrame(target_frame_);
     filter_.registerCallback(boost::bind(&ScanToCloudFilterChain::scanCallback, this, _1));
@@ -214,16 +233,12 @@ public:
     }
 
     // Transform into a PointCloud message
-    int mask = laser_geometry::channel_option::Intensity |
-      laser_geometry::channel_option::Distance |
-      laser_geometry::channel_option::Index |
-      laser_geometry::channel_option::Timestamp;
       
     if (high_fidelity_)
     {
       try
       {
-        projector_.transformLaserScanToPointCloud (target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
+        projector_.transformLaserScanToPointCloud (target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, channel_options_);
       }
       catch (tf::TransformException &ex)
       {
@@ -234,7 +249,7 @@ public:
     }
     else
     {
-      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, mask);
+      projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, channel_options_);
     }
       
     sensor_msgs::PointCloud2 filtered_cloud;
