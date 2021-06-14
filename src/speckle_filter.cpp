@@ -75,7 +75,12 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
 {
   output_scan = input_scan;
   std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
-  for (size_t idx = 0; idx < output_scan.ranges.size() - config_.filter_window + 1; ++idx)
+
+  /*Check if range size is big enough to set the window */
+  size_t maxIdx = output_scan.ranges.size();
+  if(maxIdx >  config_.filter_window  && config_.filter_window  > 0) maxIdx -= (config_.filter_window-1);
+
+  for (size_t idx = 0; idx < maxIdx; ++idx)
   {
     bool window_valid = validator_->checkWindowValid(
           output_scan, idx, config_.filter_window, config_.max_range_difference);
