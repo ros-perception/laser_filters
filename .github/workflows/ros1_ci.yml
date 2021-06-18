@@ -24,7 +24,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    -name : Debug
+    - name : Debug
       run: pwd && ls
 
     - name: Build
