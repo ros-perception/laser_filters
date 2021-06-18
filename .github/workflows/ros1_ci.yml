@@ -23,6 +23,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    -name : Debug
+      run: pwd && ls
 
     - name: Build
       # Build your program with the given configuration
