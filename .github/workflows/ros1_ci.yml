@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ros:noetic-robot
+      # The perception docker images includes laser_geometry, which we need.
+      image: ros:noetic-perception
 
     steps:
     - uses: actions/checkout@v2
