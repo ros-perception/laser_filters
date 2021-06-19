@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit with any error.
+set -e
+
 # Should be run from the root directory of the repo.
 BUILD_DIR=build
 
