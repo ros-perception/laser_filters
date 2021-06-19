@@ -4,7 +4,7 @@
     Assorted filters designed to operate on 2D planar laser scanners,
     which use the sensor_msgs/LaserScan type.
   </description>
-  <version>1.8.6</version>
+  <version>1.8.11</version>
   <maintainer email="jon.binney@gmail.com">Jon Binney</maintainer>
   <author>Tully Foote</author>
   <license>BSD</license>
@@ -13,6 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
@@ -24,6 +25,7 @@
   <build_depend>angles</build_depend>
   <build_depend>nodelet</build_depend>
 
+  <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>

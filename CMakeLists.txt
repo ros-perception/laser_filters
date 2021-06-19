@@ -1,20 +1,32 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(laser_filters)
+
+set(CMAKE_CXX_STANDARD 11)
 
 ##############################################################################
 # Find dependencies
 ##############################################################################
 
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
-  laser_geometry pluginlib angles nodelet)
+  laser_geometry pluginlib angles dynamic_reconfigure nodelet)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
-find_package(Boost REQUIRED COMPONENTS system signals)
+find_package(Boost REQUIRED COMPONENTS system)
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 ##############################################################################
 # Define package
 ##############################################################################
+
+# dynamic reconfigure
+generate_dynamic_reconfigure_options(
+  cfg/IntensityFilter.cfg
+  cfg/PolygonFilter.cfg
+  cfg/RangeFilter.cfg
+  cfg/ScanShadowsFilter.cfg
+  cfg/SpeckleFilter.cfg
+  cfg/SectorFilter.cfg
+)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -30,7 +42,16 @@ catkin_package(
 add_library(pointcloud_filters src/pointcloud_filters.cpp)
 target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
 
-add_library(laser_scan_filters src/laser_scan_filters.cpp src/median_filter.cpp src/array_filter.cpp src/box_filter.cpp)
+add_library(laser_scan_filters
+  src/laser_scan_filters.cpp
+  src/median_filter.cpp
+  src/array_filter.cpp
+  src/box_filter.cpp
+  src/polygon_filter.cpp
+  src/speckle_filter.cpp
+  src/intensity_filter.cpp
+  src/sector_filter.cpp
+)
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
@@ -46,13 +67,17 @@ target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBR
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_dependencies(laser_scan_filters ${PROJECT_NAME}_gencfg)
+
 if (CATKIN_ENABLE_TESTING)
   find_package(rostest)
   add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
-  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} gtest)
+  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} ${GTEST_LIBRARIES})
   add_dependencies(test_scan_filter_chain gtest)
 
   add_rostest(test/test_scan_filter_chain.launch)
+  add_rostest(test/test_polygon_filter.launch)
+  add_rostest(test/test_speckle_filter.launch)
 
   catkin_add_gtest(test_shadow_detector test/test_shadow_detector.cpp)
   target_link_libraries(test_shadow_detector ${catkin_LIBRARIES} ${rostest_LIBRARIES})

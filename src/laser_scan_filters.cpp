@@ -38,6 +38,10 @@
 #include "laser_filters/angular_bounds_filter.h"
 #include "laser_filters/angular_bounds_filter_in_place.h"
 #include "laser_filters/box_filter.h"
+#include "laser_filters/polygon_filter.h"
+#include "laser_filters/speckle_filter.h"
+#include "laser_filters/scan_blob_filter.h"
+#include "laser_filters/sector_filter.h"
 #include "sensor_msgs/LaserScan.h"
 #include "filters/filter_base.h"
 
@@ -54,4 +58,8 @@ PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanFootprintFilter, filters::FilterB
 PLUGINLIB_EXPORT_CLASS(laser_filters::ScanShadowsFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::InterpolationFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanBoxFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanPolygonFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanSpeckleFilter, filters::FilterBase<sensor_msgs::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanMaskFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::ScanBlobFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanSectorFilter, filters::FilterBase<sensor_msgs::LaserScan>)

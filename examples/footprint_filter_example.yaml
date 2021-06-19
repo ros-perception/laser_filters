@@ -1,5 +1,5 @@
 scan_filter_chain:
 - name: footprint_filter
-  type: LaserScanFootprintFilter
+  type: laser_filters/LaserScanFootprintFilter
   params:
     inscribed_radius: 0.325
