@@ -14,6 +14,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    continue-on-error: true
+
     container:
       # The perception docker images includes laser_geometry, which we need.
       image: ros:${{ matrix.rosdistro }}-perception
