@@ -6,7 +6,8 @@ set -e
 # Should be run from the root directory of the repo.
 BUILD_DIR=build
 
-cmake -B ${BUILD_DIR} -DCATKIN_ENABLE_TESTING=1
+mkdir -p ${BUILD_DIR}
+(cd ${BUILD_DIR} && cmake .. -DCATKIN_ENABLE_TESTING=1)
 
 # Build.
 make -C ${BUILD_DIR}

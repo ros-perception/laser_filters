@@ -8,15 +8,21 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        rosdistro: [kinetic, melodic, noetic]
+
     runs-on: ubuntu-latest
+
+    continue-on-error: true
 
     container:
       # The perception docker images includes laser_geometry, which we need.
-      image: ros:noetic-perception
+      image: ros:${{ matrix.rosdistro }}-perception
 
     steps:
     - uses: actions/checkout@v2
 
     - name: Build and run tests
-      run: . /opt/ros/noetic/setup.sh && ./ci.sh
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh
 
