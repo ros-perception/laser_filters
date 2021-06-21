@@ -1,0 +1,28 @@
+name: Build and run ROS tests
+
+on:
+  push:
+    branches: [ kinetic-devel ]
+  pull_request:
+    branches: [ kinetic-devel ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rosdistro: [kinetic, melodic, noetic]
+
+    runs-on: ubuntu-latest
+
+    continue-on-error: true
+
+    container:
+      # The perception docker images includes laser_geometry, which we need.
+      image: ros:${{ matrix.rosdistro }}-perception
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build and run tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh
+
