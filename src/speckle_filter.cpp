@@ -77,10 +77,10 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
 
   /*Check if range size is big enough to use the filter window */
-  if(output_scan.ranges.size() <= config_.filter_window +1)
+  if (output_scan.ranges.size() <= config_.filter_window + 1)
   {
-      ROS_ERROR("Scanner range size is too small: size = %i", output_scan.ranges.size());
-      return false;
+    ROS_ERROR("Scan ranges size is too small: size = %i", output_scan.ranges.size());
+    return false;
   }
 
   for (size_t idx = 0; idx < output_scan.ranges.size() - config_.filter_window + 1; ++idx)
