@@ -287,7 +287,7 @@ class ScanToCloudFilterChainNodelet : public nodelet::Nodelet
   std::unique_ptr<ScanToCloudFilterChain> chain_;
 
   void onInit() override {
-    chain_ = std::make_unique<ScanToCloudFilterChain>(getPrivateNodeHandle(), getName());
+    chain_ = std::unique_ptr<ScanToCloudFilterChain>(new ScanToCloudFilterChain(getPrivateNodeHandle(), getName()));
   }
 };
 
