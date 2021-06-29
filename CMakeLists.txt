@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 ##############################################################################
 
 set(THIS_PACKAGE_ROS_DEPS sensor_msgs roscpp tf filters message_filters
-  laser_geometry pluginlib angles dynamic_reconfigure)
+  laser_geometry pluginlib angles dynamic_reconfigure nodelet)
 
 find_package(catkin REQUIRED COMPONENTS ${THIS_PACKAGE_ROS_DEPS})
 find_package(Boost REQUIRED COMPONENTS system)
@@ -57,6 +57,10 @@ target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
 target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_library(scan_to_cloud_filter_chain_nodelet src/scan_to_cloud_filter_chain.cpp)
+target_link_libraries(scan_to_cloud_filter_chain_nodelet ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(scan_to_cloud_filter_chain_nodelet PRIVATE BUILDING_NODELET=1)
+
 add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
 target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -85,6 +89,7 @@ endif()
 
 install(TARGETS pointcloud_filters laser_scan_filters 
   scan_to_cloud_filter_chain
+  scan_to_cloud_filter_chain_nodelet
   scan_to_scan_filter_chain
   generic_laser_filter_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -96,6 +101,6 @@ install(TARGETS pointcloud_filters laser_scan_filters
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install(FILES laser_filters_plugins.xml
+install(FILES laser_filters_plugins.xml nodelets.xml
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

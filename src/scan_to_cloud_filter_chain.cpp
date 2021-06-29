@@ -51,6 +51,18 @@
 //Filters
 #include "filters/filter_chain.h"
 
+#if BUILDING_NODELET
+#include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+
+#define LASER_INFO NODELET_INFO
+#define LASER_WARN NODELET_WARN
+#else
+#define LASER_INFO ROS_INFO
+#define LASER_WARN ROS_WARN
+#endif
+
+
 /** @b ScanToCloudFilterChain combines scan filtering, scan->cloud conversion and cloud filtering.
  */
 class ScanToCloudFilterChain
@@ -69,6 +81,7 @@ public:
 
   ros::NodeHandle nh;
   ros::NodeHandle private_nh;
+  std::string name_;
     
   // TF
   tf::TransformListener tf_;
@@ -96,8 +109,9 @@ public:
   bool  incident_angle_correction_;
 
   ////////////////////////////////////////////////////////////////////////////////
-  ScanToCloudFilterChain () : laser_max_range_ (DBL_MAX), private_nh("~"), filter_(tf_, "", 50),
-                   cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
+  ScanToCloudFilterChain (ros::NodeHandle& pnh, const std::string& name) :
+      laser_max_range_ (DBL_MAX), private_nh(pnh), name_(name), filter_(tf_, "", 50),
+      cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
   {
     private_nh.param("high_fidelity", high_fidelity_, false);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
@@ -174,38 +188,44 @@ public:
       scan_filter_chain_.configure("scan_filter_chain", private_nh);
 
     deprecation_timer_ = nh.createTimer(ros::Duration(5.0), boost::bind(&ScanToCloudFilterChain::deprecation_warn, this, _1));
+
+    LASER_INFO("Scan to cloud filter initialized.");
   }
 
   // We use a deprecation warning on a timer to avoid warnings getting lost in the noise
   void deprecation_warn(const ros::TimerEvent& e)
   {
     if (using_scan_topic_deprecated_)
-      ROS_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      LASER_WARN("Use of '~scan_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_cloud_topic_deprecated_)
-      ROS_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      LASER_WARN("Use of '~cloud_topic' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_laser_max_range_deprecated_)
-      ROS_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      LASER_WARN("Use of '~laser_max_range' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_filter_window_deprecated_)
-      ROS_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
+      LASER_WARN("Use of '~filter_window' parameter in scan_to_cloud_filter_chain has been deprecated.");
 
     if (using_default_target_frame_deprecated_)
-      ROS_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
+      LASER_WARN("Use of default '~target_frame' parameter in scan_to_cloud_filter_chain has been deprecated.  Default currently set to 'base_link' please set explicitly as appropriate.");
 
     if (using_cloud_filters_deprecated_)
-      ROS_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
+      LASER_WARN("Use of '~cloud_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~cloud_filter_chain'");
 
     if (using_scan_filters_deprecated_)
-      ROS_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
+      LASER_WARN("Use of '~scan_filters/filter_chain' parameter in scan_to_cloud_filter_chain has been deprecated.  Replace with '~scan_filter_chain'");
 
     if (using_cloud_filters_wrong_deprecated_)
-      ROS_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
+      LASER_WARN("Use of '~cloud_filters/cloud_filter_chain' parameter in scan_to_cloud_filter_chain is incorrect.  Please Replace with '~cloud_filter_chain'");
 
     if (using_scan_filters_wrong_deprecated_)
-      ROS_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
+      LASER_WARN("Use of '~scan_filters/scan_filter_chain' parameter in scan_to_scan_filter_chain is incorrect.  Please Replace with '~scan_filter_chain'");
 
+  }
+
+  std::string getName() const {
+    return this->name_;
   }
 
 
@@ -242,7 +262,7 @@ public:
       }
       catch (tf::TransformException &ex)
       {
-        ROS_WARN("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
+        LASER_WARN("High fidelity enabled, but TF returned a transform exception to frame %s: %s", target_frame_.c_str (), ex.what ());
         return;
         //projector_.projectLaser (filtered_scan, scan_cloud, laser_max_range_, preservative_, mask);
       }
@@ -260,18 +280,28 @@ public:
 
 } ;
 
+#if BUILDING_NODELET
 
+class ScanToCloudFilterChainNodelet : public nodelet::Nodelet
+{
+  std::unique_ptr<ScanToCloudFilterChain> chain_;
 
+  void onInit() override {
+    chain_ = std::unique_ptr<ScanToCloudFilterChain>(new ScanToCloudFilterChain(getPrivateNodeHandle(), getName()));
+  }
+};
+
+PLUGINLIB_EXPORT_CLASS(ScanToCloudFilterChainNodelet, nodelet::Nodelet)
+#else
 int
 main (int argc, char** argv)
 {
   ros::init (argc, argv, "scan_to_cloud_filter_chain");
-  ros::NodeHandle nh;
-  ScanToCloudFilterChain f;
+  ros::NodeHandle pnh("~");
+  ScanToCloudFilterChain f(pnh, "");
 
   ros::spin();
 
   return (0);
 }
-
-
+#endif
