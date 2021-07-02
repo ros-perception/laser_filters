@@ -1,0 +1,33 @@
+name: Build and run ROS2 tests
+
+on:
+  push:
+    branches: [ foxy ]
+  pull_request:
+    branches: [ foxy ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rosdistro: [foxy]
+
+    runs-on: ubuntu-latest
+
+    continue-on-error: true
+
+    container:
+      # There don't seem to be ROS perception docker images for ros2 yet, so we
+      # use the base imageand install the rest of the dependencies using rosdep
+      # each time.
+      image: ros:${{ matrix.rosdistro }}-ros-base
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: rosdep install --from-path src -i -y --rosdistro {{ matrix.rosdistro }}
+
+    - name: Build and run tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh
+

@@ -20,8 +20,6 @@
   <depend>tf2_ros</depend>
   <depend>laser_geometry</depend>
   <depend>angles</depend>
-  <depend>rostime</depend>
-  <depend>pcl_ros</depend>
   <depend>rclcpp_lifecycle</depend>
   
   <test_depend>ament_cmake_gtest</test_depend>
