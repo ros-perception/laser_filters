@@ -67,12 +67,4 @@
       </description>
     </class>
   </library>
-  <library path="pointcloud_filters">
-    <class name="laser_filters/PointCloudFootprintFilter" type="laser_filters::PointCloudFootprintFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::PointCloud2>">
-      <description>
-	DEPRECATED: Remove points from the pointcloud inside the robot base. 
-      </description>
-    </class>
-  </library>
 </class_libraries>

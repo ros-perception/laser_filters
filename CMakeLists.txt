@@ -13,7 +13,6 @@ ament_auto_find_build_dependencies()
 ##############################################################################
 
 ament_auto_add_library(laser_scan_filters SHARED src/laser_scan_filters.cpp)
-ament_auto_add_library(pointcloud_filters SHARED src/pointcloud_filters.cpp)
 
 set(FILTER_CHAINS
     scan_to_cloud_filter_chain
