@@ -1,4 +1,4 @@
-name: Build and run ROS tests
+name: Build and run ROS2 tests
 
 on:
   push:
