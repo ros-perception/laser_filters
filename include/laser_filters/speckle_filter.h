@@ -40,7 +40,7 @@
 #ifndef SPECKLE_FILTER_H
 #define SPECKLE_FILTER_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -176,7 +176,8 @@ public:
   bool configure(){
     node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
-    node_->add_on_set_parameters_callback(std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+            std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
 
     // get params
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
@@ -262,6 +263,7 @@ private:
   double max_range_difference = 0;
   int filter_window = 0;
   rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
   {
