@@ -1,0 +1,19 @@
+scan_filter_chain:
+- name: speckle_filter
+  type: laser_filters/LaserScanSpeckleFilter
+  params:
+    # Select which filter type to use.
+    # 0: Range based filtering (distance between consecutive points)
+    # 1: Euclidean filtering based on radius outlier search
+    filter_type: 0
+
+    # Only ranges smaller than this range are taken into account
+    max_range: 2.0
+
+    # filter_type[0] (Distance): max distance between consecutive points
+    # filter_type[1] (RadiusOutlier): max distance between points
+    max_range_difference: 0.1
+
+    # filter_type[0] (Distance): Number of consecutive ranges that will be tested for max_distance
+    # filter_type[1] (RadiusOutlier): Minimum number of neighbors
+    filter_window: 2
