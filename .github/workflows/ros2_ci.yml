@@ -24,10 +24,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        path: src/laser_filters
 
     - name: Install dependencies
       run: rosdep update && apt-get update && rosdep install --from-path . -i -y --rosdistro ${{ matrix.rosdistro }}
 
-    - name: Build and run tests
-      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh
+    - name: Build tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && colcon build --event-handlers console_cohesion+
 
+    - name: Run tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && colcon test --event-handlers console_cohesion+
