@@ -33,10 +33,6 @@ jobs:
       with:
         path: src/laser_filters
 
-    # We need this from source until the next release fixes some bugs.
-    - name: Clone filters repo
-      run: git clone https://github.com/ros/filters src/filters -b ${{ matrix.filters_branch }}
-
     - name: Install dependencies
       run: rosdep update && apt-get update && rosdep install --from-path . -i -y --rosdistro ${{ matrix.rosdistro }}
 
