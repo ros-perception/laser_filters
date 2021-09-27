@@ -122,7 +122,7 @@ public:
     return true;
   }
 
-private:
+protected:
   tf::TransformListener tf_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
