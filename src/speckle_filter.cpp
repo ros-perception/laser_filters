@@ -79,7 +79,7 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   /*Check if range size is big enough to use the filter window */
   if (output_scan.ranges.size() <= config_.filter_window + 1)
   {
-    ROS_ERROR("Scan ranges size is too small: size = %i", output_scan.ranges.size());
+    ROS_ERROR("Scan ranges size is too small: size = %ld", output_scan.ranges.size());
     return false;
   }
 
