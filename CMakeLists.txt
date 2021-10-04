@@ -70,7 +70,15 @@ target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBR
 add_dependencies(laser_scan_filters ${PROJECT_NAME}_gencfg)
 
 if (CATKIN_ENABLE_TESTING)
+  if (CATKIN_ENABLE_PERFORMANCE_TESTING)
+    message("Enabling performance tests")
+    add_definitions(-DENABLE_PERFORMANCE)
+  else()
+    message("Disabled performance tests")
+  endif()
+
   find_package(rostest)
+
   add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
   target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} ${GTEST_LIBRARIES})
   add_dependencies(test_scan_filter_chain gtest)
@@ -81,6 +89,9 @@ if (CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(test_shadow_detector test/test_shadow_detector.cpp)
   target_link_libraries(test_shadow_detector ${catkin_LIBRARIES} ${rostest_LIBRARIES})
+
+  catkin_add_gtest(test_speckle_filter test/test_speckle_filter.cpp)
+  target_link_libraries(test_speckle_filter laser_scan_filters ${catkin_LIBRARIES} ${rostest_LIBRARIES})
 endif()
 
 ##############################################################################
