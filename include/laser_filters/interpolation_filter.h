@@ -41,7 +41,7 @@
 **/
 
 
-#include "filters/filter_base.h"
+#include <filters/filter_base.hpp>
 #include "sensor_msgs/LaserScan.h"
 
 namespace laser_filters

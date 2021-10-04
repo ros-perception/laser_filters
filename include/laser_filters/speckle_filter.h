@@ -41,7 +41,7 @@
 #define SPECKLE_FILTER_H
 
 #include <dynamic_reconfigure/server.h>
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 #include <laser_filters/SpeckleFilterConfig.h>
 #include <sensor_msgs/LaserScan.h>
 

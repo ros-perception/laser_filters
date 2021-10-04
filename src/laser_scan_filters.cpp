@@ -43,7 +43,7 @@
 #include "laser_filters/scan_blob_filter.h"
 #include "laser_filters/sector_filter.h"
 #include "sensor_msgs/LaserScan.h"
-#include "filters/filter_base.h"
+#include <filters/filter_base.hpp>
 
 #include "pluginlib/class_list_macros.h"
 

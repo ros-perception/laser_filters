@@ -42,7 +42,7 @@
 
 #include <dynamic_reconfigure/server.h>
 #include <laser_filters/RangeFilterConfig.h>
-#include "filters/filter_base.h"
+#include <filters/filter_base.hpp>
 #include "sensor_msgs/LaserScan.h"
 
 namespace laser_filters
