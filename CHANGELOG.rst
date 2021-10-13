@@ -2,6 +2,20 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Enable CI for foxy, galactic and rolling distros
+* Remove unneeded find_package of pcl_conversions
+* Port speckle filter to ros2
+* Remove pointcloud footprint filter
+  It has been deprecated for years, and is the only filter that depends on
+  pcl_ros. Removing it means we don't have to install the 500MB of
+  dependencies that pcl brings in on CI.
+* ROS2 migration (foxy)
+* Make laser_filters build for ros2 (on windows 10)
+* Updated deprecated pluginlib macros to avoid warning messages
+* Contributors: Brian Fjeldstad, Jon Binney, Jonathan Binney, Nick Lamprianidis, Nicolas Limpert, Patrick Lascombe, Rein Appeldoorn, hang
+
 1.8.5 (2017-09-06)
 ------------------
 * rename parameter to be more descriptive
