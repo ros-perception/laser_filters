@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.0 (2021-10-13)
+------------------
 * Enable CI for foxy, galactic and rolling distros
 * Remove unneeded find_package of pcl_conversions
 * Port speckle filter to ros2
