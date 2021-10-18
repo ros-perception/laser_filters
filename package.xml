@@ -11,6 +11,8 @@
 
   <url>http://ros.org/wiki/laser_filters</url>
 
+  <build_depend>ament_cmake_auto</build_depend>
+
   <depend>pluginlib</depend>
   <depend>sensor_msgs</depend>
   <depend>rclcpp</depend>
