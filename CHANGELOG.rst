@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.1 (2021-10-18)
+------------------
 * Add build depend on ament_cmake_auto
 * Contributors: Jon Binney
 
