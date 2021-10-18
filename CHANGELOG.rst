@@ -2,6 +2,11 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add build depend on ament_cmake_auto
+* Contributors: Jon Binney
+
 2.0.0 (2021-10-13)
 ------------------
 * Enable CI for foxy, galactic and rolling distros
