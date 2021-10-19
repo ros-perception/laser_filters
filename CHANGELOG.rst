@@ -2,6 +2,14 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add top level license file
+  The license is the same as it always has been; this commmit just copies
+  the license text from the source files into a top level LICENSE file to
+  make it clear.
+* Contributors: Jon Binney
+
 2.0.1 (2021-10-18)
 ------------------
 * Add build depend on ament_cmake_auto
