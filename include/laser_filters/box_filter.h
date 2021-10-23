@@ -72,7 +72,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
       const sensor_msgs::LaserScan& input_scan,
       sensor_msgs::LaserScan& filtered_scan);
 
-  private:
+  protected:
     bool inBox(tf::Point &point);
     std::string box_frame_;
     laser_geometry::LaserProjection projector_;
