@@ -28,7 +28,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <filters/filter_chain.h>
+#include <filters/filter_chain.hpp>
 #include <ros/ros.h>
 #include "sensor_msgs/LaserScan.h"
 #include <pluginlib/class_loader.h>

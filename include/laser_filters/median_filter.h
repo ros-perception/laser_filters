@@ -38,9 +38,9 @@
 #include "boost/scoped_ptr.hpp"
 #include "sensor_msgs/LaserScan.h"
 
-#include "filters/median.h"
-#include "filters/mean.h"
-#include "filters/filter_chain.h"
+#include <filters/median.hpp>
+#include <filters/mean.hpp>
+#include <filters/filter_chain.hpp>
 #include "boost/thread/mutex.hpp"
 
 namespace laser_filters{

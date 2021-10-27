@@ -47,7 +47,7 @@
 #ifndef BOXFILTER_H
 #define BOXFILTER_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>

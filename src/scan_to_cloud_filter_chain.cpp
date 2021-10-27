@@ -49,7 +49,7 @@
 #include "message_filters/subscriber.h"
 
 //Filters
-#include "filters/filter_chain.h"
+#include <filters/filter_chain.hpp>
 
 #if BUILDING_NODELET
 #include <nodelet/nodelet.h>

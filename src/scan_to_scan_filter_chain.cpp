@@ -33,7 +33,7 @@
 #include "message_filters/subscriber.h"
 #include "tf/message_filter.h"
 #include "tf/transform_listener.h"
-#include "filters/filter_chain.h"
+#include <filters/filter_chain.hpp>
 
 class ScanToScanFilterChain
 {
