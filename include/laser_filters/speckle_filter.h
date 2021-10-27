@@ -157,7 +157,10 @@ class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::LaserScan
 public:
   LaserScanSpeckleFilter();
   ~LaserScanSpeckleFilter();
+
   bool configure();
+  void configure(SpeckleFilterConfig& config) { reconfigureCB(config, 0); }
+
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
 
 private:
