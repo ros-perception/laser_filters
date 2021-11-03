@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.8.12 (2021-11-03)
+-------------------
 * change_access specifier kinect
 * Added nodelet version of scan_to_cloud_filter_chain .
 * fix(speckle_filter): Possible segfault when ranges size was smaller than filter window
