@@ -37,15 +37,12 @@
 #ifndef LASER_SCAN_SHADOWS_FILTER_H
 #define LASER_SCAN_SHADOWS_FILTER_H
 
-#include <set>
+#include "laser_filters/scan_shadow_detector.h"
 
 #include <filters/filter_base.hpp>
-#include "laser_filters/scan_shadow_detector.h"
 #include <sensor_msgs/LaserScan.h>
-#include <angles/angles.h>
 #include <laser_filters/ScanShadowsFilterConfig.h>
 #include <dynamic_reconfigure/server.h>
-#include <ros/ros.h>
 
 namespace laser_filters
 {

@@ -38,7 +38,9 @@
  */
 
 #include <laser_filters/scan_shadows_filter.h>
+
 #include <ros/node_handle.h>
+#include <angles/angles.h>
 
 namespace laser_filters
 {
