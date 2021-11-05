@@ -48,6 +48,8 @@ add_library(laser_scan_filters
   src/array_filter.cpp
   src/box_filter.cpp
   src/polygon_filter.cpp
+  src/scan_shadow_detector.cpp
+  src/scan_shadows_filter.cpp
   src/speckle_filter.cpp
   src/intensity_filter.cpp
   src/sector_filter.cpp
