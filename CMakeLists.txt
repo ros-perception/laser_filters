@@ -90,7 +90,7 @@ if (CATKIN_ENABLE_TESTING)
   add_rostest(test/test_speckle_filter.launch)
 
   catkin_add_gtest(test_shadow_detector test/test_shadow_detector.cpp)
-  target_link_libraries(test_shadow_detector ${catkin_LIBRARIES} ${rostest_LIBRARIES})
+  target_link_libraries(test_shadow_detector laser_scan_filters ${catkin_LIBRARIES} ${rostest_LIBRARIES})
 
   catkin_add_gtest(test_speckle_filter test/test_speckle_filter.cpp)
   target_link_libraries(test_speckle_filter laser_scan_filters ${catkin_LIBRARIES} ${rostest_LIBRARIES})
