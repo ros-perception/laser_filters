@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2008 Radu Bogdan Rusu <rusu@cs.tum.edu>
+ * Software License Agreement (BSD License)
  *
+ * Copyright (c) 2008-2021, laser_filters authors
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,15 +24,10 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: scan_shadows_filter.cpp,v 1.0 2008/12/04 12:00:00 rusu Exp $
- *
  */
 
 /*
   \author Radu Bogdan Rusu <rusu@cs.tum.edu> Tully Foote <tfoote@willowgarage.com>
-
-
 */
 
 #ifndef LASER_SCAN_SHADOWS_FILTER_H
