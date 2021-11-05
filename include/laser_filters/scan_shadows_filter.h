@@ -60,7 +60,7 @@ public:
   ScanShadowsFilterConfig param_config;
 
   ScanShadowsFilter();
-  ~ScanShadowsFilter();
+  virtual ~ScanShadowsFilter();
 
   /**@b Configure the filter from XML */
   bool configure();
