@@ -39,7 +39,7 @@
 #pragma once
 
 #include <dynamic_reconfigure/server.h>
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 #include <laser_filters/IntensityFilterConfig.h>
 #include <sensor_msgs/LaserScan.h>
 

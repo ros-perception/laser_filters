@@ -42,7 +42,7 @@ This is useful for ground plane extraction
 **/
 
 
-#include "filters/filter_base.h"
+#include <filters/filter_base.hpp>
 #include "sensor_msgs/LaserScan.h"
 #include "tf/transform_listener.h"
 #include "sensor_msgs/PointCloud.h"

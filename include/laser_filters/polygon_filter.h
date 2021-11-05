@@ -43,7 +43,7 @@
 #ifndef POLYGON_FILTER_H
 #define POLYGON_FILTER_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
