@@ -23,7 +23,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        path: src/
+        path: src/laser_filters
 
     - name: Build and run tests
       run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && src/laser_filters/ci.sh
