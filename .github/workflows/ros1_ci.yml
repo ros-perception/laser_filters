@@ -22,6 +22,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        path: src/
 
     - name: Build and run tests
       run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh

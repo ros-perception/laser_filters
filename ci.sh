@@ -1,22 +1,16 @@
 #!/bin/bash
+#
+# Run this script from the root of your catkin workspace.
+#
 
 # Exit with any error.
 set -e
 
-# Should be run from the root directory of the repo.
-BUILD_DIR=build
-
-mkdir -p ${BUILD_DIR}
-(cd ${BUILD_DIR} && cmake .. -DCATKIN_ENABLE_TESTING=1)
-
 # Build.
-make -C ${BUILD_DIR}
+catkin_make -DCATKIN_ENABLE_TESTING=1
 
-# Build the tests.
-make -C ${BUILD_DIR} tests
-
-# Run the tests.
-make -C ${BUILD_DIR} test
+# Run tests.
+catkin_make run_tests
 
 # Summarize test results (also sets the exit status for the script)
 catkin_test_results
