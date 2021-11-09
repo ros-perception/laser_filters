@@ -26,5 +26,5 @@ jobs:
         path: src/
 
     - name: Build and run tests
-      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && ./ci.sh
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && src/laser_filters/ci.sh
 
