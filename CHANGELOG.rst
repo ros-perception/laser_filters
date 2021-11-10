@@ -2,6 +2,21 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.0 (2021-11-06)
+------------------
+* change_access specifier kinect
+* Added nodelet version of scan_to_cloud_filter_chain .
+* fix(speckle_filter): Possible segfault when ranges size was smaller than filter window
+  formatting
+* Lots of fixes to CI
+* scan_to_cloud_filter_chain: Make cloud channels configurable
+* Fixed naming of laser filter plugins in yaml files
+* Add circle sector sharp filter
+* Added DynamicReconfigure for RangeFilter
+* Added support for laserscanners that spin clockwise
+* Added nodelet version of scan_to_cloud_filter_chain .
+* Contributors: Arjanboeve, Eric Wiener, Jimmy F. Klarke, Jonathan Binney, Martin Pecka, Rein Appeldoorn, YoshuaNava, renan028, teundeplanque
+
 1.8.11 (2020-06-03)
 -------------------
 * Merge pull request `#97 <https://github.com/ros-perception/laser_filters/issues/97>`_ from eurogroep/feat/speckle-filter-for-noise-removal

@@ -73,8 +73,11 @@ bool LaserScanSpeckleFilter::configure()
 
 bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
 {
+  boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
   output_scan = input_scan;
-  std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
+
+  std::vector<bool> &valid_ranges = valid_ranges_work_;
 
   /*Check if range size is big enough to use the filter window */
   if (output_scan.ranges.size() <= config_.filter_window + 1)
@@ -83,29 +86,37 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
     return false;
   }
 
-  for (size_t idx = 0; idx < output_scan.ranges.size() - config_.filter_window + 1; ++idx)
-  {
-    bool window_valid = validator_->checkWindowValid(
-          output_scan, idx, config_.filter_window, config_.max_range_difference);
-
-    // Actually set the valid ranges (do not set to false if it was already valid or out of range)
-    for (size_t neighbor_idx_or_self_nr = 0; neighbor_idx_or_self_nr < config_.filter_window; ++neighbor_idx_or_self_nr)
-    {
-      size_t neighbor_idx_or_self = idx + neighbor_idx_or_self_nr;
-      if (neighbor_idx_or_self < output_scan.ranges.size())  // Out of bound check
-      {
-        bool out_of_range = output_scan.ranges[neighbor_idx_or_self] > config_.max_range;
-        valid_ranges[neighbor_idx_or_self] = valid_ranges[neighbor_idx_or_self] || window_valid || out_of_range;
-      }
-    }
+  size_t i = 0;
+  size_t i_max = input_scan.ranges.size();
+  valid_ranges.clear();
+  while (i < i_max) {
+    bool out_of_range = output_scan.ranges[i] > config_.max_range;
+    valid_ranges.push_back(out_of_range);
+    ++i;
   }
 
-  for (size_t idx = 0; idx < valid_ranges.size(); ++idx)
-  {
-    if (!valid_ranges[idx])
-    {
-      output_scan.ranges[idx] = std::numeric_limits<float>::quiet_NaN();
+  i = 0;
+  i_max = input_scan.ranges.size() - config_.filter_window + 1;
+  while (i < i_max) {
+    bool window_valid = validator_->checkWindowValid(
+      output_scan, i, config_.filter_window, config_.max_range_difference
+    );
+    if (window_valid) {
+      size_t j = i, j_max = i + config_.filter_window;
+      do {
+        valid_ranges[j++] = true;
+      } while (j < j_max);
     }
+    ++i;
+  }
+
+  i = 0;
+  i_max = valid_ranges.size();
+  while (i < i_max) {
+    if (!valid_ranges[i]) {
+      output_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+    }
+    ++i;
   }
 
   return true;
