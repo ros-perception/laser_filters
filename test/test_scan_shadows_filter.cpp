@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
+#include <cmath>
 #include "laser_filters/scan_shadows_filter.h"
 #include "sensor_msgs/LaserScan.h"
 
@@ -12,13 +13,14 @@ sensor_msgs::LaserScan create_message(
 
     msg.header.stamp = ros::Time::now();
     msg.header.frame_id = "laser";
-    msg.angle_min = -.785398;
-    msg.angle_max = .785398;
+    // Use a small beam so that angle_increment remains small (realistic) also with few points
+    msg.angle_min = -M_PI / 12;
+    msg.angle_max = M_PI / 12;
     msg.angle_increment = (msg.angle_max - msg.angle_min) / (num_beams - 1);
     msg.time_increment = 0.1 / num_beams;
     msg.scan_time = 0.1;
-    msg.range_min = 0.5;
-    msg.range_max = 1.5;
+    msg.range_min = 0.1;
+    msg.range_max = 10;
     msg.ranges = v_range;
 
     return msg;
@@ -56,7 +58,7 @@ TEST(ScanShadowsFilter, NoShadows) {
 
     filter.reconfigureCB(config, 0);
 
-    float ranges[] = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+    float ranges[] = {9, 9, 9, 9, 9, 9, 9, 9, 9, 9};
     sensor_msgs::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
@@ -64,24 +66,26 @@ TEST(ScanShadowsFilter, NoShadows) {
 
     filter.update(input_scan, output_scan);
 
-    float expected[] = {5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+    float expected[] = {9, 9, 9, 9, 9, 9, 9, 9, 9, 9};
 
     expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
 }
 
-TEST(ScanShadowsFilter, SingleShadow) {
+TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow) {
     laser_filters::ScanShadowsFilter filter;
     laser_filters::ScanShadowsFilterConfig config;
 
     config.min_angle = 15.0;
     config.max_angle = 165.0;
-    config.neighbors = 1;
+    config.neighbors = 0;
     config.window = 1;
     config.remove_shadow_start_point = true;
 
     filter.reconfigureCB(config, 0);
 
-    float ranges[] = {5, 5, 5, 5, 1, 5, 5, 5, 5, 5};
+    // This input data is very much simplified. The range-5 points represent a nearby object, and
+    // the range-9 points a wall.
+    float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
     sensor_msgs::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
@@ -89,12 +93,146 @@ TEST(ScanShadowsFilter, SingleShadow) {
 
     filter.update(input_scan, output_scan);
 
-    float expected[] = {5, 5, 5, NAN, NAN, NAN, 5, 5, 5, 5};
+    // Below is what is expected given the filter's current logic. However, it shows that the
+    // filter is primitive and can filter out point that are not shadows.
+    float expected[] = {5, 5, 5, 5, NAN, NAN, 9, 9, 9, 9};
 
     expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
 }
 
-TEST(ScanShadowsFilter, NeigborShadows) {
+TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_8_172) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 8.0;
+    config.max_angle = 172.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // Increasing the angle range still results in the same filter behaviour.
+    float expected[] = {5, 5, 5, 5, NAN, NAN, 9, 9, 9, 9};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_5_175) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 5.0;
+    config.max_angle = 175.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // Increasing the angle range more, filters out fewer points
+    float expected[] = {5, 5, 5, 5, 5, NAN, 9, 9, 9, 9};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, DistanceDeltaWithoutShadowFlipped_Angles_5_175) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 5.0;
+    config.max_angle = 175.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    float ranges[] = {9, 9, 9, 9, 9, 5, 5, 5, 5, 5};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // Reversing the input results in reversed output
+    float expected[] = {9, 9, 9, 9, NAN, 5, 5, 5, 5, 5};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_3_177) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 3.0;
+    config.max_angle = 177.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // Increasing the range even more, no more points are filtered out
+    float expected[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, SingleBackwardShadow_NoNeighbours) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 15.0;
+    config.max_angle = 165.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    // This input data is very much simplified. The range-5 points represent a nearby object, and
+    // the range-9 points a wall. The range-7 point is a shadow.
+    float ranges[] = {5, 5, 5, 5, 5, 9, 7, 9, 9, 9};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // The shadow is filtered out, as well as some other points
+    float expected[] = {5, 5, 5, 5, NAN, NAN, NAN, NAN, 9, 9};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, SingleBackwardShadow_OneNeighbour) {
     laser_filters::ScanShadowsFilter filter;
     laser_filters::ScanShadowsFilterConfig config;
 
@@ -106,7 +244,7 @@ TEST(ScanShadowsFilter, NeigborShadows) {
 
     filter.reconfigureCB(config, 0);
 
-    float ranges[] = {5, 5, 5, 5, 20, 5, 5, 5, 5, 5};
+    float ranges[] = {5, 5, 5, 5, 5, 9, 7, 9, 9, 9};
     sensor_msgs::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
@@ -114,12 +252,42 @@ TEST(ScanShadowsFilter, NeigborShadows) {
 
     filter.update(input_scan, output_scan);
 
-    float expected[] = {5, 5, 5, 5, NAN, 5, 5, 5, 5, 5};
+    // Below is what is expected given the filter's current logic. Note, this configuration does
+    // not filter out the simulated shadow but some other points.
+    float expected[] = {5, 5, 5, 5, 5, NAN, 7, NAN, 9, 9};
 
     expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
 }
 
-TEST(ScanShadowsFilter, NeigborShadowsWithRemoveStart) {
+TEST(ScanShadowsFilter, SingleForwardShadow_NoNeighbours) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 15.0;
+    config.max_angle = 165.0;
+    config.neighbors = 0;
+    config.window = 1;
+    config.remove_shadow_start_point = true;
+
+    filter.reconfigureCB(config, 0);
+
+    // This input data is very much simplified. The range-5 points represent a nearby object, and
+    // the range-9 points a wall. The range-3 point is a shadow.
+    float ranges[] = {5, 5, 5, 5, 5, 9, 3, 9, 9, 9};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // The shadow is filtered out, as well as some other points
+    float expected[] = {5, 5, 5, 5, NAN, NAN, NAN, NAN, 9, 9};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, SingleForwardShadow_OneNeighbour) {
     laser_filters::ScanShadowsFilter filter;
     laser_filters::ScanShadowsFilterConfig config;
 
@@ -127,11 +295,11 @@ TEST(ScanShadowsFilter, NeigborShadowsWithRemoveStart) {
     config.max_angle = 165.0;
     config.neighbors = 1;
     config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.remove_shadow_start_point = false;
 
     filter.reconfigureCB(config, 0);
 
-    float ranges[] = {5, 5, 5, 5, 20, 5, 5, 5, 5, 5};
+    float ranges[] = {5, 5, 5, 5, 5, 9, 3, 9, 9, 9};
     sensor_msgs::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
@@ -139,57 +307,9 @@ TEST(ScanShadowsFilter, NeigborShadowsWithRemoveStart) {
 
     filter.update(input_scan, output_scan);
 
-    float expected[] = {5, 5, 5, NAN, NAN, NAN, 5, 5, 5, 5};
-
-    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
-}
-
-TEST(ScanShadowsFilter, MultipleShadows) {
-    laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
-
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 1;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
-
-    filter.reconfigureCB(config, 0);
-
-    float ranges[] = {5, 20, 5, 5, 5, 5, 5, 20, 5, 5};
-    sensor_msgs::LaserScan input_scan = create_message(
-        ranges, sizeof(ranges) / sizeof(float)
-    );
-    sensor_msgs::LaserScan output_scan;
-
-    filter.update(input_scan, output_scan);
-
-    float expected[] = {NAN, NAN, NAN, 5, 5, 5, NAN, NAN, NAN, 5};
-
-    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
-}
-
-TEST(ScanShadowsFilter, ShadowFarNeighbor) {
-    laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
-
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 2;
-    config.window = 2;
-    config.remove_shadow_start_point = true;
-
-    filter.reconfigureCB(config, 0);
-
-    float ranges[] = {5, 1, 5, 5, 5, 5, 5, 5, 5, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
-        ranges, sizeof(ranges) / sizeof(float)
-    );
-    sensor_msgs::LaserScan output_scan;
-
-    filter.update(input_scan, output_scan);
-
-    float expected[] = {NAN, NAN, NAN, NAN, 5, 5, 5, NAN, NAN, NAN};
+    // Below is what is expected given the filter's current logic. Note, this configuration does
+    // not filter out the simulated shadow but some other points.
+    float expected[] = {5, 5, 5, 5, 5, NAN, 3, NAN, 9, 9};
 
     expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
 }
