@@ -92,6 +92,9 @@ if (CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(test_speckle_filter test/test_speckle_filter.cpp)
   target_link_libraries(test_speckle_filter laser_scan_filters ${catkin_LIBRARIES} ${rostest_LIBRARIES})
+
+  catkin_add_gtest(test_scan_shadows_filter test/test_scan_shadows_filter.cpp)
+  target_link_libraries(test_scan_shadows_filter laser_scan_filters ${catkin_LIBRARIES} ${rostest_LIBRARIES})
 endif()
 
 ##############################################################################
