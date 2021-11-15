@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 * 
-*  Copyright (c) 2017, laser_filters authors
+*  Copyright (c) 2017-2021, laser_filters authors
 *  All rights reserved.
 * 
 *  Redistribution and use in source and binary forms, with or without
@@ -36,19 +36,40 @@
 \author Atsushi Watanabe (SEQSENSE, Inc.)
 */
 
-#ifndef SCAN_SHADOW_DETECTOR_H
-#define SCAN_SHADOW_DETECTOR_H
+#include <laser_filters/scan_shadow_detector.h>
+#include <math.h>
+#include <ros/ros.h>
 
 namespace laser_filters
 {
-class ScanShadowDetector
-{
-public:
-  float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
+  void ScanShadowDetector::configure(const float min_angle, const float max_angle)
+  {
+    min_angle_tan_ = tanf(min_angle);
+    max_angle_tan_ = tanf(max_angle);
 
-  void configure(const float min_angle, const float max_angle);
-  bool isShadow(const float r1, const float r2, const float included_angle);
-};
+    // Correct sign of tan around singularity points
+    if (min_angle_tan_ < 0.0)
+      min_angle_tan_ = -min_angle_tan_;
+    if (max_angle_tan_ > 0.0)
+      max_angle_tan_ = -max_angle_tan_;
+  }
+
+  bool ScanShadowDetector::isShadow(const float r1, const float r2, const float included_angle)
+  {
+    const float perpendicular_y_ = r2 * sinf(included_angle);
+    const float perpendicular_x_ = r1 - r2 * cosf(included_angle);
+    const float perpendicular_tan_ = fabs(perpendicular_y_) / perpendicular_x_;
+
+    if (perpendicular_tan_ > 0)
+    {
+      if (perpendicular_tan_ < min_angle_tan_)
+        return true;
+    }
+    else
+    {
+      if (perpendicular_tan_ > max_angle_tan_)
+        return true;
+    }
+    return false;
+  }
 }
-
-#endif  //SCAN_SHADOW_DETECTOR_H
