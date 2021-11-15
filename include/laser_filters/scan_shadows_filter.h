@@ -1,7 +1,8 @@
-/*
+/**********************************************************************
  * Software License Agreement (BSD License)
  *
- * Copyright (c) 2008-2021, laser_filters authors
+ * Copyright (c) 2008 Radu Bogdan Rusu <rusu@cs.tum.edu> and other laser_filters authors
+ *
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,7 +25,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- */
+ *********************************************************************/
 
 /*
   \author Radu Bogdan Rusu <rusu@cs.tum.edu> Tully Foote <tfoote@willowgarage.com>
