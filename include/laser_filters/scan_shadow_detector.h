@@ -39,6 +39,8 @@
 #ifndef SCAN_SHADOW_DETECTOR_H
 #define SCAN_SHADOW_DETECTOR_H
 
+#include <cstddef>
+
 namespace laser_filters
 {
 class ScanShadowDetector
