@@ -46,8 +46,19 @@ class ScanShadowDetector
 public:
   float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
 
-  void configure(const float min_angle, const float max_angle);
-  bool isShadow(const float r1, const float r2, const float included_angle);
+  void configure(const float min_angle, const float max_angle, const int window);
+  bool isShadow(const float r1, const float r2, const int angle_index, const float angle_increment);
+
+  ~ScanShadowDetector();
+private:
+  int window_;
+  float angle_increment_;
+  float *sin_map_ = NULL;
+  float *cos_map_ = NULL;
+  float *shifted_sin_map_;
+  float *shifted_cos_map_;
+
+  void updateAngleMap(const float angle_increment);
 };
 }
 

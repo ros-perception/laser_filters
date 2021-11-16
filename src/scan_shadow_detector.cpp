@@ -42,10 +42,21 @@
 
 namespace laser_filters
 {
-  void ScanShadowDetector::configure(const float min_angle, const float max_angle)
+  void ScanShadowDetector::configure(const float min_angle, const float max_angle, const int window)
   {
     min_angle_tan_ = tanf(min_angle);
     max_angle_tan_ = tanf(max_angle);
+    window_ = window;
+    angle_increment_ = 0;
+    if (sin_map_ != NULL)
+    {
+      delete [] sin_map_;
+      delete [] cos_map_;
+    }
+    sin_map_ = new float[window_ * 2 + 1];
+    cos_map_ = new float[window_ * 2 + 1];
+    shifted_sin_map_ = sin_map_ + window_;
+    shifted_cos_map_ = cos_map_ + window_;
 
     // Correct sign of tan around singularity points
     if (min_angle_tan_ < 0.0)
@@ -54,22 +65,37 @@ namespace laser_filters
       max_angle_tan_ = -max_angle_tan_;
   }
 
-  bool ScanShadowDetector::isShadow(const float r1, const float r2, const float included_angle)
-  {
-    const float perpendicular_y_ = r2 * sinf(included_angle);
-    const float perpendicular_x_ = r1 - r2 * cosf(included_angle);
-    const float perpendicular_tan_ = fabs(perpendicular_y_) / perpendicular_x_;
+  void ScanShadowDetector::updateAngleMap(const float angle_increment) {
+    ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
+    angle_increment_ = angle_increment;
 
-    if (perpendicular_tan_ > 0)
-    {
-      if (perpendicular_tan_ < min_angle_tan_)
-        return true;
+    float included_angle = -window_ * angle_increment;
+    for (int i = -window_; i < window_ + 1; ++i) {
+      shifted_sin_map_[i] = fabs(sinf(included_angle));
+      shifted_cos_map_[i] = cosf(included_angle);
+      included_angle += angle_increment;
     }
-    else
-    {
-      if (perpendicular_tan_ > max_angle_tan_)
-        return true;
+  }
+
+  bool ScanShadowDetector::isShadow(const float r1, const float r2, const int angle_index, const float angle_increment)
+  {
+    if (angle_increment_ != angle_increment) {
+      updateAngleMap(angle_increment);
     }
-    return false;
+
+    const float perpendicular_y_ = r2 * shifted_sin_map_[angle_index];
+    const float perpendicular_x_ = r1 - r2 * shifted_cos_map_[angle_index];
+    const float perpendicular_tan_ = perpendicular_y_ / perpendicular_x_;
+
+    return perpendicular_tan_ < min_angle_tan_ && perpendicular_tan_ > max_angle_tan_;
+  }
+
+  ScanShadowDetector::~ScanShadowDetector()
+  {
+    if (sin_map_ != NULL)
+    {
+      delete [] sin_map_;
+      delete [] cos_map_;
+    }
   }
 }

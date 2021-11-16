@@ -90,7 +90,7 @@ bool ScanShadowsFilter::configure()
       ROS_ERROR("max_angle must be 90 <= max_angle. Forcing max_angle = 90.\n");
       max_angle_ = 90.0;
     }
-    if (180 < min_angle_)
+    if (180 < max_angle_)
     {
       ROS_ERROR("max_angle must be max_angle <= 180. Forcing max_angle = 180.\n");
       max_angle_ = 180.0;
@@ -98,7 +98,8 @@ bool ScanShadowsFilter::configure()
 
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
-        angles::from_degrees(max_angle_));
+        angles::from_degrees(max_angle_),
+        window_);
 
     param_config.min_angle = min_angle_;
     param_config.max_angle = max_angle_;
@@ -116,7 +117,8 @@ void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t 
     max_angle_ = config.max_angle;
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
-        angles::from_degrees(max_angle_));
+        angles::from_degrees(max_angle_),
+        config.window);
     neighbors_ = config.neighbors;
     window_ = config.window;
     remove_shadow_start_point_ = config.remove_shadow_start_point;
@@ -129,42 +131,40 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     // copy across all data first
     scan_out = scan_in;
 
-    std::set<int> indices_to_delete;
+    int size = scan_in.ranges.size();
+    int maxY;
+    int maxNeighbors;
     // For each point in the current line scan
-    for (unsigned int i = 0; i < scan_in.ranges.size(); i++)
+    for (int i = 0; i < size; i++)
     {
-      for (int y = -window_; y < window_ + 1; y++)
+      maxY = std::min<int>(size - i, window_ + 1);
+      for (int y = std::max<int>(-i, -window_); y < maxY; y++)
       {
-        int j = i + y;
-        if (j < 0 || j >= (int)scan_in.ranges.size() || (int)i == j)
-        {  // Out of scan bounds or itself
+        if (y == 0)
+        {
           continue;
         }
 
         if (shadow_detector_.isShadow(
-                scan_in.ranges[i], scan_in.ranges[j], y * scan_in.angle_increment))
+                scan_in.ranges[i], scan_in.ranges[i + y], y, scan_in.angle_increment))
         {
-          for (int index = std::max<int>(i - neighbors_, 0); index <= std::min<int>(i + neighbors_, (int)scan_in.ranges.size() - 1); index++)
+          maxNeighbors = std::min<int>(i + neighbors_, size - 1);
+          for (int index = std::max<int>(i - neighbors_, 0); index <= maxNeighbors; index++)
           {
             if (scan_in.ranges[i] < scan_in.ranges[index])
             {  // delete neighbor if they are farther away (note not self)
-              indices_to_delete.insert(index);
+              scan_out.ranges[index] = std::numeric_limits<float>::quiet_NaN(); 
             }
           }
           if (remove_shadow_start_point_)
           {
-            indices_to_delete.insert(i);
+              scan_out.ranges[i] = std::numeric_limits<float>::quiet_NaN(); 
           }
+          break;
         }
       }
     }
 
-    ROS_DEBUG("ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d",
-              (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
-    for (std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
-    {
-      scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value
-    }
     return true;
 }
 }
