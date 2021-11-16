@@ -57,12 +57,14 @@ bool isShadowPureImpl(const float r1, const float r2, const float included_angle
 
 TEST(ScanShadowDetector, ShadowDetectionGeometry)
 {
+  const float angle_increment = 0.02;
   for (float min_angle = 90.0; min_angle >= 0.0; min_angle -= 5.0)
   {
     for (float max_angle = 90.0; max_angle <= 180; max_angle += 5.0)
     {
       laser_filters::ScanShadowDetector detector;
       detector.configure(angles::from_degrees(min_angle), angles::from_degrees(max_angle), 5);
+      detector.prepareForInput(angle_increment);
 
       for (float r1 = 0.1; r1 < 1.0; r1 += 0.1)
       {
@@ -72,8 +74,8 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
           {
             // Compare with original ScanShadowsFilter implementation
             EXPECT_EQ(
-                detector.isShadow(r1, r2, inc, 0.02),
-                isShadowPureImpl(r1, r2, inc * 0.02, min_angle, max_angle));
+                detector.isShadow(r1, r2, inc),
+                isShadowPureImpl(r1, r2, inc * angle_increment, min_angle, max_angle));
           }
         }
       }

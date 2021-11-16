@@ -48,7 +48,7 @@ namespace laser_filters
     max_angle_tan_ = tanf(max_angle);
     window_ = window;
     angle_increment_ = 0;
-    if (sin_map_ != NULL)
+    if (sin_map_ != nullptr)
     {
       delete [] sin_map_;
       delete [] cos_map_;
@@ -65,24 +65,22 @@ namespace laser_filters
       max_angle_tan_ = -max_angle_tan_;
   }
 
-  void ScanShadowDetector::updateAngleMap(const float angle_increment) {
-    ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
-    angle_increment_ = angle_increment;
+  void ScanShadowDetector::prepareForInput(const float angle_increment) {
+    if (angle_increment_ != angle_increment) {
+      ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
+      angle_increment_ = angle_increment;
 
-    float included_angle = -window_ * angle_increment;
-    for (int i = -window_; i < window_ + 1; ++i) {
-      shifted_sin_map_[i] = fabs(sinf(included_angle));
-      shifted_cos_map_[i] = cosf(included_angle);
-      included_angle += angle_increment;
+      float included_angle = -window_ * angle_increment;
+      for (int i = -window_; i < window_ + 1; ++i) {
+        shifted_sin_map_[i] = fabs(sinf(included_angle));
+        shifted_cos_map_[i] = cosf(included_angle);
+        included_angle += angle_increment;
+      }
     }
   }
 
-  bool ScanShadowDetector::isShadow(const float r1, const float r2, const int angle_index, const float angle_increment)
+  bool ScanShadowDetector::isShadow(const float r1, const float r2, const int angle_index)
   {
-    if (angle_increment_ != angle_increment) {
-      updateAngleMap(angle_increment);
-    }
-
     const float perpendicular_y_ = r2 * shifted_sin_map_[angle_index];
     const float perpendicular_x_ = r1 - r2 * shifted_cos_map_[angle_index];
     const float perpendicular_tan_ = perpendicular_y_ / perpendicular_x_;
@@ -92,7 +90,7 @@ namespace laser_filters
 
   ScanShadowDetector::~ScanShadowDetector()
   {
-    if (sin_map_ != NULL)
+    if (sin_map_ != nullptr)
     {
       delete [] sin_map_;
       delete [] cos_map_;

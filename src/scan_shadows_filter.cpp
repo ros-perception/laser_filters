@@ -134,6 +134,7 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     int size = scan_in.ranges.size();
     int maxY;
     int maxNeighbors;
+    shadow_detector_.prepareForInput(scan_in.angle_increment);
     // For each point in the current line scan
     for (int i = 0; i < size; i++)
     {
@@ -146,7 +147,7 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         }
 
         if (shadow_detector_.isShadow(
-                scan_in.ranges[i], scan_in.ranges[i + y], y, scan_in.angle_increment))
+                scan_in.ranges[i], scan_in.ranges[i + y], y))
         {
           maxNeighbors = std::min<int>(i + neighbors_, size - 1);
           for (int index = std::max<int>(i - neighbors_, 0); index <= maxNeighbors; index++)
