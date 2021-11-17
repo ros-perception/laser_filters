@@ -67,11 +67,11 @@ namespace laser_filters
 
   void ScanShadowDetector::prepareForInput(const float angle_increment) {
     if (angle_increment_ != angle_increment) {
-      ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
+      ROS_DEBUG ("[ScanShadowDetector] No precomputed map given. Computing one.");
       angle_increment_ = angle_increment;
 
       float included_angle = -window_ * angle_increment;
-      for (int i = -window_; i < window_ + 1; ++i) {
+      for (int i = -window_; i <= window_; ++i) {
         shifted_sin_map_[i] = fabs(sinf(included_angle));
         shifted_cos_map_[i] = cosf(included_angle);
         included_angle += angle_increment;

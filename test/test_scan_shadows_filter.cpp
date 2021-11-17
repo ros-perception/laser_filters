@@ -5,7 +5,7 @@
 #include "sensor_msgs/LaserScan.h"
 
 sensor_msgs::LaserScan create_message(
-    float ranges[], int num_beams, float angle_limit = M_PI
+    float ranges[], int num_beams
 ) {
     sensor_msgs::LaserScan msg;
 
@@ -14,8 +14,8 @@ sensor_msgs::LaserScan create_message(
     msg.header.stamp = ros::Time::now();
     msg.header.frame_id = "laser";
     // Use a small beam so that angle_increment remains small (realistic) also with few points
-    msg.angle_min = -angle_limit / 12;
-    msg.angle_max = angle_limit / 12;
+    msg.angle_min = -M_PI / 12;
+    msg.angle_max = M_PI / 12;
     msg.angle_increment = (msg.angle_max - msg.angle_min) / (num_beams - 1);
     msg.time_increment = 0.1 / num_beams;
     msg.scan_time = 0.1;
