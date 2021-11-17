@@ -5,7 +5,7 @@
 #include "sensor_msgs/LaserScan.h"
 
 sensor_msgs::LaserScan create_message(
-    float ranges[], int num_beams
+    float ranges[], int num_beams, float angle_limit = M_PI
 ) {
     sensor_msgs::LaserScan msg;
 
@@ -14,8 +14,8 @@ sensor_msgs::LaserScan create_message(
     msg.header.stamp = ros::Time::now();
     msg.header.frame_id = "laser";
     // Use a small beam so that angle_increment remains small (realistic) also with few points
-    msg.angle_min = -M_PI / 12;
-    msg.angle_max = M_PI / 12;
+    msg.angle_min = -angle_limit / 12;
+    msg.angle_max = angle_limit / 12;
     msg.angle_increment = (msg.angle_max - msg.angle_min) / (num_beams - 1);
     msg.time_increment = 0.1 / num_beams;
     msg.scan_time = 0.1;
@@ -312,6 +312,41 @@ TEST(ScanShadowsFilter, SingleForwardShadow_OneNeighbour) {
     float expected[] = {5, 5, 5, 5, 5, NAN, 3, NAN, 9, 9};
 
     expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+}
+
+TEST(ScanShadowsFilter, SingleForwardShadow_AngleIncrementChanged) {
+    laser_filters::ScanShadowsFilter filter;
+    laser_filters::ScanShadowsFilterConfig config;
+
+    config.min_angle = 15.0;
+    config.max_angle = 165.0;
+    config.neighbors = 1;
+    config.window = 1;
+    config.remove_shadow_start_point = false;
+
+    filter.reconfigureCB(config, 0);
+
+    float ranges[] = {5, 5, 5, 5, 5, 4, 4, 4, 4, 4};
+    sensor_msgs::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float)
+    );
+    sensor_msgs::LaserScan output_scan;
+
+    filter.update(input_scan, output_scan);
+
+    // Below is what is expected given the filter's current logic. Note, this configuration does
+    // not filter out the simulated shadow but some other points.
+    float expected[] = {5, 5, 5, 5, 5, 4, 4, 4, 4, 4};
+
+    expect_ranges_equal(output_scan.ranges, expected, sizeof(expected) / sizeof(float));
+
+    // Smaller angle_increment, results in steeper angles and shadow detection
+    input_scan.angle_increment /= 2;    
+    filter.update(input_scan, output_scan);
+
+    float new_expected[] = {5, 5, 5, 5, NAN, 4, 4, 4, 4, 4};
+
+    expect_ranges_equal(output_scan.ranges, new_expected, sizeof(new_expected) / sizeof(float));
 }
 
 #ifdef ENABLE_PERFORMANCE
