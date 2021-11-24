@@ -43,7 +43,7 @@
 #ifndef POLYGON_FILTER_H
 #define POLYGON_FILTER_H
 
-#include <filters/filter_base.hpp>
+#include <filters/filter_base.h>
 
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
@@ -61,32 +61,58 @@ namespace laser_filters
 /**
  * @brief This is a filter that removes points in a laser scan inside of a polygon.
  */
-class LaserScanPolygonFilter : public filters::FilterBase<sensor_msgs::LaserScan>
-{
+class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::LaserScan> {
 public:
-  LaserScanPolygonFilter();
-  bool configure();
+  virtual bool configure();
+  virtual void configure(PolygonFilterConfig& config) { reconfigureCB(config, 0); }
 
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan);
+  virtual bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) { return false; }
 
-private:
-  // configuration
-  ros::Publisher polygon_pub_;
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
-  void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
+protected:
   boost::recursive_mutex own_mutex_;
+  // configuration
   std::string polygon_frame_;
   geometry_msgs::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
 
+  void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
+
   // checks if points in polygon
   bool inPolygon(tf::Point& point) const;
 
-  laser_geometry::LaserProjection projector_;
+private:
+  // configuration
+  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
+};
 
+class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
+public:
+  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
+
+private:
+  // configuration
+  ros::Publisher polygon_pub_;
+  laser_geometry::LaserProjection projector_;
   // tf listener to transform scans into the polygon_frame
   tf::TransformListener tf_;
+};
+
+/**
+ * @brief This is a filter that removes points in a laser scan inside of a polygon
+ * assuming that the transform between polygon and scanner remains static over the entire run.
+ */
+class StaticLaserScanPolygonFilter : public LaserScanPolygonFilterBase {
+public:
+  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
+
+private:
+  Eigen::ArrayXXd co_sine_map_;
+  float co_sine_map_angle_min_;
+  float co_sine_map_angle_max_;
+  bool is_polygon_transformed_;
+
+  void checkCoSineMap(const sensor_msgs::LaserScan& input_scan);
 };
 }
 #endif /* polygon_filter.h */

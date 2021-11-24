@@ -247,16 +247,14 @@ std::string polygonToString(geometry_msgs::Polygon polygon)
 }
 
 namespace laser_filters{
-LaserScanPolygonFilter::LaserScanPolygonFilter()
-{
-}
 
-bool LaserScanPolygonFilter::configure()
+bool LaserScanPolygonFilterBase::configure()
 {
   XmlRpc::XmlRpcValue polygon_xmlrpc;
   std::string polygon_string;
   PolygonFilterConfig param_config;
 
+  is_polygon_transformed_ = false;
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>::CallbackType f;
@@ -276,8 +274,6 @@ bool LaserScanPolygonFilter::configure()
   param_config.polygon_padding = polygon_padding;
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
-
-  polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1);
 
   if (!polygon_frame_set)
   {
@@ -386,14 +382,103 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
   return true;
 }
 
+void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& scan_in) {
+  size_t n_pts = scan_in.ranges.size();
 
-bool LaserScanPolygonFilter::inPolygon(tf::Point& point) const
-{
+  if (
+    co_sine_map_.rows() != (int)n_pts ||
+    co_sine_map_angle_min_ != scan_in.angle_min ||
+    co_sine_map_angle_max_ != scan_in.angle_max
+  ) {
+    ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
+    co_sine_map_ = Eigen::ArrayXXd(n_pts, 2);
+    co_sine_map_angle_min_ = scan_in.angle_min;
+    co_sine_map_angle_max_ = scan_in.angle_max;
+
+    // Spherical->Cartesian projection
+    for (size_t i = 0; i < n_pts; ++i) {
+      co_sine_map_(i, 0) = cos(scan_in.angle_min + (double) i * scan_in.angle_increment);
+      co_sine_map_(i, 1) = sin(scan_in.angle_min + (double) i * scan_in.angle_increment);
+    }
+  }
+}
+
+// Note: This implementation does not transform the laser scan points to the base link
+// before checking if the fall inside the polygon. Assuming the transform between the 
+// laser scanner and the base link is static, this only needs to be done once. The
+// polygon can be translated relative to the scanner.
+bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
+                                        sensor_msgs::LaserScan& output_scan) {
+  boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
+  if (!is_polygon_transformed_) {
+    tf::TransformListener tf();
+    bool success = tf.waitForTransform(
+        input_scan.header.frame_id, polygon_frame_,
+        input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
+        ros::Duration(1.0), ros::Duration(0.01), &error_msg);
+
+    if (!success) {
+      ROS_WARN("Could not get transform, ignoring laser scan! %s", error_msg.c_str());
+      return false;
+    }
+
+    try {
+      // Transform each point of polygon.
+      // First create a stamped point from polygon point.
+      // After tranform change it into a message to have access to the new set of coordinates.
+      // Copy new coordinates into the polygon point.
+      for (int i = 0; i < polygon_.points.size(); ++i) {
+        tf::Point point(polygon_.points[i].x, polygon_.points[i].y, 0);
+        tf::Stamped<tf::Point> point_stamped(
+          point,
+          input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
+          polygon_frame_);
+        tf::Stamped<tf::Point> point_stamped_new;
+        tf_.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
+        geometry_msgs::PointStamped result_point;
+        tf::pointStampedTFToMsg(point_stamped_new, result_point);
+        polygon_.points[i].x = result_point.point.x;
+        polygon_.points[i].y = result_point.point.y;
+      }
+
+      is_polygon_transformed_ = true;
+    }
+    catch (tf::TransformException& ex) {
+      ROS_INFO_THROTTLE(.3, "Ignoring Scan: Waiting for TF");
+      return false;
+    }
+  }
+
+  output_scan = input_scan;
+  checkCoSineMap(input_scan);
+
+  size_t i = 0;
+  size_t i_max = input_scan.ranges.size();
+
+  while (i < i_max) {
+    float range = input_scan.ranges[i];
+
+    float x = co_sine_map_(i, 0) * range;
+    float y = co_sine_map_(i, 1) * range;
+    tf::Point point(x, y, 0);
+
+    if (invert_filter_ != inPolygon(point)) {
+      output_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+    }
+
+    ++i;
+  }
+
+  return true;
+}
+
+// See https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
   int i, j;
   bool c = false;
 
-  for (i = 0, j = polygon_.points.size() - 1; i < polygon_.points.size(); j = i++)
-  {
+  for (i = 0, j = polygon_.points.size() - 1; i < polygon_.points.size(); j = i++) {
     if ((polygon_.points.at(i).y > point.y() != (polygon_.points.at(j).y > point.y()) &&
          (point.x() < (polygon_.points[j].x - polygon_.points[i].x) * (point.y() - polygon_.points[i].y) /
                               (polygon_.points[j].y - polygon_.points[i].y) +
@@ -403,9 +488,8 @@ bool LaserScanPolygonFilter::inPolygon(tf::Point& point) const
   return c;
 }
 
-
-void LaserScanPolygonFilter::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level)
-{
+void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
+  is_polygon_transformed_ = false;
   invert_filter_ = config.invert;
   polygon_ = makePolygonFromString(config.polygon, polygon_);
   padPolygon(polygon_, config.polygon_padding);
