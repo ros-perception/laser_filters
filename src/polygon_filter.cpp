@@ -464,8 +464,8 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
   if (!is_polygon_transformed_) {
-    tf::TransformListener tf();
-    bool success = tf.waitForTransform(
+    tf::TransformListener transform_listener();
+    bool success = transform_listener.waitForTransform(
         input_scan.header.frame_id, polygon_frame_,
         input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
         ros::Duration(1.0), ros::Duration(0.01), &error_msg);
@@ -485,7 +485,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
           input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
           polygon_frame_);
         tf::Stamped<tf::Point> point_stamped_new;
-        tf_.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
+        transform_listener.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
         geometry_msgs::PointStamped result_point;
         tf::pointStampedTFToMsg(point_stamped_new, result_point);
         polygon_.points[i].x = result_point.point.x;

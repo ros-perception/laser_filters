@@ -75,15 +75,12 @@ protected:
   geometry_msgs::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
+  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
 
   virtual void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
 
   // checks if points in polygon
   bool inPolygon(tf::Point& point) const;
-
-private:
-  // configuration
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
 };
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
