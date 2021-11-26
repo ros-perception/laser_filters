@@ -293,9 +293,47 @@ bool LaserScanPolygonFilterBase::configure()
 
 bool LaserScanPolygonFilter::configure()
 {
-  bool result = LaserScanPolygonFilterBase::configure();
+  XmlRpc::XmlRpcValue polygon_xmlrpc;
+  std::string polygon_string;
+  PolygonFilterConfig param_config;
+
+  ros::NodeHandle private_nh("~" + getName());
+  dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>(own_mutex_, private_nh));
+  dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>::CallbackType f;
+  f = boost::bind(&laser_filters::LaserScanPolygonFilter::reconfigureCB, this, _1, _2);
+  dyn_server_->setCallback(f);
+
+  bool polygon_set = getParam("polygon", polygon_xmlrpc);
+  bool polygon_frame_set = getParam("polygon_frame", polygon_frame_);
+  bool invert_set = getParam("invert", invert_filter_);
+  polygon_ = makePolygonFromXMLRPC(polygon_xmlrpc, "polygon");
+
+  double polygon_padding = 0;
+  getParam("polygon_padding", polygon_padding);
+
+  polygon_string = polygonToString(polygon_);
+  param_config.polygon = polygon_string;
+  param_config.polygon_padding = polygon_padding;
+  param_config.invert = invert_filter_;
+  dyn_server_->updateConfig(param_config);
+  
   polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1);
-  return result;
+
+  if (!polygon_frame_set)
+  {
+    ROS_ERROR("polygon_frame is not set!");
+  }
+  if (!polygon_set)
+  {
+    ROS_ERROR("polygon is not set!");
+  }
+  if (!invert_set)
+  {
+    ROS_INFO("invert filter not set, assuming false");
+    invert_filter_ = false;
+  }
+
+  return polygon_frame_set && polygon_set;
 }
 
 bool StaticLaserScanPolygonFilter::configure()
