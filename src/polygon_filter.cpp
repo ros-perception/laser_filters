@@ -254,7 +254,6 @@ bool LaserScanPolygonFilterBase::configure()
   std::string polygon_string;
   PolygonFilterConfig param_config;
 
-  is_polygon_transformed_ = false;
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>::CallbackType f;
@@ -290,6 +289,19 @@ bool LaserScanPolygonFilterBase::configure()
   }
 
   return polygon_frame_set && polygon_set;
+}
+
+bool LaserScanPolygonFilter::configure()
+{
+  bool result = LaserScanPolygonFilterBase::configure();
+  polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1);
+  return result;
+}
+
+bool StaticLaserScanPolygonFilter::configure()
+{
+  is_polygon_transformed_ = false;
+  return LaserScanPolygonFilterBase::configure();
 }
 
 bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
@@ -390,7 +402,7 @@ void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& 
     co_sine_map_angle_min_ != scan_in.angle_min ||
     co_sine_map_angle_max_ != scan_in.angle_max
   ) {
-    ROS_DEBUG ("[projectLaser] No precomputed map given. Computing one.");
+    ROS_DEBUG ("[StaticLaserScanPolygonFilter] No precomputed map given. Computing one.");
     co_sine_map_ = Eigen::ArrayXXd(n_pts, 2);
     co_sine_map_angle_min_ = scan_in.angle_min;
     co_sine_map_angle_max_ = scan_in.angle_max;
@@ -403,10 +415,12 @@ void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& 
   }
 }
 
-// Note: This implementation does not transform the laser scan points to the base link
-// before checking if the fall inside the polygon. Assuming the transform between the 
-// laser scanner and the base link is static, this only needs to be done once. The
-// polygon can be translated relative to the scanner.
+// Note: This implementation transforms the polygon relative to the laser.
+// It does this lazily and only once. This has the advantage that the check if points fall inside the polygon is fast
+// as the transform is not needed there. Furthermore, it means that the filter chain node
+// does not need to be continuously subscribed to the transform topic, which significantly reduces CPU load.
+// A pre-requisite for this to work is that the transform is static, i.e. the position and orientation of the laser with regard to
+// the base of the robot does not change.
 bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
                                         sensor_msgs::LaserScan& output_scan) {
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
@@ -419,15 +433,13 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
         ros::Duration(1.0), ros::Duration(0.01), &error_msg);
 
     if (!success) {
-      ROS_WARN("Could not get transform, ignoring laser scan! %s", error_msg.c_str());
+      ROS_WARN("[StaticLaserScanPolygonFilter] Could not get transform, ignoring laser scan! %s", error_msg.c_str());
       return false;
     }
 
     try {
-      // Transform each point of polygon.
-      // First create a stamped point from polygon point.
-      // After tranform change it into a message to have access to the new set of coordinates.
-      // Copy new coordinates into the polygon point.
+      // Transform each point of polygon. This includes multiple type convertions because of transformPoint API requiring Stamped<Point>
+      // which does not in turn expose coordinate values
       for (int i = 0; i < polygon_.points.size(); ++i) {
         tf::Point point(polygon_.points[i].x, polygon_.points[i].y, 0);
         tf::Stamped<tf::Point> point_stamped(
@@ -489,9 +501,13 @@ bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
 }
 
 void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
-  is_polygon_transformed_ = false;
   invert_filter_ = config.invert;
   polygon_ = makePolygonFromString(config.polygon, polygon_);
   padPolygon(polygon_, config.polygon_padding);
+}
+
+void StaticLaserScanPolygonFilter::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
+  is_polygon_transformed_ = false;
+  LaserScanPolygonFilterBase::reconfigureCB(config, level);
 }
 }

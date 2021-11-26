@@ -76,7 +76,7 @@ protected:
   double polygon_padding_;
   bool invert_filter_;
 
-  void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
+  virtual void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
 
   // checks if points in polygon
   bool inPolygon(tf::Point& point) const;
@@ -88,6 +88,7 @@ private:
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
+  bool configure() override;
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
 
 private:
@@ -99,12 +100,18 @@ private:
 };
 
 /**
- * @brief This is a filter that removes points in a laser scan inside of a polygon
- * assuming that the transform between polygon and scanner remains static over the entire run.
+ * @brief This is a filter that removes points in a laser scan inside of a polygon.
+ * It assumes that the transform between the scanner and the robot base remains unchanged,
+ * i.e. the position and orientation of the laser filter should not change.
+ * A typical use case for this filter is to filter out parts of the robot body or load that it may carry.
  */
 class StaticLaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
+  bool configure() override;
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
+  
+protected:
+  void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) override;
 
 private:
   Eigen::ArrayXXd co_sine_map_;
