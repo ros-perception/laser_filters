@@ -464,7 +464,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
   if (!is_polygon_transformed_) {
-    tf::TransformListener transform_listener();
+    tf::TransformListener transform_listener;
 
     std::string error_msg;
     bool success = transform_listener.waitForTransform(
