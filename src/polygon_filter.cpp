@@ -465,6 +465,8 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
 
   if (!is_polygon_transformed_) {
     tf::TransformListener transform_listener();
+
+    std::string error_msg;
     bool success = transform_listener.waitForTransform(
         input_scan.header.frame_id, polygon_frame_,
         input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
