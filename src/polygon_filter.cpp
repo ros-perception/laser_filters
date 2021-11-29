@@ -291,6 +291,27 @@ bool LaserScanPolygonFilterBase::configure()
   return polygon_frame_set && polygon_set;
 }
 
+// See https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
+bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
+  int i, j;
+  bool c = false;
+
+  for (i = 0, j = polygon_.points.size() - 1; i < polygon_.points.size(); j = i++) {
+    if ((polygon_.points.at(i).y > point.y() != (polygon_.points.at(j).y > point.y()) &&
+         (point.x() < (polygon_.points[j].x - polygon_.points[i].x) * (point.y() - polygon_.points[i].y) /
+                              (polygon_.points[j].y - polygon_.points[i].y) +
+                          polygon_.points[i].x)))
+      c = !c;
+  }
+  return c;
+}
+
+void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
+  invert_filter_ = config.invert;
+  polygon_ = makePolygonFromString(config.polygon, polygon_);
+  padPolygon(polygon_, config.polygon_padding);
+}
+
 bool LaserScanPolygonFilter::configure()
 {
   XmlRpc::XmlRpcValue polygon_xmlrpc;
@@ -334,12 +355,6 @@ bool LaserScanPolygonFilter::configure()
   }
 
   return polygon_frame_set && polygon_set;
-}
-
-bool StaticLaserScanPolygonFilter::configure()
-{
-  is_polygon_transformed_ = false;
-  return LaserScanPolygonFilterBase::configure();
 }
 
 bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
@@ -430,6 +445,12 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
   }
 
   return true;
+}
+
+bool StaticLaserScanPolygonFilter::configure()
+{
+  is_polygon_transformed_ = false;
+  return LaserScanPolygonFilterBase::configure();
 }
 
 void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& scan_in) {
@@ -523,27 +544,6 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
   }
 
   return true;
-}
-
-// See https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
-  int i, j;
-  bool c = false;
-
-  for (i = 0, j = polygon_.points.size() - 1; i < polygon_.points.size(); j = i++) {
-    if ((polygon_.points.at(i).y > point.y() != (polygon_.points.at(j).y > point.y()) &&
-         (point.x() < (polygon_.points[j].x - polygon_.points[i].x) * (point.y() - polygon_.points[i].y) /
-                              (polygon_.points[j].y - polygon_.points[i].y) +
-                          polygon_.points[i].x)))
-      c = !c;
-  }
-  return c;
-}
-
-void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
-  invert_filter_ = config.invert;
-  polygon_ = makePolygonFromString(config.polygon, polygon_);
-  padPolygon(polygon_, config.polygon_padding);
 }
 
 void StaticLaserScanPolygonFilter::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
