@@ -39,6 +39,8 @@
 #ifndef SCAN_SHADOW_DETECTOR_H
 #define SCAN_SHADOW_DETECTOR_H
 
+#include <vector>
+
 namespace laser_filters
 {
 class ScanShadowDetector
@@ -54,10 +56,8 @@ public:
 private:
   int window_;
   float angle_increment_;
-  float *sin_map_ = nullptr;
-  float *cos_map_ = nullptr;
-  float *shifted_sin_map_;
-  float *shifted_cos_map_;
+  std::vector<float> sin_map_;
+  std::vector<float> cos_map_;
 };
 }
 

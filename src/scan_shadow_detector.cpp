@@ -48,15 +48,6 @@ namespace laser_filters
     max_angle_tan_ = tanf(max_angle);
     window_ = window;
     angle_increment_ = 0;
-    if (sin_map_ != nullptr)
-    {
-      delete [] sin_map_;
-      delete [] cos_map_;
-    }
-    sin_map_ = new float[window_ * 2 + 1];
-    cos_map_ = new float[window_ * 2 + 1];
-    shifted_sin_map_ = sin_map_ + window_;
-    shifted_cos_map_ = cos_map_ + window_;
 
     // Correct sign of tan around singularity points
     if (min_angle_tan_ < 0.0)
@@ -69,11 +60,13 @@ namespace laser_filters
     if (angle_increment_ != angle_increment) {
       ROS_DEBUG ("[ScanShadowDetector] No precomputed map given. Computing one.");
       angle_increment_ = angle_increment;
+      sin_map_.clear();
+      cos_map_.clear();
 
       float included_angle = -window_ * angle_increment;
       for (int i = -window_; i <= window_; ++i) {
-        shifted_sin_map_[i] = fabs(sinf(included_angle));
-        shifted_cos_map_[i] = cosf(included_angle);
+        sin_map_.push_back(fabs(sinf(included_angle)));
+        cos_map_.push_back(cosf(included_angle));
         included_angle += angle_increment;
       }
     }
@@ -81,8 +74,8 @@ namespace laser_filters
 
   bool ScanShadowDetector::isShadow(const float r1, const float r2, const int angle_index)
   {
-    const float perpendicular_y_ = r2 * shifted_sin_map_[angle_index];
-    const float perpendicular_x_ = r1 - r2 * shifted_cos_map_[angle_index];
+    const float perpendicular_y_ = r2 * sin_map_[angle_index + window_];
+    const float perpendicular_x_ = r1 - r2 * cos_map_[angle_index + window_];
     const float perpendicular_tan_ = perpendicular_y_ / perpendicular_x_;
 
     return perpendicular_tan_ < min_angle_tan_ && perpendicular_tan_ > max_angle_tan_;
@@ -90,10 +83,5 @@ namespace laser_filters
 
   ScanShadowDetector::~ScanShadowDetector()
   {
-    if (sin_map_ != nullptr)
-    {
-      delete [] sin_map_;
-      delete [] cos_map_;
-    }
   }
 }
