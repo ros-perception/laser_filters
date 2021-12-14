@@ -46,18 +46,15 @@ namespace laser_filters
 class ScanShadowDetector
 {
 public:
+  friend class ScanShadowsFilter;
   float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
 
-  void configure(const float min_angle, const float max_angle, const int window);
-  void prepareForInput(const float angle_increment);
-  bool isShadow(const float r1, const float r2, const int angle_index);
+  void configure(const float min_angle, const float max_angle);
+  bool isShadow(const float r1, const float r2, const float included_angle);
 
   ~ScanShadowDetector();
 private:
-  int window_;
-  float angle_increment_;
-  std::vector<float> sin_map_;
-  std::vector<float> cos_map_;
+  bool isShadow(float r1, float r2, float included_angle_sin, float included_angle_cos);
 };
 }
 

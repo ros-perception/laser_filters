@@ -98,9 +98,9 @@ bool ScanShadowsFilter::configure()
 
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
-        angles::from_degrees(max_angle_),
-        window_);
+        angles::from_degrees(max_angle_));
 
+    angle_increment_ = 0;
     param_config.min_angle = min_angle_;
     param_config.max_angle = max_angle_;
     param_config.window = window_;
@@ -113,14 +113,16 @@ bool ScanShadowsFilter::configure()
 
 void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t level)
 {
+    boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
     min_angle_ = config.min_angle;
     max_angle_ = config.max_angle;
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
-        angles::from_degrees(max_angle_),
-        config.window);
+        angles::from_degrees(max_angle_));
     neighbors_ = config.neighbors;
     window_ = config.window;
+    angle_increment_ = 0;
     remove_shadow_start_point_ = config.remove_shadow_start_point;
 }
 
@@ -134,7 +136,7 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     int size = scan_in.ranges.size();
     int max_y;
     int max_neighbors;
-    shadow_detector_.prepareForInput(scan_in.angle_increment);
+    prepareForInput(scan_in.angle_increment);
     // For each point in the current line scan
     for (int i = 0; i < size; i++)
     {
@@ -147,7 +149,7 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         }
 
         if (shadow_detector_.isShadow(
-                scan_in.ranges[i], scan_in.ranges[i + y], y))
+                scan_in.ranges[i], scan_in.ranges[i + y], sin_map_[y + window_], cos_map_[y + window_]))
         {
           max_neighbors = std::min<int>(i + neighbors_, size - 1);
           for (int index = std::max<int>(i - neighbors_, 0); index <= max_neighbors; index++)
@@ -167,5 +169,21 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     }
 
     return true;
+}
+
+void ScanShadowsFilter::prepareForInput(const float angle_increment) {
+  if (angle_increment_ != angle_increment) {
+    ROS_DEBUG ("[ScanShadowsFilter] No precomputed map given. Computing one.");
+    angle_increment_ = angle_increment;
+    sin_map_.clear();
+    cos_map_.clear();
+
+    float included_angle = -window_ * angle_increment;
+    for (int i = -window_; i <= window_; ++i) {
+      sin_map_.push_back(fabs(sinf(included_angle)));
+      cos_map_.push_back(cosf(included_angle));
+      included_angle += angle_increment;
+    }
+  }
 }
 }

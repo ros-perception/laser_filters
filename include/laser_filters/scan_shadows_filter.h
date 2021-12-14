@@ -76,6 +76,12 @@ public:
    * \param scan_out the output LaserScan message
    */
   bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
+private:
+  float angle_increment_;
+  std::vector<float> sin_map_;
+  std::vector<float> cos_map_;
+  
+  void prepareForInput(const float angle_increment);
 };
 }
 

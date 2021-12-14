@@ -42,12 +42,10 @@
 
 namespace laser_filters
 {
-  void ScanShadowDetector::configure(const float min_angle, const float max_angle, const int window)
+  void ScanShadowDetector::configure(const float min_angle, const float max_angle)
   {
     min_angle_tan_ = tanf(min_angle);
     max_angle_tan_ = tanf(max_angle);
-    window_ = window;
-    angle_increment_ = 0;
 
     // Correct sign of tan around singularity points
     if (min_angle_tan_ < 0.0)
@@ -56,29 +54,29 @@ namespace laser_filters
       max_angle_tan_ = -max_angle_tan_;
   }
 
-  void ScanShadowDetector::prepareForInput(const float angle_increment) {
-    if (angle_increment_ != angle_increment) {
-      ROS_DEBUG ("[ScanShadowDetector] No precomputed map given. Computing one.");
-      angle_increment_ = angle_increment;
-      sin_map_.clear();
-      cos_map_.clear();
-
-      float included_angle = -window_ * angle_increment;
-      for (int i = -window_; i <= window_; ++i) {
-        sin_map_.push_back(fabs(sinf(included_angle)));
-        cos_map_.push_back(cosf(included_angle));
-        included_angle += angle_increment;
-      }
-    }
+  bool ScanShadowDetector::isShadow(const float r1, const float r2, const float included_angle)
+  {
+    float included_angle_sin = sinf(included_angle);
+    float included_angle_cos = cosf(included_angle);
+    return isShadow(r1, r2, included_angle_sin, included_angle_cos);
   }
 
-  bool ScanShadowDetector::isShadow(const float r1, const float r2, const int angle_index)
+  bool ScanShadowDetector::isShadow(float r1, float r2, float included_angle_sin, float included_angle_cos)
   {
-    const float perpendicular_y_ = r2 * sin_map_[angle_index + window_];
-    const float perpendicular_x_ = r1 - r2 * cos_map_[angle_index + window_];
-    const float perpendicular_tan_ = perpendicular_y_ / perpendicular_x_;
+    const float perpendicular_y_ = r2 * included_angle_sin;
+    const float perpendicular_x_ = r1 - r2 * included_angle_cos;
+    const float perpendicular_tan_ = fabs(perpendicular_y_) / perpendicular_x_;
 
-    return perpendicular_tan_ < min_angle_tan_ && perpendicular_tan_ > max_angle_tan_;
+    if (perpendicular_tan_ > 0) {
+      if (perpendicular_tan_ < min_angle_tan_)
+        return true;
+    }
+    else {
+      if (perpendicular_tan_ > max_angle_tan_)
+        return true;
+    }
+
+    return false;
   }
 
   ScanShadowDetector::~ScanShadowDetector()

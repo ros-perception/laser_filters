@@ -64,8 +64,7 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
     for (float max_angle = 90.0; max_angle <= 180; max_angle += 5.0)
     {
       laser_filters::ScanShadowDetector detector;
-      detector.configure(angles::from_degrees(min_angle), angles::from_degrees(max_angle), window);
-      detector.prepareForInput(angle_increment);
+      detector.configure(angles::from_degrees(min_angle), angles::from_degrees(max_angle));
 
       for (float r1 = 0.1; r1 < 1.0; r1 += 0.1)
       {
@@ -78,7 +77,7 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
               
             // Compare with original ScanShadowsFilter implementation
             EXPECT_EQ(
-                detector.isShadow(r1, r2, inc),
+                detector.isShadow(r1, r2, inc * angle_increment),
                 isShadowPureImpl(r1, r2, inc * angle_increment, min_angle, max_angle));
           }
         }
