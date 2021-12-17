@@ -38,6 +38,7 @@
 
 #include <gtest/gtest.h>
 #include <angles/angles.h>
+#include <math.h>
 
 #include "laser_filters/scan_shadow_detector.h"
 
@@ -74,11 +75,18 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
           {
             if (inc == 0)
               continue;
+
+            float angle = inc * angle_increment;
               
             // Compare with original ScanShadowsFilter implementation
             EXPECT_EQ(
-                detector.isShadow(r1, r2, inc * angle_increment),
-                isShadowPureImpl(r1, r2, inc * angle_increment, min_angle, max_angle));
+                detector.isShadow(r1, r2, angle),
+                isShadowPureImpl(r1, r2, angle, min_angle, max_angle));
+              
+            // Compare with original ScanShadowsFilter implementation
+            EXPECT_EQ(
+                detector.isShadow(r1, r2, sinf(angle), cosf(angle)),
+                isShadowPureImpl(r1, r2, angle, min_angle, max_angle));
           }
         }
       }
