@@ -46,7 +46,6 @@ namespace laser_filters
 class ScanShadowDetector
 {
 public:
-  friend class ScanShadowsFilter;
   float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
 
   void configure(const float min_angle, const float max_angle);
@@ -67,8 +66,6 @@ public:
    * \param included_angle_cos the cosine of an angle between laser scans for these two points
    */
   bool isShadow(float r1, float r2, float included_angle_sin, float included_angle_cos);
-
-  ~ScanShadowDetector();
 };
 }
 

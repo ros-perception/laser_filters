@@ -78,8 +78,4 @@ namespace laser_filters
 
     return false;
   }
-
-  ScanShadowDetector::~ScanShadowDetector()
-  {
-  }
 }
