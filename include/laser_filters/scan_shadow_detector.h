@@ -39,6 +39,8 @@
 #ifndef SCAN_SHADOW_DETECTOR_H
 #define SCAN_SHADOW_DETECTOR_H
 
+#include <vector>
+
 namespace laser_filters
 {
 class ScanShadowDetector
@@ -47,7 +49,23 @@ public:
   float min_angle_tan_, max_angle_tan_;  // Filter angle thresholds
 
   void configure(const float min_angle, const float max_angle);
+
+  /** \brief Check if the point is a shadow of another point within one laser scan.
+   * \param r1 the distance to the first point
+   * \param r2 the distance to the second point
+   * \param included_angle the angle between laser scans for these two points
+   */
   bool isShadow(const float r1, const float r2, const float included_angle);
+
+  /** \brief Check if the point is a shadow of another point within one laser scan.
+   * Use this method instead of the version without the extra parameters to avoid
+   * computing sin and cos of the angle on every execution.
+   * \param r1 the distance to the first point
+   * \param r2 the distance to the second point
+   * \param included_angle_sin the sine of an angle between laser scans for these two points
+   * \param included_angle_cos the cosine of an angle between laser scans for these two points
+   */
+  bool isShadow(float r1, float r2, float included_angle_sin, float included_angle_cos);
 };
 }
 

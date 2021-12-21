@@ -56,20 +56,26 @@ namespace laser_filters
 
   bool ScanShadowDetector::isShadow(const float r1, const float r2, const float included_angle)
   {
-    const float perpendicular_y_ = r2 * sinf(included_angle);
-    const float perpendicular_x_ = r1 - r2 * cosf(included_angle);
+    float included_angle_sin = sinf(included_angle);
+    float included_angle_cos = cosf(included_angle);
+    return isShadow(r1, r2, included_angle_sin, included_angle_cos);
+  }
+
+  bool ScanShadowDetector::isShadow(float r1, float r2, float included_angle_sin, float included_angle_cos)
+  {
+    const float perpendicular_y_ = r2 * included_angle_sin;
+    const float perpendicular_x_ = r1 - r2 * included_angle_cos;
     const float perpendicular_tan_ = fabs(perpendicular_y_) / perpendicular_x_;
 
-    if (perpendicular_tan_ > 0)
-    {
+    if (perpendicular_tan_ > 0) {
       if (perpendicular_tan_ < min_angle_tan_)
         return true;
     }
-    else
-    {
+    else {
       if (perpendicular_tan_ > max_angle_tan_)
         return true;
     }
+
     return false;
   }
 }

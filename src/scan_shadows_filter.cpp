@@ -90,7 +90,7 @@ bool ScanShadowsFilter::configure()
       ROS_ERROR("max_angle must be 90 <= max_angle. Forcing max_angle = 90.\n");
       max_angle_ = 90.0;
     }
-    if (180 < min_angle_)
+    if (180 < max_angle_)
     {
       ROS_ERROR("max_angle must be max_angle <= 180. Forcing max_angle = 180.\n");
       max_angle_ = 180.0;
@@ -100,6 +100,7 @@ bool ScanShadowsFilter::configure()
         angles::from_degrees(min_angle_),
         angles::from_degrees(max_angle_));
 
+    angle_increment_ = 0;
     param_config.min_angle = min_angle_;
     param_config.max_angle = max_angle_;
     param_config.window = window_;
@@ -112,6 +113,8 @@ bool ScanShadowsFilter::configure()
 
 void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t level)
 {
+    boost::recursive_mutex::scoped_lock lock(own_mutex_);
+
     min_angle_ = config.min_angle;
     max_angle_ = config.max_angle;
     shadow_detector_.configure(
@@ -119,6 +122,7 @@ void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t 
         angles::from_degrees(max_angle_));
     neighbors_ = config.neighbors;
     window_ = config.window;
+    angle_increment_ = 0;
     remove_shadow_start_point_ = config.remove_shadow_start_point;
 }
 
@@ -129,42 +133,57 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     // copy across all data first
     scan_out = scan_in;
 
-    std::set<int> indices_to_delete;
+    int size = scan_in.ranges.size();
+    int max_y;
+    int max_neighbors;
+    prepareForInput(scan_in.angle_increment);
     // For each point in the current line scan
-    for (unsigned int i = 0; i < scan_in.ranges.size(); i++)
+    for (int i = 0; i < size; i++)
     {
-      for (int y = -window_; y < window_ + 1; y++)
+      max_y = std::min<int>(size - i, window_ + 1);
+      for (int y = std::max<int>(-i, -window_); y < max_y; y++)
       {
-        int j = i + y;
-        if (j < 0 || j >= (int)scan_in.ranges.size() || (int)i == j)
-        {  // Out of scan bounds or itself
+        if (y == 0)
+        {
           continue;
         }
 
         if (shadow_detector_.isShadow(
-                scan_in.ranges[i], scan_in.ranges[j], y * scan_in.angle_increment))
+                scan_in.ranges[i], scan_in.ranges[i + y], sin_map_[y + window_], cos_map_[y + window_]))
         {
-          for (int index = std::max<int>(i - neighbors_, 0); index <= std::min<int>(i + neighbors_, (int)scan_in.ranges.size() - 1); index++)
+          max_neighbors = std::min<int>(i + neighbors_, size - 1);
+          for (int index = std::max<int>(i - neighbors_, 0); index <= max_neighbors; index++)
           {
             if (scan_in.ranges[i] < scan_in.ranges[index])
             {  // delete neighbor if they are farther away (note not self)
-              indices_to_delete.insert(index);
+              scan_out.ranges[index] = std::numeric_limits<float>::quiet_NaN(); 
             }
           }
           if (remove_shadow_start_point_)
           {
-            indices_to_delete.insert(i);
+              scan_out.ranges[i] = std::numeric_limits<float>::quiet_NaN(); 
           }
+          break;
         }
       }
     }
 
-    ROS_DEBUG("ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d",
-              (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
-    for (std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
-    {
-      scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value
-    }
     return true;
+}
+
+void ScanShadowsFilter::prepareForInput(const float angle_increment) {
+  if (angle_increment_ != angle_increment) {
+    ROS_DEBUG ("[ScanShadowsFilter] No precomputed map given. Computing one.");
+    angle_increment_ = angle_increment;
+    sin_map_.clear();
+    cos_map_.clear();
+
+    float included_angle = -window_ * angle_increment;
+    for (int i = -window_; i <= window_; ++i) {
+      sin_map_.push_back(fabs(sinf(included_angle)));
+      cos_map_.push_back(cosf(included_angle));
+      included_angle += angle_increment;
+    }
+  }
 }
 }
