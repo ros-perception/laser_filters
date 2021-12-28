@@ -51,6 +51,7 @@ add_library(laser_scan_filters
   src/speckle_filter.cpp
   src/intensity_filter.cpp
   src/sector_filter.cpp
+  src/lower_resolution_filter.cpp
 )
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
