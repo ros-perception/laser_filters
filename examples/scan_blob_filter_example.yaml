@@ -1,0 +1,6 @@
+scan_filter_chain:
+- name: scan_blob_filter
+  type: laser_filters/ScanBlobFilter
+  params:
+    max_radius: 0.25 # maximum radius to be considered as blob object
+    min_points: 6 # min scan points to be considered as blob object
