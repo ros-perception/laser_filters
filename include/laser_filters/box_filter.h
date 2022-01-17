@@ -80,8 +80,10 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
       bool y_min_set = getParam("min_y", min_y);
       bool z_min_set = getParam("min_z", min_z);
 
-      keep_box_points_= true;
-      getParam("keep_box_points", keep_box_points_);
+      // box within the box are kept (instead of discarded) if filter is inverted
+      bool invert = false;
+      getParam("invert", invert);
+      remove_box_points_ = not invert;
 
       max_.setX(max_x);
       max_.setY(max_y);
@@ -187,7 +189,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     {
         Point point(*iter_x, *iter_y, *iter_z);
 
-        if (keep_box_points_ != inBox(point))
+        if (remove_box_points_ == inBox(point))
         {
           output_scan.ranges[*iter_i] = std::numeric_limits<float>::quiet_NaN();
         }
@@ -217,7 +219,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     bool up_and_running_;
 
     // flag to decide what to do with the points within the box
-    bool keep_box_points_;
+    bool remove_box_points_;
   };
 
 } // namespace laser_filters
