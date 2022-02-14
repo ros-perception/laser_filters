@@ -456,14 +456,23 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
     tf::TransformListener transform_listener;
 
     std::string error_msg;
+    ROS_DEBUG(
+      "[StaticLaserScanPolygonFilter] waitForTransform %s -> %s",
+      polygon_frame_.c_str(), input_scan.header.frame_id.c_str()
+    );
     bool success = transform_listener.waitForTransform(
-        input_scan.header.frame_id, polygon_frame_,
-        input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
-        ros::Duration(1.0), ros::Duration(0.01), &error_msg);
+      input_scan.header.frame_id, polygon_frame_,
+      ros::Time(),       // No restrictions on transform time. It is static.
+      ros::Duration(60), // In a loaded system, it can take long for data to arrive
+      ros::Duration(0),  // This setting has no effect
+      &error_msg
+    );
 
     if (!success) {
       ROS_WARN("[StaticLaserScanPolygonFilter] Could not get transform, ignoring laser scan! %s", error_msg.c_str());
       return false;
+    } else {
+      ROS_DEBUG("[StaticLaserScanPolygonFilter] obtained transform");
     }
 
     try {
@@ -471,10 +480,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
       // which does not in turn expose coordinate values
       for (int i = 0; i < polygon_.points.size(); ++i) {
         tf::Point point(polygon_.points[i].x, polygon_.points[i].y, 0);
-        tf::Stamped<tf::Point> point_stamped(
-          point,
-          input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size() * input_scan.time_increment),
-          polygon_frame_);
+        tf::Stamped<tf::Point> point_stamped(point, ros::Time(), polygon_frame_);
         tf::Stamped<tf::Point> point_stamped_new;
         transform_listener.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
         geometry_msgs::PointStamped result_point;
@@ -486,7 +492,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
       is_polygon_transformed_ = true;
     }
     catch (tf::TransformException& ex) {
-      ROS_INFO_THROTTLE(.3, "Ignoring Scan: Waiting for TF");
+      ROS_INFO("[StaticLaserScanPolygonFilter] Exception while transforming polygon");
       return false;
     }
   }
