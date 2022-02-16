@@ -69,12 +69,14 @@ public:
   virtual bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) { return false; }
 
 protected:
+  ros::Publisher polygon_pub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
   geometry_msgs::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
+  bool was_polygon_published_ = false;
   std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
 
   virtual void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
@@ -85,12 +87,10 @@ protected:
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
-  bool configure() override;
   bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
 
 private:
   // configuration
-  ros::Publisher polygon_pub_;
   laser_geometry::LaserProjection projector_;
   // tf listener to transform scans into the polygon_frame
   tf::TransformListener tf_;
