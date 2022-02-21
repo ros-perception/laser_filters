@@ -76,13 +76,15 @@ protected:
   geometry_msgs::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
-  bool was_polygon_published_ = false;
+  bool is_polygon_published_ = false;
   std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
 
   virtual void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
 
   // checks if points in polygon
   bool inPolygon(tf::Point& point) const;
+
+  void publishPolygon();
 };
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {

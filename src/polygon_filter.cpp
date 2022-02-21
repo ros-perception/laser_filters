@@ -275,7 +275,7 @@ bool LaserScanPolygonFilterBase::configure()
   dyn_server_->updateConfig(param_config);
 
   polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
-  was_polygon_published_ = false;
+  is_polygon_published_ = false;
 
   if (!polygon_frame_set)
   {
@@ -309,11 +309,22 @@ bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
   return c;
 }
 
+void LaserScanPolygonFilterBase::publishPolygon() {
+  if (!is_polygon_published_) {
+    geometry_msgs::PolygonStamped polygon_stamped;
+    polygon_stamped.header.frame_id = polygon_frame_;
+    polygon_stamped.header.stamp = ros::Time::now();
+    polygon_stamped.polygon = polygon_;
+    polygon_pub_.publish(polygon_stamped);
+    is_polygon_published_ = true;
+  }
+}
+
 void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) {
   invert_filter_ = config.invert;
   polygon_ = makePolygonFromString(config.polygon, polygon_);
   padPolygon(polygon_, config.polygon_padding);
-  was_polygon_published_ = false;
+  is_polygon_published_ = false;
 }
 
 bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
@@ -321,14 +332,7 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
 {
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
-  if (!was_polygon_published_) {
-    geometry_msgs::PolygonStamped polygon_stamped;
-    polygon_stamped.header.frame_id = polygon_frame_;
-    polygon_stamped.header.stamp = ros::Time::now();
-    polygon_stamped.polygon = polygon_;
-    polygon_pub_.publish(polygon_stamped);
-    was_polygon_published_ = true;
-  }
+  publishPolygon();
 
   output_scan = input_scan;
 
@@ -446,14 +450,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
                                         sensor_msgs::LaserScan& output_scan) {
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
-  if (!was_polygon_published_) {
-    geometry_msgs::PolygonStamped polygon_stamped;
-    polygon_stamped.header.frame_id = polygon_frame_;
-    polygon_stamped.header.stamp = ros::Time::now();
-    polygon_stamped.polygon = polygon_;
-    polygon_pub_.publish(polygon_stamped);
-    was_polygon_published_ = true;
-  }
+  publishPolygon();
 
   if (!is_polygon_transformed_) {
     tf::TransformListener transform_listener;
