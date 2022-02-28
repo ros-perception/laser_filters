@@ -87,6 +87,10 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
       min_.setY(min_y);
       min_.setZ(min_z);
 
+      bool invert = false;
+      getParam("invert", invert);
+      remove_box_points_ = not invert;
+
       if (!box_frame_set)
       {
         RCLCPP_ERROR(get_logger(), "box_frame is not set!");
@@ -184,7 +188,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     {
         Point point(*iter_x, *iter_y, *iter_z);
 
-        if (inBox(point))
+        if (remove_box_points_ == inBox(point))
         {
           output_scan.ranges[*iter_i] = std::numeric_limits<float>::quiet_NaN();
         }
@@ -208,6 +212,9 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     // tf listener to transform scans into the box_frame
     tf2_ros::Buffer buffer_;
     tf2_ros::TransformListener tf_;
+
+    // parameter to decide if points in box or points outside of box are removed
+    bool remove_box_points_ = true;
 
     // defines two opposite corners of the box
     Point min_, max_;
