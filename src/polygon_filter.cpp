@@ -416,6 +416,10 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
 bool StaticLaserScanPolygonFilter::configure()
 {
   is_polygon_transformed_ = false;
+
+  transform_timeout_ = 5; // Default
+  getParam("transform_timeout", transform_timeout_);
+
   return LaserScanPolygonFilterBase::configure();
 }
 
@@ -463,7 +467,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
     bool success = transform_listener.waitForTransform(
       input_scan.header.frame_id, polygon_frame_,
       ros::Time(),       // No restrictions on transform time. It is static.
-      ros::Duration(60), // In a loaded system, it can take long for data to arrive
+      ros::Duration(transform_timeout_),
       ros::Duration(0),  // This setting has no effect
       &error_msg
     );
