@@ -43,7 +43,7 @@
 #ifndef POLYGON_FILTER_H
 #define POLYGON_FILTER_H
 
-#include <filters/filter_base.h>
+#include <filters/filter_base.hpp>
 
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
@@ -113,6 +113,8 @@ protected:
   void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) override;
 
 private:
+  double transform_timeout_;
+
   Eigen::ArrayXXd co_sine_map_;
   float co_sine_map_angle_min_;
   float co_sine_map_angle_max_;
