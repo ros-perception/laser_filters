@@ -49,57 +49,32 @@ laser_filters::LaserScanBoxFilter::LaserScanBoxFilter(){
 
 }
 
+
 bool laser_filters::LaserScanBoxFilter::configure(){
+  ros::NodeHandle private_nh("~" + getName());
+  dyn_server_.reset(new dynamic_reconfigure::Server<BoxFilterConfig>(own_mutex_, private_nh));
+  dynamic_reconfigure::Server<BoxFilterConfig>::CallbackType f;
+  f = boost::bind(&LaserScanBoxFilter::reconfigureCB, this, _1, _2);
+  dyn_server_->setCallback(f);
+
   up_and_running_ = true;
-  double min_x = 0, min_y = 0, min_z = 0, max_x = 0, max_y = 0, max_z = 0;
-  bool box_frame_set = getParam("box_frame", box_frame_);
-  bool x_max_set = getParam("max_x", max_x);
-  bool y_max_set = getParam("max_y", max_y);
-  bool z_max_set = getParam("max_z", max_z);
-  bool x_min_set = getParam("min_x", min_x);
-  bool y_min_set = getParam("min_y", min_y);
-  bool z_min_set = getParam("min_z", min_z);
-  bool invert_set = getParam("invert", invert_filter);
+
+  getParam("box_frame", config_.box_frame);
+  getParam("max_x", config_.max_x);
+  getParam("max_y", config_.max_y);
+  getParam("max_z", config_.max_z);
+  getParam("min_x", config_.min_x);
+  getParam("min_y", config_.min_y);
+  getParam("min_z", config_.min_z);
+  getParam("invert", config_.invert);
+  dyn_server_->updateConfig(config_);
   
   ROS_INFO("BOX filter started");
-
-  max_.setX(max_x);
-  max_.setY(max_y);
-  max_.setZ(max_z);
-  min_.setX(min_x);
-  min_.setY(min_y);
-  min_.setZ(min_z);
-  
-  if(!box_frame_set){
-    ROS_ERROR("box_frame is not set!");
-  }
-  if(!x_max_set){
-    ROS_ERROR("max_x is not set!");
-  }
-  if(!y_max_set){
-    ROS_ERROR("max_y is not set!");
-  }
-  if(!z_max_set){
-    ROS_ERROR("max_z is not set!");
-  }
-  if(!x_min_set){
-    ROS_ERROR("min_x is not set!");
-  }
-  if(!y_min_set){
-    ROS_ERROR("min_y is not set!");
-  }
-  if(!z_min_set){
-    ROS_ERROR("min_z is not set!");
-  }
-  if(!invert_set){
-    ROS_INFO("invert filter not set, assuming false");
-    invert_filter=false;
-  }
-
-
-  return box_frame_set && x_max_set && y_max_set && z_max_set &&
-    x_min_set && y_min_set && z_min_set;
-
+  ROS_INFO("Box frame is: %s", config_.box_frame.c_str());
+  ROS_INFO("Box: x_min %f, x_max, %f, y_min, %f, y_max, %f, min_z %f, max_z %f", config_.min_x,
+   config_.max_x, config_.min_y, config_.max_y, config_.min_z, config_.max_z);
+  ROS_INFO("Box filter invert: %d", config_.invert);
+  return true;
 }
 
 bool laser_filters::LaserScanBoxFilter::update(
@@ -112,7 +87,7 @@ bool laser_filters::LaserScanBoxFilter::update(
   std::string error_msg;
 
   bool success = tf_.waitForTransform(
-    box_frame_,
+    config_.box_frame,
     input_scan.header.frame_id,
     input_scan.header.stamp + ros::Duration().fromSec(input_scan.ranges.size()*input_scan.time_increment),
     ros::Duration(1.0),
@@ -125,7 +100,7 @@ bool laser_filters::LaserScanBoxFilter::update(
   }
 
   try{
-    projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, tf_);
+    projector_.transformLaserScanToPointCloud(config_.box_frame, input_scan, laser_cloud, tf_);
   }
   catch(tf::TransformException& ex){
     if(up_and_running_){
@@ -182,7 +157,7 @@ bool laser_filters::LaserScanBoxFilter::update(
 
     tf::Point point(x, y, z);
 
-    if(!invert_filter){
+    if(!config_.invert){
       if(inBox(point)){
         output_scan.ranges[index] = std::numeric_limits<float>::quiet_NaN();
       }
@@ -200,8 +175,13 @@ bool laser_filters::LaserScanBoxFilter::update(
 
 bool laser_filters::LaserScanBoxFilter::inBox(tf::Point &point){
   return
-    point.x() < max_.x() && point.x() > min_.x() && 
-    point.y() < max_.y() && point.y() > min_.y() &&
-    point.z() < max_.z() && point.z() > min_.z();
+    point.x() < config_.max_x && point.x() > config_.min_x &&
+    point.y() < config_.max_y && point.y() > config_.min_y &&
+    point.z() < config_.max_z && point.z() > config_.min_z;
+}
+
+void laser_filters::LaserScanBoxFilter::reconfigureCB(BoxFilterConfig& config, uint32_t level)
+{
+  config_ = config;
 }
 
