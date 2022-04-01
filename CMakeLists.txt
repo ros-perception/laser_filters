@@ -39,7 +39,7 @@ if(BUILD_TESTING)
     set(TEST_NAME test_scan_filter_chain)
     set(RESULT_FILENAME ${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${TEST_NAME}.gtest.xml)
     ament_add_gtest_executable(${TEST_NAME} test/${TEST_NAME}.cpp)
-    ament_target_dependencies(${TEST_NAME} filters pluginlib rclcpp)
+    ament_target_dependencies(${TEST_NAME} filters pluginlib rclcpp sensor_msgs)
     ament_add_test(
         ${TEST_NAME}
         COMMAND 
