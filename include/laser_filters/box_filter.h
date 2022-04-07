@@ -56,6 +56,9 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <laser_filters/BoxFilterConfig.h>
+
 
 namespace laser_filters
 {
@@ -84,6 +87,11 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
     tf::Point min_, max_; 
     bool invert_filter;
     bool up_and_running_;
+
+    std::shared_ptr<dynamic_reconfigure::Server<BoxFilterConfig>> dyn_server_;
+    void reconfigureCB(BoxFilterConfig& config, uint32_t level);
+    boost::recursive_mutex own_mutex_;
+    BoxFilterConfig config_ = BoxFilterConfig::__getDefault__();
 };
 
 }
