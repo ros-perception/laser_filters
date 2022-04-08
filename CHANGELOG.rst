@@ -2,6 +2,12 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add a sensor_msgs dependency to test_scan_filter_chain
+* adding support for invert-parameter to select if points within or outside of box are kept
+* Contributors: Chris Lalancette, Jonathan Binney, Nikolas Engelhard
+
 2.0.3 (2021-10-19)
 ------------------
 * Add top level license file
