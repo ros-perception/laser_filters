@@ -32,21 +32,19 @@
 
 #include <map>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 
-#include "boost/thread/mutex.hpp"
-#include "boost/scoped_ptr.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 #include "filters/median.hpp"
 #include "filters/mean.hpp"
 #include "filters/filter_chain.hpp"
-#include "boost/thread/mutex.hpp"
 
 namespace laser_filters{
 
 /** \brief A class to provide median filtering of laser scans in time*/
-class LaserArrayFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan> 
+class LaserArrayFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   /** \brief Constructor
@@ -96,7 +94,7 @@ public:
       return false;
     }
 
-    boost::mutex::scoped_lock lock(data_lock);
+    std::lock_guard<std::mutex> lock(data_lock);
     scan_out = scan_in; ///Quickly pass through all data \todo don't copy data too
 
     if (scan_in.ranges.size() != num_ranges_) //Reallocating
@@ -122,7 +120,7 @@ private:
   rclcpp::Parameter range_config_;
   rclcpp::Parameter intensity_config_;
 
-  boost::mutex data_lock;                 /// Protection from multi threaded programs
+  std::mutex data_lock;                 /// Protection from multi threaded programs
   sensor_msgs::msg::LaserScan temp_scan_; /** \todo cache only shallow info not full scan */
 
   filters::MultiChannelFilterChain<float> *range_filter_;
