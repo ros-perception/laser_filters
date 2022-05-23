@@ -42,7 +42,7 @@ if(BUILD_TESTING)
     ament_target_dependencies(${TEST_NAME} filters pluginlib rclcpp sensor_msgs)
     ament_add_test(
         ${TEST_NAME}
-        COMMAND 
+        COMMAND
             $<TARGET_FILE:${TEST_NAME}>
             --ros-args --params-file ${PROJECT_SOURCE_DIR}/test/${TEST_NAME}.yaml
             --gtest_output=xml:${RESULT_FILENAME}
