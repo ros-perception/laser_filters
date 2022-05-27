@@ -2,6 +2,13 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove remaining uses of boost.
+  All of that functionality is now available in std:: .  Also, this
+  should fix the build on RHEL.
+* Contributors: Chris Lalancette
+
 2.0.4 (2022-04-08)
 ------------------
 * Add a sensor_msgs dependency to test_scan_filter_chain
