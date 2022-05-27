@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.5 (2022-05-26)
+------------------
 * Remove remaining uses of boost.
   All of that functionality is now available in std:: .  Also, this
   should fix the build on RHEL.
