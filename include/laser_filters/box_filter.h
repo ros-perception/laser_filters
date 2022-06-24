@@ -89,7 +89,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
 
       bool invert = false;
       getParam("invert", invert);
-      remove_box_points_ = not invert;
+      remove_box_points_ = !invert;
 
       if (!box_frame_set)
       {
