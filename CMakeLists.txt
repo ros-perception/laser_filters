@@ -74,10 +74,10 @@ add_dependencies(laser_scan_filters ${PROJECT_NAME}_gencfg)
 
 if (CATKIN_ENABLE_TESTING)
   if (CATKIN_ENABLE_PERFORMANCE_TESTING)
-    message("Enabling performance tests")
+    message(STATUS "Enabling performance tests")
     add_definitions(-DENABLE_PERFORMANCE)
   else()
-    message("Disabled performance tests")
+    message(STATUS "Disabled performance tests")
   endif()
 
   find_package(rostest)
