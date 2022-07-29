@@ -73,8 +73,8 @@ bool LaserScanIntensityFilter::update(const sensor_msgs::LaserScan& input_scan, 
     float& range = filtered_scan.ranges[i];
     float& intensity = filtered_scan.intensities[i];
 
-    // Is this reading below our lower threshold?
-    // Is this reading above our upper threshold?
+    // Is this reading below or equal to our lower threshold?
+    // Is this reading above or equal to our upper threshold?
     bool filter = intensity <= config_.lower_threshold || intensity >= config_.upper_threshold;
     if (config_.invert)
     {
