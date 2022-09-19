@@ -59,15 +59,21 @@ protected:
   ros::Timer deprecation_timer_;
   bool  using_filter_chain_deprecated_;
 
+  // Input/output default topic names
+  std::string scan_topic = "/scan", out_topic = "/scan_filtered";
+
 public:
   // Constructor
   ScanToScanFilterChain() :
     private_nh_("~"),
-    scan_sub_(nh_, "scan", 50),
     tf_(NULL),
     tf_filter_(NULL),
     filter_chain_("sensor_msgs::LaserScan")
   {
+    // Subscribe to input scan topic specified in config file
+    private_nh_.getParam("scan_in", scan_topic);
+    scan_sub_.subscribe(private_nh_, scan_topic, 50);
+
     // Configure filter chain
     
     using_filter_chain_deprecated_ = private_nh_.hasParam("filter_chain");
@@ -98,9 +104,10 @@ public:
       // Pass through if no tf_message_filter_target_frame
       scan_sub_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
     }
-    
+
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
+    private_nh_.getParam("scan_out", out_topic);
+    output_pub_ = private_nh_.advertise<sensor_msgs::LaserScan>(out_topic, 1000);
 
     // Set up deprecation printout
     deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, _1));
