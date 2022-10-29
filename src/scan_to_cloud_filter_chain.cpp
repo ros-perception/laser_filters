@@ -53,7 +53,7 @@
 
 #if BUILDING_NODELET
 #include <nodelet/nodelet.h>
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 
 #define LASER_INFO NODELET_INFO
 #define LASER_WARN NODELET_WARN

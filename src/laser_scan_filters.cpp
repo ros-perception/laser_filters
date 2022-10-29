@@ -45,7 +45,7 @@
 #include "sensor_msgs/LaserScan.h"
 #include <filters/filter_base.hpp>
 
-#include "pluginlib/class_list_macros.h"
+#include "pluginlib/class_list_macros.hpp"
 
 
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::LaserScan>)
