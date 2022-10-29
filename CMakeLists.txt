@@ -80,11 +80,8 @@ if (CATKIN_ENABLE_TESTING)
 
   find_package(rostest)
 
-  add_executable(test_scan_filter_chain test/test_scan_filter_chain.cpp)
-  target_link_libraries(test_scan_filter_chain laser_scan_filters ${rostest_LIBRARIES} ${GTEST_LIBRARIES})
-  add_dependencies(test_scan_filter_chain gtest)
-
-  add_rostest(test/test_scan_filter_chain.launch)
+  add_rostest_gtest(test_scan_filter_chain test/test_scan_filter_chain.launch test/test_scan_filter_chain.cpp)
+  target_link_libraries(test_scan_filter_chain laser_scan_filters ${catkin_LIBRARIES})
   add_rostest(test/test_polygon_filter.launch)
   add_rostest(test/test_speckle_filter.launch)
 
