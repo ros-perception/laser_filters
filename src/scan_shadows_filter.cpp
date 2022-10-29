@@ -48,7 +48,7 @@ bool ScanShadowsFilter::configure()
     ros::NodeHandle private_nh("~" + getName());
     dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::ScanShadowsFilterConfig>(own_mutex_, private_nh));
     dynamic_reconfigure::Server<laser_filters::ScanShadowsFilterConfig>::CallbackType f;
-    f = boost::bind(&laser_filters::ScanShadowsFilter::reconfigureCB, this, _1, _2);
+    f = [this](auto& config, auto level){ reconfigureCB(config, level); };
     dyn_server_->setCallback(f);
 
     if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("min_angle"), min_angle_))

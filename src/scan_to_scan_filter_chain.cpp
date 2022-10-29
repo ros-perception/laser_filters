@@ -91,19 +91,19 @@ public:
       tf_filter_->setTolerance(ros::Duration(tf_filter_tolerance_));
 
       // Setup tf::MessageFilter generates callback
-      tf_filter_->registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
+      tf_filter_->registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, boost::placeholders::_1));
     }
     else 
     {
       // Pass through if no tf_message_filter_target_frame
-      scan_sub_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, _1));
+      scan_sub_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, boost::placeholders::_1));
     }
     
     // Advertise output
     output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
 
     // Set up deprecation printout
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, _1));
+    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, boost::placeholders::_1));
   }
 
   // Destructor

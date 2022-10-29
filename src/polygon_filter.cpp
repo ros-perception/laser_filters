@@ -257,7 +257,7 @@ bool LaserScanPolygonFilterBase::configure()
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>::CallbackType f;
-  f = boost::bind(&laser_filters::LaserScanPolygonFilter::reconfigureCB, this, _1, _2);
+  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
   dyn_server_->setCallback(f);
 
   bool polygon_set = getParam("polygon", polygon_xmlrpc);

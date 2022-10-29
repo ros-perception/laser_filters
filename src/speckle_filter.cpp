@@ -60,7 +60,7 @@ bool LaserScanSpeckleFilter::configure()
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>::CallbackType f;
-  f = boost::bind(&laser_filters::LaserScanSpeckleFilter::reconfigureCB, this, _1, _2);
+  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
   dyn_server_->setCallback(f);
 
   getParam("filter_type", config_.filter_type);

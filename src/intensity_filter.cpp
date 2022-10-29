@@ -50,7 +50,7 @@ bool LaserScanIntensityFilter::configure()
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<IntensityFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<IntensityFilterConfig>::CallbackType f;
-  f = boost::bind(&LaserScanIntensityFilter::reconfigureCB, this, _1, _2);
+  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
   dyn_server_->setCallback(f);
 
   getParam("lower_threshold", config_.lower_threshold);
