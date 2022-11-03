@@ -109,8 +109,8 @@ public:
   bool  incident_angle_correction_;
 
   ////////////////////////////////////////////////////////////////////////////////
-  ScanToCloudFilterChain (ros::NodeHandle& pnh, const std::string& name) :
-      laser_max_range_ (DBL_MAX), private_nh(pnh), name_(name), filter_(tf_, "", 50),
+  ScanToCloudFilterChain (ros::NodeHandle& nh_, ros::NodeHandle& pnh, const std::string& name) :
+      laser_max_range_ (DBL_MAX), nh(nh_), private_nh(pnh), name_(name), filter_(tf_, "", 50),
       cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
   {
     private_nh.param("high_fidelity", high_fidelity_, false);
@@ -287,7 +287,7 @@ class ScanToCloudFilterChainNodelet : public nodelet::Nodelet
   std::unique_ptr<ScanToCloudFilterChain> chain_;
 
   void onInit() override {
-    chain_ = std::unique_ptr<ScanToCloudFilterChain>(new ScanToCloudFilterChain(getPrivateNodeHandle(), getName()));
+    chain_ = std::unique_ptr<ScanToCloudFilterChain>(new ScanToCloudFilterChain(getNodeHandle(), getPrivateNodeHandle(), getName()));
   }
 };
 
@@ -297,8 +297,8 @@ int
 main (int argc, char** argv)
 {
   ros::init (argc, argv, "scan_to_cloud_filter_chain");
-  ros::NodeHandle pnh("~");
-  ScanToCloudFilterChain f(pnh, "");
+  ros::NodeHandle nh, pnh("~");
+  ScanToCloudFilterChain f(nh, pnh, "");
 
   ros::spin();
 
