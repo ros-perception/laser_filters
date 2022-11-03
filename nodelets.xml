@@ -1,7 +1,12 @@
-<library path="lib/libscan_to_cloud_filter_chain_nodelet">
+<library path="lib/liblaser_filters_nodelets">
   <class name="laser_filters/scan_to_cloud_filter_chain" type="ScanToCloudFilterChainNodelet" base_class_type="nodelet::Nodelet">
     <description>
       Convert laser scans to pointclouds allowing to filter both as a scan and as a point cloud.
+    </description>
+  </class>
+  <class name="laser_filters/scan_to_scan_filter_chain" type="ScanToScanFilterChainNodelet" base_class_type="nodelet::Nodelet">
+    <description>
+      Laser scan filter pipeline
     </description>
   </class>
 </library>

@@ -60,12 +60,14 @@ target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
 target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-add_library(scan_to_cloud_filter_chain_nodelet src/scan_to_cloud_filter_chain.cpp)
-target_link_libraries(scan_to_cloud_filter_chain_nodelet ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-target_compile_definitions(scan_to_cloud_filter_chain_nodelet PRIVATE BUILDING_NODELET=1)
-
 add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
 target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_library(${PROJECT_NAME}_nodelets
+  src/scan_to_cloud_filter_chain.cpp
+  src/scan_to_scan_filter_chain.cpp)
+target_link_libraries(${PROJECT_NAME}_nodelets ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_compile_definitions(${PROJECT_NAME}_nodelets PRIVATE BUILDING_NODELET=1)
 
 add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
 target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -106,8 +108,8 @@ endif()
 
 install(TARGETS pointcloud_filters laser_scan_filters 
   scan_to_cloud_filter_chain
-  scan_to_cloud_filter_chain_nodelet
   scan_to_scan_filter_chain
+  ${PROJECT_NAME}_nodelets
   generic_laser_filter_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
