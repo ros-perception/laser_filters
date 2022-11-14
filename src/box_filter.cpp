@@ -54,7 +54,7 @@ bool laser_filters::LaserScanBoxFilter::configure(){
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<BoxFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<BoxFilterConfig>::CallbackType f;
-  f = boost::bind(&LaserScanBoxFilter::reconfigureCB, this, _1, _2);
+  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
   dyn_server_->setCallback(f);
 
   up_and_running_ = true;

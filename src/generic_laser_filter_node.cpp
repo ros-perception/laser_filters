@@ -66,13 +66,13 @@ public:
     filter_chain_.configure("");
     
     // Setup tf::MessageFilter for input
-    tf_filter_.registerCallback(boost::bind(&GenericLaserScanFilterNode::callback, this, _1));
+    tf_filter_.registerCallback(boost::bind(&GenericLaserScanFilterNode::callback, this, boost::placeholders::_1));
     tf_filter_.setTolerance(ros::Duration(0.03));
     
     // Advertise output
     output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("output", 1000);
 
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&GenericLaserScanFilterNode::deprecation_warn, this, _1));
+    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), [this](auto& event){ deprecation_warn(event); });
   }
   
   void deprecation_warn(const ros::TimerEvent& e)

@@ -51,6 +51,7 @@ namespace laser_filters
 class WindowValidator
 {
 public:
+  virtual ~WindowValidator() = default;
   virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference) = 0;
 };
 

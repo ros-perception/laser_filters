@@ -46,7 +46,7 @@ bool LaserScanSectorFilter::configure()
   ros::NodeHandle private_nh("~" + getName());
   dyn_server_.reset(new dynamic_reconfigure::Server<SectorFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<SectorFilterConfig>::CallbackType f;
-  f = boost::bind(&LaserScanSectorFilter::reconfigureCB, this, _1, _2);
+  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
   dyn_server_->setCallback(f);
 
   getParam("angle_min", config_.angle_min);
