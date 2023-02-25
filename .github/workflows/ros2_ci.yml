@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        rosdistro: [foxy, galactic, rolling]
+        rosdistro: [foxy, galactic, humble, rolling]
 
     runs-on: ubuntu-latest
 
@@ -28,7 +28,7 @@ jobs:
         path: src/laser_filters
 
     - name: Install dependencies
-      run: rosdep update && apt-get update && rosdep install --from-path . -i -y --rosdistro ${{ matrix.rosdistro }}
+      run: rosdep update --include-eol-distros && apt-get update && rosdep install --from-path . -i -y --rosdistro ${{ matrix.rosdistro }}
 
     - name: Build tests
       run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && colcon build --event-handlers console_cohesion+
