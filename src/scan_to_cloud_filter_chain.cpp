@@ -94,15 +94,21 @@ public:
                                                          cloud_filter_chain_("sensor_msgs::msg::PointCloud2"),
                                                          scan_filter_chain_("sensor_msgs::msg::LaserScan")
   {
-    nh_->get_parameter_or("high_fidelity", high_fidelity_, false);
-    nh_->get_parameter_or("notifier_tolerance", tf_tolerance_, 0.03);
-    nh_->get_parameter_or("target_frame", target_frame_, std::string("base_link"));
+    nh_->declare_parameter("high_fidelity", false);
+    nh_->declare_parameter("notifier_tolerance", 0.03);
+    nh_->declare_parameter("target_frame", std::string("base_link"));
+    nh_->declare_parameter("incident_angle_correction", true);
+    
+    nh_->get_parameter("high_fidelity", high_fidelity_);
+    nh_->get_parameter("notifier_tolerance", tf_tolerance_);
+    nh_->get_parameter("target_frame", target_frame_);
+    nh_->get_parameter("incident_angle_correction", incident_angle_correction_);
 
     nh_->get_parameter_or("filter_window", window_, 2);
     nh_->get_parameter_or("laser_max_range", laser_max_range_, DBL_MAX);
     nh_->get_parameter_or("scan_topic", scan_topic_, std::string("tilt_scan"));
     nh_->get_parameter_or("cloud_topic", cloud_topic_, std::string("tilt_laser_cloud_filtered"));
-    nh_->get_parameter_or("incident_angle_correction", incident_angle_correction_, true);
+
 
     filter_.setTargetFrame(target_frame_);
     filter_.registerCallback(std::bind(&ScanToCloudFilterChain::scanCallback, this, std::placeholders::_1));
