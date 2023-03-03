@@ -48,4 +48,18 @@ if(BUILD_TESTING)
             --gtest_output=xml:${RESULT_FILENAME}
         RESULT_FILE ${RESULT_FILENAME}
     )
+
+    set(TEST_NAME test_shadow_detector)
+    set(RESULT_FILENAME ${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${TEST_NAME}.gtest.xml)
+    ament_add_gtest_executable(${TEST_NAME} test/${TEST_NAME}.cpp)
+    ament_target_dependencies(${TEST_NAME} angles)
+    target_link_libraries(${TEST_NAME} laser_scan_filters)
+    ament_add_test(
+        ${TEST_NAME}
+        COMMAND
+            $<TARGET_FILE:${TEST_NAME}>
+            --ros-args
+            --gtest_output=xml:${RESULT_FILENAME}
+        RESULT_FILE ${RESULT_FILENAME}
+    )
 endif()
