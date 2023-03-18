@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.6 (2023-03-18)
+------------------
 * Added declaration of parameters
 * Reduce computation cost of ScanShadowsFilter
 * Update scan_to_cloud_filter_chain.cpp
