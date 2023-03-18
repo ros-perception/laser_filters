@@ -2,6 +2,15 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added declaration of parameters
+* Reduce computation cost of ScanShadowsFilter
+* Update scan_to_cloud_filter_chain.cpp
+  As of Eloquent a timer interface is required for the tf buffer.
+  https://docs.ros.org/en/galactic/Releases/Release-Eloquent-Elusor.html#tf2-buffer
+* Contributors: Atsushi Watanabe, Jon Binney, Jonathan Binney, Riccardo Tornese, brandonbeggs
+
 2.0.5 (2022-05-26)
 ------------------
 * Remove remaining uses of boost.
