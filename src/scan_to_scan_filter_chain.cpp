@@ -37,7 +37,7 @@
 
 #if BUILDING_NODELET
 #include <nodelet/nodelet.h>
-#include <pluginlib/class_list_macros.h>
+#include <pluginlib/class_list_macros.hpp>
 #endif
 
 class ScanToScanFilterChain
