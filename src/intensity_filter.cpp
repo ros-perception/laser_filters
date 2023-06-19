@@ -65,6 +65,8 @@ bool LaserScanIntensityFilter::configure()
 
 bool LaserScanIntensityFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
 {
+  auto start = std::chrono::high_resolution_clock::now();
+
   filtered_scan = input_scan;
 
   // Need to check ever reading in the current scan
@@ -102,6 +104,11 @@ bool LaserScanIntensityFilter::update(const sensor_msgs::LaserScan& input_scan, 
     }
   }
 
+  auto end = std::chrono::high_resolution_clock::now();
+  auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+  ROS_DEBUG_NAMED("LaserScanIntensityFilter", "LaserScanIntensityFilter update took %lu microseconds", update_elapsed);
+  
   return true;
 }
 

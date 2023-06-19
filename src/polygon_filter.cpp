@@ -334,6 +334,8 @@ void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfi
 bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
                                     sensor_msgs::LaserScan& output_scan)
 {
+  auto start = std::chrono::high_resolution_clock::now();
+
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
   publishPolygon();
@@ -413,6 +415,11 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
       }
     }
   }
+
+  auto end = std::chrono::high_resolution_clock::now();
+  auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+  ROS_DEBUG_NAMED("LaserScanPolygonFilter", "LaserScanPolygonFilter update took %lu microseconds", update_elapsed);
 
   return true;
 }

@@ -128,6 +128,8 @@ void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t 
 
 bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
 {
+    auto start = std::chrono::high_resolution_clock::now();
+
     boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
     // copy across all data first
@@ -167,6 +169,11 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         }
       }
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+    ROS_DEBUG_NAMED("LaserScanShadowsFilter", "LaserScanShadowsFilter update took %lu microseconds", update_elapsed);
 
     return true;
 }
