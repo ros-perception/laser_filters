@@ -35,8 +35,8 @@
  */
 
 #include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #include <float.h>
 
@@ -44,8 +44,8 @@
 #include <laser_geometry/laser_geometry.h>
 
 // TF
-#include <tf/transform_listener.h>
-#include "tf/message_filter.h"
+#include <tf2/transform_listener.h>
+#include "tf2/message_filter.h"
 #include "message_filters/subscriber.h"
 
 //Filters
@@ -84,14 +84,14 @@ public:
   std::string name_;
     
   // TF
-  tf::TransformListener tf_;
+  tf2::TransformListener tf_;
 
-  message_filters::Subscriber<sensor_msgs::LaserScan> sub_;
-  tf::MessageFilter<sensor_msgs::LaserScan> filter_;
+  message_filters::Subscriber<sensor_msgs::msg::LaserScan> sub_;
+  tf::MessageFilter<sensor_msgs::msg::LaserScan> filter_;
 
   double tf_tolerance_;
-  filters::FilterChain<sensor_msgs::PointCloud2> cloud_filter_chain_;
-  filters::FilterChain<sensor_msgs::LaserScan> scan_filter_chain_;
+  filters::FilterChain<sensor_msgs::msg::PointCloud2> cloud_filter_chain_;
+  filters::FilterChain<sensor_msgs::msg::LaserScan> scan_filter_chain_;
   ros::Publisher cloud_pub_;
   unsigned int channel_options_;
 
@@ -111,7 +111,7 @@ public:
   ////////////////////////////////////////////////////////////////////////////////
   ScanToCloudFilterChain (ros::NodeHandle& nh_, ros::NodeHandle& pnh, const std::string& name) :
       laser_max_range_ (DBL_MAX), nh(nh_), private_nh(pnh), name_(name), filter_(tf_, "", 50),
-      cloud_filter_chain_("sensor_msgs::PointCloud2"), scan_filter_chain_("sensor_msgs::LaserScan")
+      cloud_filter_chain_("sensor_msgs::msg::PointCloud2"), scan_filter_chain_("sensor_msgs::msg::LaserScan")
   {
     private_nh.param("high_fidelity", high_fidelity_, false);
     private_nh.param("notifier_tolerance", tf_tolerance_, 0.03);
@@ -167,9 +167,9 @@ public:
     filter_.connectInput(sub_);
 
     if (using_cloud_topic_deprecated_)
-      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2> (cloud_topic_, 10);
+      cloud_pub_ = nh.advertise<sensor_msgs::msg::PointCloud2> (cloud_topic_, 10);
     else
-      cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2> ("cloud_filtered", 10);
+      cloud_pub_ = nh.advertise<sensor_msgs::msg::PointCloud2> ("cloud_filtered", 10);
 
     std::string cloud_filter_xml;
 
@@ -231,15 +231,15 @@ public:
 
   ////////////////////////////////////////////////////////////////////////////////
   void
-  scanCallback (const sensor_msgs::LaserScan::ConstPtr& scan_msg)
+  scanCallback (const sensor_msgs::msg::LaserScan::ConstPtr& scan_msg)
   {
-    //    sensor_msgs::LaserScan scan_msg = *scan_in;
+    //    sensor_msgs::msg::LaserScan scan_msg = *scan_in;
 
-    sensor_msgs::LaserScan filtered_scan;
+    sensor_msgs::msg::LaserScan filtered_scan;
     scan_filter_chain_.update (*scan_msg, filtered_scan);
 
     // Project laser into point cloud
-    sensor_msgs::PointCloud2 scan_cloud;
+    sensor_msgs::msg::PointCloud2 scan_cloud;
 
     //\TODO CLEAN UP HACK 
     // This is a trial at correcting for incident angles.  It makes many assumptions that do not generalise
@@ -272,7 +272,7 @@ public:
       projector_.transformLaserScanToPointCloud(target_frame_, filtered_scan, scan_cloud, tf_, laser_max_range_, channel_options_);
     }
       
-    sensor_msgs::PointCloud2 filtered_cloud;
+    sensor_msgs::msg::PointCloud2 filtered_cloud;
     cloud_filter_chain_.update (scan_cloud, filtered_cloud);
 
     cloud_pub_.publish(filtered_cloud);

@@ -44,7 +44,7 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 #include <laser_filters/PolygonFilterConfig.h>
-#include <geometry_msgs/PolygonStamped.h>
+#include <geometry_msgs/msg/polygon_stamped.hpp>
 #include <cstdio>  // for EOF
 #include <string>
 #include <sstream>
@@ -56,12 +56,12 @@ inline double sign0(double x)
   return x < 0.0 ? -1.0 : (x > 0.0 ? 1.0 : 0.0);
 }
 
-void padPolygon(geometry_msgs::Polygon& polygon, double padding)
+void padPolygon(geometry_msgs::msg::Polygon& polygon, double padding)
 {
   // pad polygon in place
   for (unsigned int i = 0; i < polygon.points.size(); i++)
   {
-    geometry_msgs::Point32& pt = polygon.points[ i ];
+    geometry_msgs::msg::Point32& pt = polygon.points[ i ];
     pt.x += sign0(pt.x) * padding;
     pt.y += sign0(pt.y) * padding;
   }
@@ -80,7 +80,7 @@ double getNumberFromXMLRPC(XmlRpc::XmlRpcValue& value, const std::string& full_p
   return value.getType() == XmlRpc::XmlRpcValue::TypeInt ? (int)(value) : (double)(value);
 }
 
-geometry_msgs::Polygon makePolygonFromXMLRPC(const XmlRpc::XmlRpcValue& polygon_xmlrpc,
+geometry_msgs::msg::Polygon makePolygonFromXMLRPC(const XmlRpc::XmlRpcValue& polygon_xmlrpc,
                                              const std::string& full_param_name)
 {
   // Make sure we have an array of at least 3 elements.
@@ -94,8 +94,8 @@ geometry_msgs::Polygon makePolygonFromXMLRPC(const XmlRpc::XmlRpcValue& polygon_
     throw std::runtime_error("The polygon must be specified as nested list on the parameter server with at least "
                              "3 points eg: [[x1, y1], [x2, y2], ..., [xn, yn]]");
   }
-  geometry_msgs::Polygon polygon;
-  geometry_msgs::Point32 pt;
+  geometry_msgs::msg::Polygon polygon;
+  geometry_msgs::msg::Point32 pt;
 
   for (int i = 0; i < polygon_xmlrpc.size(); ++i)
   {
@@ -201,8 +201,8 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, 
       return last_polygon;
     }
 
-    geometry_msgs::Polygon polygon;
-    geometry_msgs::Point32 point;
+    geometry_msgs::msg::Polygon polygon;
+    geometry_msgs::msg::Point32 point;
 
     // convert vvf into points.
     if (vvf.size() < 3 && vvf.size() > 0)
@@ -231,7 +231,7 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, 
     return polygon;
 }
 
-std::string polygonToString(geometry_msgs::Polygon polygon)
+std::string polygonToString(geometry_msgs::msg::Polygon polygon)
 {
   std::string polygon_string = "[";
   bool first = true;
@@ -274,7 +274,7 @@ bool LaserScanPolygonFilterBase::configure()
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
 
-  polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
+  polygon_pub_ = private_nh.advertise<geometry_msgs::msg::PolygonStamped>("polygon", 1, true);
   is_polygon_published_ = false;
 
   if (!polygon_frame_set)
@@ -314,7 +314,7 @@ void LaserScanPolygonFilterBase::publishPolygon()
 {
   if (!is_polygon_published_)
   {
-    geometry_msgs::PolygonStamped polygon_stamped;
+    geometry_msgs::msg::PolygonStamped polygon_stamped;
     polygon_stamped.header.frame_id = polygon_frame_;
     polygon_stamped.header.stamp = ros::Time::now();
     polygon_stamped.polygon = polygon_;
@@ -331,8 +331,8 @@ void LaserScanPolygonFilterBase::reconfigureCB(laser_filters::PolygonFilterConfi
   is_polygon_published_ = false;
 }
 
-bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
-                                    sensor_msgs::LaserScan& output_scan)
+bool LaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_scan,
+                                    sensor_msgs::msg::LaserScan& output_scan)
 {
   auto start = std::chrono::high_resolution_clock::now();
 
@@ -342,7 +342,7 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
 
   output_scan = input_scan;
 
-  sensor_msgs::PointCloud2 laser_cloud;
+  sensor_msgs::msg::PointCloud2 laser_cloud;
 
   std::string error_msg;
 
@@ -434,7 +434,7 @@ bool StaticLaserScanPolygonFilter::configure()
   return LaserScanPolygonFilterBase::configure();
 }
 
-void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& scan_in)
+void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::msg::LaserScan& scan_in)
 {
   size_t n_pts = scan_in.ranges.size();
 
@@ -463,8 +463,8 @@ void StaticLaserScanPolygonFilter::checkCoSineMap(const sensor_msgs::LaserScan& 
 // does not need to be continuously subscribed to the transform topic, which significantly reduces CPU load.
 // A pre-requisite for this to work is that the transform is static, i.e. the position and orientation of the laser with regard to
 // the base of the robot does not change.
-bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_scan,
-                                          sensor_msgs::LaserScan& output_scan)
+bool StaticLaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_scan,
+                                          sensor_msgs::msg::LaserScan& output_scan)
 {
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
@@ -508,7 +508,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::LaserScan& input_sc
         tf::Stamped<tf::Point> point_stamped(point, ros::Time(), polygon_frame_);
         tf::Stamped<tf::Point> point_stamped_new;
         transform_listener.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
-        geometry_msgs::PointStamped result_point;
+        geometry_msgs::msg::PointStamped result_point;
         tf::pointStampedTFToMsg(point_stamped_new, result_point);
         polygon_.points[i].x = result_point.point.x;
         polygon_.points[i].y = result_point.point.y;

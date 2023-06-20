@@ -45,31 +45,32 @@
 
 #include <filters/filter_base.hpp>
 
-#include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/point_cloud_conversion.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
 #include <laser_geometry/laser_geometry.h>
-#include <geometry_msgs/Polygon.h>
-#include <geometry_msgs/PolygonStamped.h>
-#include <laser_filters/PolygonFilterConfig.h>
-#include <dynamic_reconfigure/server.h>
+#include <geometry_msgs/msg/polygon.hpp>
+#include <geometry_msgs/msg/polygon_stamped.hpp>
 
-#include <tf/transform_datatypes.h>
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_datatypes.h>
+#include <boost/thread.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/set_parameters_result.hpp>
+
 
 namespace laser_filters
 {
 /**
  * @brief This is a filter that removes points in a laser scan inside of a polygon.
  */
-class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::LaserScan> {
+class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan> {
 public:
   virtual bool configure();
-  virtual void configure(PolygonFilterConfig& config) { reconfigureCB(config, 0); }
+  virtual void configure(PolygonFilterConfig& config) { reconfigureCB(); }
 
-  virtual bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) { return false; }
+  virtual bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) { return false; }
 
 protected:
-  ros::Publisher polygon_pub_;
+  rclcpp::Publisher polygon_pub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
@@ -77,9 +78,10 @@ protected:
   double polygon_padding_;
   bool invert_filter_;
   bool is_polygon_published_ = false;
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>> dyn_server_;
-
-  virtual void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level);
+  
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
 
   // checks if points in polygon
   bool inPolygon(tf::Point& point) const;
@@ -89,13 +91,13 @@ protected:
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) override;
 
 private:
   // configuration
   laser_geometry::LaserProjection projector_;
   // tf listener to transform scans into the polygon_frame
-  tf::TransformListener tf_;
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
 };
 
 /**
@@ -107,10 +109,10 @@ private:
 class StaticLaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
   bool configure() override;
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan) override;
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) override;
   
 protected:
-  void reconfigureCB(laser_filters::PolygonFilterConfig& config, uint32_t level) override;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters) override;
 
 private:
   double transform_timeout_;
@@ -120,7 +122,7 @@ private:
   float co_sine_map_angle_max_;
   bool is_polygon_transformed_;
 
-  void checkCoSineMap(const sensor_msgs::LaserScan& input_scan);
+  void checkCoSineMap(const sensor_msgs::msg::LaserScan& input_scan);
 };
 }
 #endif /* polygon_filter.h */

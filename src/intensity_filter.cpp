@@ -63,7 +63,7 @@ bool LaserScanIntensityFilter::configure()
   return true;
 }
 
-bool LaserScanIntensityFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
+bool LaserScanIntensityFilter::update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
 {
   auto start = std::chrono::high_resolution_clock::now();
 

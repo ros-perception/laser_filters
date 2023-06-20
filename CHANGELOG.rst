@@ -2,6 +2,124 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2023-06-20)
+-------------------
+* feat(filters): Debug log filter duration (`#1 <https://github.com/eurogroep/laser_filters/issues/1>`_)
+* Merge pull request `#177 <https://github.com/eurogroep/laser_filters/issues/177>`_ from lucasw/ubuntu2204
+  use class_list_macros.hpp instead of .h
+* use class_list_macros.hpp instead of .h
+* Merge pull request `#171 <https://github.com/eurogroep/laser_filters/issues/171>`_ from ros-o/obese-devel
+  [ROS-O] various cleanup
+* Merge pull request `#169 <https://github.com/eurogroep/laser_filters/issues/169>`_ from marip8/fix/nodelet-remapping
+  ROS1 Nodelet Updates
+* add virtual destructor to avoid warning
+  as these are pure method classes it's actually not an issue,
+  but still a valid bug for clang to complain about.
+* update header include paths for pluginlib
+  the non-hpp headers have been deprecated since kinetic.
+* remove global usage of boost's _1
+  since std::bind was around boost's _1 has been deprecated as global symbol.
+  Debian removed implicit support for it in their ROS packages and fails without
+  this patch. Sadly message_filters does not (yet?) work with generic lambdas,
+  so I added the namespaces for these cases.
+* build rostest with canonical instructions
+  to avoid linker errors on Debian.
+  Either way this is how it should have been specified
+  to start with.
+* Added nodelet for scan filtering pipeline
+* Pass in public node handle from nodelet to allow for correct topic remapping
+* Do not force obsolete C++11 standard
+  this breaks with current log4cxx builds which require c++17
+* Merge pull request `#163 <https://github.com/eurogroep/laser_filters/issues/163>`_ from rickvanosch/noetic-devel
+  Setting STATUS lvl to msgs reg. performance tests
+* Setting STATUS lvl to msgs reg. performance tests
+  Default level of messages is None/Notice, these are forwarded to stderr, triggering a warning in the build when using catkin build.
+* Merge pull request `#158 <https://github.com/eurogroep/laser_filters/issues/158>`_ from LarsJanssenTUe/noetic-devel
+  Boxfilter dynamic reconfigure for noetic devel
+* Fix(BoxFilter): fix copy mistakes in cfg file
+* Feature(BoxFilter): add dynamic reconfigure to box filter
+* Merge pull request `#155 <https://github.com/eurogroep/laser_filters/issues/155>`_ from erwinbonsmatopic/improve-static-polygon-filter
+  Improve robustness of polygon fetch by static polygon filter
+* Improve logging
+  Also minor formatting changes.
+* Fix build warning
+* Make transform time-out configurable
+* Do not look for specific time in static filter
+* Merge pull request `#157 <https://github.com/eurogroep/laser_filters/issues/157>`_ from erwinbonsmatopic/consistently-publish-polygon
+  Consistently publish polygon
+* Merge pull request `#153 <https://github.com/eurogroep/laser_filters/issues/153>`_ from JohnTGZ/noetic-devel
+  Added examples for InterpolationFilter and LaserScanAngularBoundsFilter
+* removed .vscode file
+* Merge pull request `#154 <https://github.com/eurogroep/laser_filters/issues/154>`_ from erwinbonsmatopic/add-static-polygon-filter-plugin
+  Register static polygon filter as plugin
+* Move common logic to base class function
+* Add polygon publishing to static filter
+* added interpolation filter example
+* added angle filter example
+* Merge pull request `#149 <https://github.com/eurogroep/laser_filters/issues/149>`_ from JohnTGZ/noetic-devel
+  added example config and launch file for scan blob filter
+* added example config and launch file for scan blob filter
+* Add plugin
+* Merge pull request `#145 <https://github.com/eurogroep/laser_filters/issues/145>`_ from erwinbonsmatopic/add-static-polygon-filter
+  Add static polygon filter
+* Merge pull request `#144 <https://github.com/eurogroep/laser_filters/issues/144>`_ from erwinbonsmatopic/speed-up-shadow-filter
+  Speed up shadow filter
+* Minor clean-up
+  Remove empty destructor.
+  Remove unneeded friend declaration.
+* Make isShadow overload public and add comments
+* Move (co)sine caching to shadows filter
+* Replace arrays by vectors
+* Rename variables for style consistency
+* Reorder methods to group by class
+* Remove unnecessary parentheses
+* Declare missing variable
+* Fix the build
+* Fix the build
+* Apply review comments
+* Split polygn filter into existing, static filters
+* Minor changes
+* Update unit tests
+* Optimize angle_increment change handling
+* Fix missing NULL definition
+* Improve shadov filter and detector performance
+* Merge pull request `#139 <https://github.com/eurogroep/laser_filters/issues/139>`_ from erwinbonsmatopic/split-shadow-filter-headers
+  Split shadow filter headers
+* Revert some changes to copyright headers
+  This addresses review comments in PR `#139 <https://github.com/eurogroep/laser_filters/issues/139>`_
+* Merge pull request `#141 <https://github.com/eurogroep/laser_filters/issues/141>`_ from erwinbonsmatopic/create-shadow-filter-tests
+  Create shadow filter tests
+* Tweak and extend tests
+* Add unit and performance tests
+* Merge branch 'noetic-devel' into split-shadow-filter-headers
+* Merge pull request `#140 <https://github.com/eurogroep/laser_filters/issues/140>`_ from jonbinney/jbinney-catkin-make-on-ci
+  Use catkin_make to build and run tests on CI
+* Fix checkout path in CI
+* Update path to CI script
+* Use catkin_make to build and run tests on CI
+  Using cmake directly wasn't handling the LD_LIBRARY_PATH correctly when
+  running tests, causing them to use the version of the laser_filters
+  library from /opt/ros/... instead of the one compiled from source.
+* Fix to CI set-up (a workaround)
+* Merge pull request `#130 <https://github.com/eurogroep/laser_filters/issues/130>`_ from erwinbonsmatopic/speed-up-speckle-filter
+  Speed up speckle filter implementation
+* Ensure destructor remains virtual
+* Fix build of shadow detector test
+* Update headers
+* Clean up include statements
+* Merge branch 'noetic-devel' into split-shadow-filter-headers
+* Split shadow filter and detector header files
+* Speed up speckle filter implementation
+  Main changes:
+  - Do not allocate dynamic memory in each update invocation
+  - Speed up loop end-condition checks
+  - Algorithm improvements:
+  - Perform out-of-range check during initialisation, only once for each
+  sample
+  - Remove out of bound check from distance window validator.
+  Handle this by setting loop end criterion.
+* Contributors: Bohdan Yarema, Erwin Bonsma, Jon Binney, Jonathan Binney, Lars, Lucas Walter, Michael Ripperger, Yannick de Hoop, johntgz, rickvanosch, v4hn
+
 1.9.0 (2021-11-06)
 ------------------
 * change_access specifier kinect

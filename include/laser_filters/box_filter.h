@@ -49,49 +49,52 @@
 
 #include <filters/filter_base.hpp>
 
-#include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/point_cloud_conversion.h>
-#include <laser_geometry/laser_geometry.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include "sensor_msgs/point_cloud2_iterator.hpp"
+#include <laser_geometry/laser_geometry.hpp>
 
-#include <tf/transform_datatypes.h>
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
 
-#include <dynamic_reconfigure/server.h>
-#include <laser_filters/BoxFilterConfig.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/set_parameters_result.hpp>
+#include <boost/thread.hpp>
+#include <chrono>
 
+typedef tf2::Vector3 Point;
+using namespace std::chrono_literals;
 
 namespace laser_filters
 {
 /**
  * @brief This is a filter that removes points in a laser scan inside of a cartesian box.
  */
-class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
   public:
     LaserScanBoxFilter();
     bool configure();
 
     bool update(
-      const sensor_msgs::LaserScan& input_scan,
-      sensor_msgs::LaserScan& filtered_scan);
+      const sensor_msgs::msg::LaserScan& input_scan,
+      sensor_msgs::msg::LaserScan& filtered_scan);
 
   protected:
-    bool inBox(tf::Point &point);
+    bool inBox(Point &point);
     std::string box_frame_;
     laser_geometry::LaserProjection projector_;
     
     // tf listener to transform scans into the box_frame
-    tf::TransformListener tf_; 
+    std::shared_ptr<tf2_ros::Buffer> buffer_;
     
     // defines two opposite corners of the box
-    tf::Point min_, max_; 
-    bool invert_filter;
+    Point min_, max_; 
+    bool remove_box_points_ = true;
     bool up_and_running_;
 
-    std::shared_ptr<dynamic_reconfigure::Server<BoxFilterConfig>> dyn_server_;
-    void reconfigureCB(BoxFilterConfig& config, uint32_t level);
+    rclcpp::Node::SharedPtr node_;
+    rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+    rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
     boost::recursive_mutex own_mutex_;
-    BoxFilterConfig config_ = BoxFilterConfig::__getDefault__();
 };
 
 }

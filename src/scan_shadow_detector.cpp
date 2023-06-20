@@ -38,7 +38,6 @@
 
 #include <laser_filters/scan_shadow_detector.h>
 #include <math.h>
-#include <ros/ros.h>
 
 namespace laser_filters
 {

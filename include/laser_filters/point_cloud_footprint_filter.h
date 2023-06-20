@@ -43,14 +43,14 @@ This is useful for ground plane extraction
 
 #include "laser_geometry/laser_geometry.h"
 #include <filters/filter_base.hpp>
-#include "tf/transform_listener.h"
-#include "sensor_msgs/PointCloud.h"
+#include "tf2/transform_listener.h"
+#include "sensor_msgs/msg/point_cloud.hpp"
 #include "ros/ros.h"
 
 namespace laser_filters
 {
 
-class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::PointCloud>
+class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::PointCloud>
 {
 public:
   PointCloudFootprintFilter() {
@@ -72,7 +72,7 @@ public:
 
   }
 
-  bool update(const sensor_msgs::PointCloud& input_scan, sensor_msgs::PointCloud& filtered_scan)
+  bool update(const sensor_msgs::msg::PointCloud& input_scan, sensor_msgs::msg::PointCloud& filtered_scan)
   {
     if(&input_scan == &filtered_scan){
       ROS_ERROR("This filter does not currently support in place copying");
@@ -123,7 +123,7 @@ public:
   }
 
 protected:
-  tf::TransformListener tf_;
+  tf2::TransformListener tf_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
 } ;

@@ -32,28 +32,28 @@
 #ifndef LASER_SCAN_SECTOR_FILTER_IN_PLACE_H
 #define LASER_SCAN_SECTOR_FILTER_IN_PLACE_H
 
-#include <dynamic_reconfigure/server.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 #include <laser_filters/SectorFilterConfig.h>
 
 #include <filters/filter_base.hpp>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp> 
 
 namespace laser_filters
 {
 
-class LaserScanSectorFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanSectorFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   LaserScanSectorFilter();
   bool configure();
   bool isClearInside();
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan);
 
   virtual ~LaserScanSectorFilter(){}
 
 private:
-  std::shared_ptr<dynamic_reconfigure::Server<SectorFilterConfig>> dyn_server_;
-  void reconfigureCB(SectorFilterConfig& config, uint32_t level);
+  ddynamic_reconfigure::DDynamicReconfigure dyn_server_;
+  void reconfigureCB();
   boost::recursive_mutex own_mutex_;
 
   SectorFilterConfig config_ = SectorFilterConfig::__getDefault__();

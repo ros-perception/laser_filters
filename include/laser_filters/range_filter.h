@@ -40,17 +40,17 @@
 **/
 
 
-#include <dynamic_reconfigure/server.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 #include <laser_filters/RangeFilterConfig.h>
 #include <filters/filter_base.hpp>
-#include "sensor_msgs/LaserScan.h"
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 namespace laser_filters
 {
 
-class LaserScanRangeFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanRangeFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
-  std::shared_ptr<dynamic_reconfigure::Server<RangeFilterConfig>> dyn_server_;
+  ddynamic_reconfigure::DDynamicReconfigure dyn_server_;
   boost::recursive_mutex own_mutex_;
 
   RangeFilterConfig config_ = RangeFilterConfig::__getDefault__();
@@ -79,7 +79,7 @@ public:
 
   }
 
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
   {
     double lower_threshold = config_.lower_threshold;
     double upper_threshold = config_.upper_threshold;
@@ -109,9 +109,9 @@ public:
     return true;
   }
 
-  void reconfigureCB(RangeFilterConfig& config, uint32_t level)
+  void reconfigureCB()
   {
-    config_ = config;
+    // config_ = config;
   }
 } ;
 

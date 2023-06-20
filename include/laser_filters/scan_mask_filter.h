@@ -41,7 +41,7 @@
 
 
 #include <filters/filter_base.hpp>
-#include "sensor_msgs/LaserScan.h"
+#include "sensor_msgs/msg/laser_scan.hpp"
 
 #include <XmlRpcException.h>
 
@@ -53,7 +53,7 @@
 namespace laser_filters
 {
 
-class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanMaskFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   std::map<std::string, std::vector<size_t> > masks_;
@@ -102,7 +102,7 @@ public:
   {
   }
 
-  bool update(const sensor_msgs::LaserScan& data_in, sensor_msgs::LaserScan& data_out)
+  bool update(const sensor_msgs::msg::LaserScan& data_in, sensor_msgs::msg::LaserScan& data_out)
   {
     data_out = data_in;
     if (masks_.find(data_out.header.frame_id) == masks_.end())

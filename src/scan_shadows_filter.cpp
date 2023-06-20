@@ -29,7 +29,6 @@
 
 #include <laser_filters/scan_shadows_filter.h>
 
-#include <ros/node_handle.h>
 #include <angles/angles.h>
 
 namespace laser_filters
@@ -45,88 +44,99 @@ ScanShadowsFilter::~ScanShadowsFilter()
     
 bool ScanShadowsFilter::configure()
 {
-    ros::NodeHandle private_nh("~" + getName());
-    dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::ScanShadowsFilterConfig>(own_mutex_, private_nh));
-    dynamic_reconfigure::Server<laser_filters::ScanShadowsFilterConfig>::CallbackType f;
-    f = [this](auto& config, auto level){ reconfigureCB(config, level); };
-    dyn_server_->setCallback(f);
+  node_ = std::make_shared<rclcpp::Node>(getName());
+  // dynamic reconfigure parameters callback:
+  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+            std::bind(&ScanShadowsFilter::reconfigureCB, this, std::placeholders::_1));
 
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("min_angle"), min_angle_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
-      return false;
-    }
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("max_angle"), max_angle_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given min_angle.\n");
-      return false;
-    }
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("window"), window_))
-    {
-      ROS_ERROR("Error: ShadowsFilter was not given window.\n");
-      return false;
-    }
-    neighbors_ = 0;  // default value
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("neighbors"), neighbors_))
-    {
-      ROS_INFO("Error: ShadowsFilter was not given neighbors.\n");
-    }
-    remove_shadow_start_point_ = false;  // default value
-    filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("remove_shadow_start_point"), remove_shadow_start_point_);
-    ROS_INFO("Remove shadow start point: %s", remove_shadow_start_point_ ? "true" : "false");
 
-    if (min_angle_ < 0)
-    {
-      ROS_ERROR("min_angle must be 0 <= min_angle. Forcing min_angle = 0.\n");
-      min_angle_ = 0.0;
-    }
-    if (90 < min_angle_)
-    {
-      ROS_ERROR("min_angle must be min_angle <= 90. Forcing min_angle = 90.\n");
-      min_angle_ = 90.0;
-    }
-    if (max_angle_ < 90)
-    {
-      ROS_ERROR("max_angle must be 90 <= max_angle. Forcing max_angle = 90.\n");
-      max_angle_ = 90.0;
-    }
-    if (180 < max_angle_)
-    {
-      ROS_ERROR("max_angle must be max_angle <= 180. Forcing max_angle = 180.\n");
-      max_angle_ = 180.0;
-    }
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+    return false;
+  }
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_angle"), max_angle_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
+    return false;
+  }
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("window"), window_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given window.\n");
+    return false;
+  }
+  neighbors_ = 0;  // default value
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("neighbors"), neighbors_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given neighbors.\n");
+  }
 
-    shadow_detector_.configure(
-        angles::from_degrees(min_angle_),
-        angles::from_degrees(max_angle_));
 
-    angle_increment_ = 0;
-    param_config.min_angle = min_angle_;
-    param_config.max_angle = max_angle_;
-    param_config.window = window_;
-    param_config.neighbors = neighbors_;
-    param_config.remove_shadow_start_point = remove_shadow_start_point_;
-    dyn_server_->updateConfig(param_config);
+  remove_shadow_start_point_ = false;  // default value
+  filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("remove_shadow_start_point"), remove_shadow_start_point_);
+  RCLCPP_INFO(logging_interface_->get_logger(), "Remove shadow start point: %s", remove_shadow_start_point_ ? "true" : "false");
 
-    return true;
+  if (min_angle_ < 0)
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "min_angle must be 0 <= min_angle. Forcing min_angle = 0.\n");
+    min_angle_ = 0.0;
+  }
+  if (90 < min_angle_)
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "min_angle must be min_angle <= 90. Forcing min_angle = 90.\n");
+    min_angle_ = 90.0;
+  }
+  if (max_angle_ < 90)
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "max_angle must be 90 <= max_angle. Forcing max_angle = 90.\n");
+    max_angle_ = 90.0;
+  }
+  if (180 < max_angle_)
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "max_angle must be max_angle <= 180. Forcing max_angle = 180.\n");
+    max_angle_ = 180.0;
+  }
+
+  shadow_detector_.configure(
+      angles::from_degrees(min_angle_),
+      angles::from_degrees(max_angle_));
+
+  angle_increment_ = 0;
+  return true;
 }
 
-void ScanShadowsFilter::reconfigureCB(ScanShadowsFilterConfig& config, uint32_t level)
+rcl_interfaces::msg::SetParametersResult ScanShadowsFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
     boost::recursive_mutex::scoped_lock lock(own_mutex_);
 
-    min_angle_ = config.min_angle;
-    max_angle_ = config.max_angle;
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      if(parameter.get_name() == "min_angle"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          min_angle_ = parameter.as_double();
+      else if(parameter.get_name() == "max_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_angle_ = parameter.as_double();
+      else if(parameter.get_name() == "neighbors" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          neighbors_ = parameter.as_int();
+      else if(parameter.get_name() == "window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          window_ = parameter.as_int();
+      else if(parameter.get_name() == "remove_shadow_start_point" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+          remove_shadow_start_point_ = parameter.as_bool();
+      else
+        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+    }
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),
         angles::from_degrees(max_angle_));
-    neighbors_ = config.neighbors;
-    window_ = config.window;
     angle_increment_ = 0;
-    remove_shadow_start_point_ = config.remove_shadow_start_point;
+
+  return result;
 }
 
-bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+bool ScanShadowsFilter::update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
 {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -173,14 +183,14 @@ bool ScanShadowsFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
     auto end = std::chrono::high_resolution_clock::now();
     auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-    ROS_DEBUG_NAMED("LaserScanShadowsFilter", "LaserScanShadowsFilter update took %lu microseconds", update_elapsed);
+    RCLCPP_DEBUG(logging_interface_->get_logger(), "LaserScanShadowsFilter update took %lu microseconds", update_elapsed);
 
     return true;
 }
 
 void ScanShadowsFilter::prepareForInput(const float angle_increment) {
   if (angle_increment_ != angle_increment) {
-    ROS_DEBUG ("[ScanShadowsFilter] No precomputed map given. Computing one.");
+    RCLCPP_DEBUG(logging_interface_->get_logger(), "[ScanShadowsFilter] No precomputed map given. Computing one.");
     angle_increment_ = angle_increment;
     sin_map_.clear();
     cos_map_.clear();

@@ -40,7 +40,7 @@
 #include <set>
 
 #include <filters/filter_base.hpp>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs//msg/laser_scan.hpp"
 #include "angles/angles.h"
 
 namespace laser_filters{
@@ -48,7 +48,7 @@ namespace laser_filters{
 /** @b ScanBlobFilter is a simple filter that filters shadow points in a laser scan line 
  */
 
-class ScanBlobFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class ScanBlobFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
 
@@ -67,14 +67,14 @@ public:
   bool configure()
   {
     max_radius_ = 0.1;//default value
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("max_radius"), max_radius_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_radius"), max_radius_))
     {
       ROS_ERROR("Error: BlobFilter was not given min_radius.\n");
       return false;
     }
 
     min_points_ = 5;//default value
-    if (!filters::FilterBase<sensor_msgs::LaserScan>::getParam(std::string("min_points"), min_points_))
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_points"), min_points_))
     {
       ROS_INFO("Error: BlobFilter was not given min_points.\n");
       return false;
@@ -90,7 +90,7 @@ public:
    * \param scan_in the input LaserScan message
    * \param scan_out the output LaserScan message
    */
-  bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out)
+  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out)
   {
     //copy across all data first
     scan_out = scan_in;

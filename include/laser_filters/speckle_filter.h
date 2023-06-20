@@ -40,24 +40,31 @@
 #ifndef SPECKLE_FILTER_H
 #define SPECKLE_FILTER_H
 
-#include <dynamic_reconfigure/server.h>
 #include <filters/filter_base.hpp>
-#include <laser_filters/SpeckleFilterConfig.h>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rcl_interfaces/msg/set_parameters_result.hpp>
+#include <boost/thread.hpp>
 
 namespace laser_filters
 {
+
+enum SpeckleFilterType //Enum to select the filtering method
+{
+  Distance = 0, // Range based filtering (distance between consecutive points
+  RadiusOutlier = 1 // Euclidean filtering based on radius outlier search
+};
 
 class WindowValidator
 {
 public:
   virtual ~WindowValidator() = default;
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference) = 0;
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan& scan, size_t idx, size_t window, double max_range_difference) = 0;
 };
 
 class DistanceWindowValidator : public WindowValidator
 {
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_range_difference)
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan& scan, size_t idx, size_t window, double max_range_difference)
   {
     const float& range = scan.ranges[idx];
     if (range != range) {
@@ -80,7 +87,7 @@ class DistanceWindowValidator : public WindowValidator
 
 class RadiusOutlierWindowValidator : public WindowValidator
 {
-  virtual bool checkWindowValid(const sensor_msgs::LaserScan& scan, size_t idx, size_t window, double max_distance)
+  virtual bool checkWindowValid(const sensor_msgs::msg::LaserScan& scan, size_t idx, size_t window, double max_distance)
   {
     int num_neighbors = 0;
     const float& r1 = scan.ranges[idx];
@@ -151,24 +158,27 @@ class RadiusOutlierWindowValidator : public WindowValidator
 /**
  * @brief This is a filter that removes speckle points in a laser scan based on consecutive ranges
  */
-class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanSpeckleFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   LaserScanSpeckleFilter();
   ~LaserScanSpeckleFilter();
 
   bool configure();
-  void configure(SpeckleFilterConfig& config) { reconfigureCB(config, 0); }
-
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
+ 
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan);
 
 private:
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>> dyn_server_;
-  void reconfigureCB(laser_filters::SpeckleFilterConfig& config, uint32_t level);
-  boost::recursive_mutex own_mutex_;
-
-  SpeckleFilterConfig config_ = SpeckleFilterConfig::__getDefault__();
   WindowValidator* validator_;
+  int filter_type_ = 0;
+  double max_range_ = 0;
+  double max_range_difference_ = 0;
+  int filter_window_ = 0;
+
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
+  boost::recursive_mutex own_mutex_;
 
   // Work area. Vector re-used by update() to avoid repeated dynamic memory allocations
   std::vector<bool> valid_ranges_work_;

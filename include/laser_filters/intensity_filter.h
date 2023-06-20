@@ -38,23 +38,23 @@
 
 #pragma once
 
-#include <dynamic_reconfigure/server.h>
+#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 #include <filters/filter_base.hpp>
 #include <laser_filters/IntensityFilterConfig.h>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_can.hpp>
 
 namespace laser_filters
 {
-class LaserScanIntensityFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class LaserScanIntensityFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   LaserScanIntensityFilter();
   bool configure();
-  bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan);
+  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan);
 
 private:
-  std::shared_ptr<dynamic_reconfigure::Server<IntensityFilterConfig>> dyn_server_;
-  void reconfigureCB(IntensityFilterConfig& config, uint32_t level);
+  void reconfigureCB();
+  ddynamic_reconfigure::DDynamicReconfigure dyn_server_;
   boost::recursive_mutex own_mutex_;
 
   IntensityFilterConfig config_ = IntensityFilterConfig::__getDefault__();

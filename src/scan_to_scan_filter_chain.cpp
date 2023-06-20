@@ -29,10 +29,10 @@
 
 
 #include "ros/ros.h"
-#include "sensor_msgs/LaserScan.h"
+#include "sensor_msgs/msg/laser_scan.hpp"
 #include "message_filters/subscriber.h"
-#include "tf/message_filter.h"
-#include "tf/transform_listener.h"
+#include "tf2/message_filter.h"
+#include "tf2/transform_listener.h"
 #include <filters/filter_chain.hpp>
 
 #if BUILDING_NODELET
@@ -49,15 +49,15 @@ protected:
 
   // Components for tf::MessageFilter
   tf::TransformListener *tf_;
-  message_filters::Subscriber<sensor_msgs::LaserScan> scan_sub_;
-  tf::MessageFilter<sensor_msgs::LaserScan> *tf_filter_;
+  message_filters::Subscriber<sensor_msgs::msg::LaserScan> scan_sub_;
+  tf::MessageFilter<sensor_msgs::msg::LaserScan> *tf_filter_;
   double tf_filter_tolerance_;
 
   // Filter Chain
-  filters::FilterChain<sensor_msgs::LaserScan> filter_chain_;
+  filters::FilterChain<sensor_msgs::msg::LaserScan> filter_chain_;
 
   // Components for publishing
-  sensor_msgs::LaserScan msg_;
+  sensor_msgs::msg::LaserScan msg_;
   ros::Publisher output_pub_;
 
   // Deprecation helpers
@@ -72,7 +72,7 @@ public:
     tf_(nullptr),
     scan_sub_(nh_, "scan", 50),
     tf_filter_(nullptr),
-    filter_chain_("sensor_msgs::LaserScan")
+    filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
     
@@ -92,7 +92,7 @@ public:
       private_nh_.param("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
 
       tf_ = new tf::TransformListener();
-      tf_filter_ = new tf::MessageFilter<sensor_msgs::LaserScan>(scan_sub_, *tf_, "", 50);
+      tf_filter_ = new tf::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, *tf_, "", 50);
       tf_filter_->setTargetFrame(tf_message_filter_target_frame);
       tf_filter_->setTolerance(ros::Duration(tf_filter_tolerance_));
 
@@ -106,7 +106,7 @@ public:
     }
     
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::LaserScan>("scan_filtered", 1000);
+    output_pub_ = nh_.advertise<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
 
     // Set up deprecation printout
     deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, boost::placeholders::_1));
@@ -129,7 +129,7 @@ public:
   }
 
   // Callback
-  void callback(const sensor_msgs::LaserScan::ConstPtr& msg_in)
+  void callback(const sensor_msgs::msg::LaserScan::ConstPtr& msg_in)
   {
     // Run the filter chain
     if (filter_chain_.update(*msg_in, msg_))

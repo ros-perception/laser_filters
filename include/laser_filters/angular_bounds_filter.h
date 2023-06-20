@@ -38,11 +38,11 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
 #include <filters/filter_base.hpp>
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {
-  class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+  class LaserScanAngularBoundsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
   {
     public:
       double lower_angle_;
@@ -63,7 +63,7 @@ namespace laser_filters
 
       virtual ~LaserScanAngularBoundsFilter(){}
 
-      bool update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan){
+      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
         filtered_scan.ranges.resize(input_scan.ranges.size());
         filtered_scan.intensities.resize(input_scan.intensities.size());
 

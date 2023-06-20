@@ -37,16 +37,15 @@
 #include "laser_filters/scan_shadow_detector.h"
 
 #include <filters/filter_base.hpp>
-#include <sensor_msgs/LaserScan.h>
-#include <laser_filters/ScanShadowsFilterConfig.h>
-#include <dynamic_reconfigure/server.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <boost/thread.hpp>
 
 namespace laser_filters
 {
 /** @b ScanShadowsFilter is a simple filter that filters shadow points in a laser scan line 
  */
 
-class ScanShadowsFilter : public filters::FilterBase<sensor_msgs::LaserScan>
+class ScanShadowsFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
   double laser_max_range_;        // Used in laser scan projection
@@ -56,17 +55,12 @@ public:
 
   ScanShadowDetector shadow_detector_;
 
-  std::shared_ptr<dynamic_reconfigure::Server<laser_filters::ScanShadowsFilterConfig>> dyn_server_;
-  boost::recursive_mutex own_mutex_;
-  ScanShadowsFilterConfig param_config;
 
   ScanShadowsFilter();
   virtual ~ScanShadowsFilter();
 
   /**@b Configure the filter from XML */
   bool configure();
-
-  void reconfigureCB(ScanShadowsFilterConfig& config, uint32_t level);
 
   /** \brief Filter shadow points based on 3 global parameters: min_angle, max_angle
    * and window. {min,max}_angle specify the allowed angle interval (in degrees)
@@ -75,8 +69,13 @@ public:
    * \param scan_in the input LaserScan message
    * \param scan_out the output LaserScan message
    */
-  bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);
-private:
+  bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
+private:  
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
+  boost::recursive_mutex own_mutex_;
+  
   float angle_increment_;
   std::vector<float> sin_map_;
   std::vector<float> cos_map_;

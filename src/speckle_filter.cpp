@@ -38,7 +38,6 @@
  */
 
 #include <laser_filters/speckle_filter.h>
-#include <ros/node_handle.h>
 
 namespace laser_filters
 {
@@ -57,21 +56,55 @@ LaserScanSpeckleFilter::~LaserScanSpeckleFilter()
 
 bool LaserScanSpeckleFilter::configure()
 {
-  ros::NodeHandle private_nh("~" + getName());
-  dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>(own_mutex_, private_nh));
-  dynamic_reconfigure::Server<laser_filters::SpeckleFilterConfig>::CallbackType f;
-  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
-  dyn_server_->setCallback(f);
+  node_ = std::make_shared<rclcpp::Node>(getName());
+  // dynamic reconfigure parameters callback:
+  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+            std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
 
-  getParam("filter_type", config_.filter_type);
-  getParam("max_range", config_.max_range);
-  getParam("max_range_difference", config_.max_range_difference);
-  getParam("filter_window", config_.filter_window);
-  dyn_server_->updateConfig(config_);
+  // get params
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type_))
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given filter_type.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range"), max_range_))
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given max_range.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range_difference"), max_range_difference_))
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given max_range_difference.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_window"), filter_window_))
+  {
+    RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given filter_window.\n");
+    return false;
+  }
+  
+  switch (filter_type_) {
+    case laser_filters::SpeckleFilterType::RadiusOutlier:
+      if (validator_)
+      {
+        delete validator_;
+      }
+      validator_ = new laser_filters::RadiusOutlierWindowValidator();
+      break;
+
+    case laser_filters::SpeckleFilterType::Distance:
+      if (validator_)
+      {
+        delete validator_;
+      }
+      validator_ = new laser_filters::DistanceWindowValidator();
+      break;
+
+    default:
+      break;
+  }
+
   return true;
 }
 
-bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& output_scan)
+bool LaserScanSpeckleFilter::update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan)
 {
   auto start = std::chrono::high_resolution_clock::now();
 
@@ -82,9 +115,9 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   std::vector<bool> &valid_ranges = valid_ranges_work_;
 
   /*Check if range size is big enough to use the filter window */
-  if (output_scan.ranges.size() <= config_.filter_window + 1)
+  if (output_scan.ranges.size() <= filter_window_ + 1)
   {
-    ROS_ERROR("Scan ranges size is too small: size = %ld", output_scan.ranges.size());
+    RCLCPP_ERROR(node_->get_logger(), "Scan ranges size is too small: size = %ld", output_scan.ranges.size());
     return false;
   }
 
@@ -92,19 +125,19 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   size_t i_max = input_scan.ranges.size();
   valid_ranges.clear();
   while (i < i_max) {
-    bool out_of_range = output_scan.ranges[i] > config_.max_range;
+    bool out_of_range = output_scan.ranges[i] > max_range_;
     valid_ranges.push_back(out_of_range);
     ++i;
   }
 
   i = 0;
-  i_max = input_scan.ranges.size() - config_.filter_window + 1;
+  i_max = input_scan.ranges.size() - filter_window_ + 1;
   while (i < i_max) {
     bool window_valid = validator_->checkWindowValid(
-      output_scan, i, config_.filter_window, config_.max_range_difference
+      output_scan, i, filter_window_, max_range_difference_
     );
     if (window_valid) {
-      size_t j = i, j_max = i + config_.filter_window;
+      size_t j = i, j_max = i + filter_window_;
       do {
         valid_ranges[j++] = true;
       } while (j < j_max);
@@ -124,17 +157,33 @@ bool LaserScanSpeckleFilter::update(const sensor_msgs::LaserScan& input_scan, se
   auto end = std::chrono::high_resolution_clock::now();
   auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-  ROS_DEBUG_NAMED("LaserScanSpeckleFilter", "LaserScanSpeckleFilter update took %lu microseconds", update_elapsed);
+  RCLCPP_DEBUG(node_->get_logger(), "LaserScanSpeckleFilter", "LaserScanSpeckleFilter update took %lu microseconds", update_elapsed);
 
   return true;
 }
 
-void LaserScanSpeckleFilter::reconfigureCB(laser_filters::SpeckleFilterConfig& config, uint32_t level)
+rcl_interfaces::msg::SetParametersResult LaserScanSpeckleFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
-  config_ = config;
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
 
-  switch (config_.filter_type) {
-    case laser_filters::SpeckleFilter_RadiusOutlier:
+    for (auto parameter : parameters)
+    {
+      RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      if(parameter.get_name() == "filter_type"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          filter_type_ = parameter.as_int();
+      else if(parameter.get_name() == "max_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_range_ = parameter.as_double();
+      else if(parameter.get_name() == "max_range_difference" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_range_difference_ = parameter.as_double();
+      else if(parameter.get_name() == "filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          filter_window_ = parameter.as_int();
+      else
+        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+    }
+
+  switch (filter_type_) {
+    case laser_filters::SpeckleFilterType::RadiusOutlier:
       if (validator_)
       {
         delete validator_;
@@ -142,7 +191,7 @@ void LaserScanSpeckleFilter::reconfigureCB(laser_filters::SpeckleFilterConfig& c
       validator_ = new laser_filters::RadiusOutlierWindowValidator();
       break;
 
-    case laser_filters::SpeckleFilter_Distance:
+    case laser_filters::SpeckleFilterType::Distance:
       if (validator_)
       {
         delete validator_;
@@ -154,5 +203,8 @@ void LaserScanSpeckleFilter::reconfigureCB(laser_filters::SpeckleFilterConfig& c
       break;
   }
 
+  return result;
+
 }
+
 }

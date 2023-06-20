@@ -77,7 +77,7 @@ bool LaserScanSectorFilter::isClearInside()
   return clear_inside;
 }
 
-bool LaserScanSectorFilter::update(const sensor_msgs::LaserScan& input_scan, sensor_msgs::LaserScan& filtered_scan)
+bool LaserScanSectorFilter::update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
 {
   filtered_scan = input_scan; //copy entire message
 
