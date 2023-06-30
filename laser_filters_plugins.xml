@@ -1,79 +1,79 @@
 <class_libraries>
   <library path="laser_scan_filters">
     <class name="laser_filters/LaserArrayFilter" type="laser_filters::LaserArrayFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	This is a filter which runs two internal MultiChannelFilterChain filters on the range and intensity measurements.  
       </description>
     </class>
     <class name="laser_filters/LaserScanIntensityFilter" type="laser_filters::LaserScanIntensityFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	This is a filter which filters sensor_msgs::msg::LaserScan messages based on intensity
       </description>
     </class>
     <class name="laser_filters/LaserScanRangeFilter" type="laser_filters::LaserScanRangeFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	This is a filter which filters sensor_msgs::msg::LaserScan messages based on range
       </description>
     </class>
     <class name="laser_filters/ScanShadowsFilter" type="laser_filters::ScanShadowsFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	This is a filter which filters points from a laser scan that look like the veiling effect.
       </description>
     </class>
     <class name="laser_filters/InterpolationFilter" type="laser_filters::InterpolationFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
       This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
       </description>
     </class>
     <class name="laser_filters/LaserScanAngularBoundsFilter" type="laser_filters::LaserScanAngularBoundsFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	 This is a filter that removes points in a laser scan outside of certain angular bounds.
       </description>
     </class>
     <class name="laser_filters/LaserScanAngularBoundsFilterInPlace" type="laser_filters::LaserScanAngularBoundsFilterInPlace" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	 This is a filter that removes points in a laser scan inside of certain angular bounds.
       </description>
     </class>
      <class name="laser_filters/LaserScanBoxFilter" type="laser_filters::LaserScanBoxFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	 This is a filter that removes points in a laser scan inside of a cartesian box.
       </description>
     </class>
     <class name="laser_filters/LaserScanSpeckleFilter" type="laser_filters::LaserScanSpeckleFilter"
-	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::LaserScan&gt;">
       <description>
  	This is a filter that removes speckle points in a laser scan by looking at neighbor points.
       </description>
     </class>
     <class name="laser_filters/LaserScanMaskFilter" type="laser_filters::LaserScanMaskFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	 This is a filter that removes points on directions defined in a mask from a laser scan.
       </description>
     </class>
     <class name="laser_filters/LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	DEPRECATED: This is a median filter which filters sensor_msgs::msg::LaserScan messages.  
       </description>
     </class>
     <class name="laser_filters/LaserScanFootprintFilter" type="laser_filters::LaserScanFootprintFilter" 
-	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	DEPRECATED: This is a filter which filters points out of a laser scan which are inside the inscribed radius.
       </description>
     </class>
     <class name="laser_filters/LaserScanSpeckleFilter" type="laser_filters::LaserScanSpeckleFilter"
-      base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+      base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
   DEPRECATED: This is a filter which filters points out of a laser scan which are inside the inscribed radius.
       </description>
