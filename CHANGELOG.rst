@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.7 (2023-07-31)
+------------------
 * Escape invalid xml in laser_filters_plugins.xml
 * Contributors: Calder Phillips-Grafflin
 

@@ -4,7 +4,7 @@
     Assorted filters designed to operate on 2D planar laser scanners,
     which use the sensor_msgs/LaserScan type.
   </description>
-  <version>2.0.6</version>
+  <version>2.0.7</version>
   <maintainer email="jon.binney@gmail.com">Jon Binney</maintainer>
   <author>Tully Foote</author>
   <license>BSD</license>
