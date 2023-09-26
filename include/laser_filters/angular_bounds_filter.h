@@ -79,7 +79,7 @@ namespace laser_filters
           if(start_angle < lower_angle_){
             start_angle += input_scan.angle_increment;
             current_angle += input_scan.angle_increment;
-            start_time.set__sec(start_time.sec + input_scan.time_increment);
+            start_time.set__nanosec(start_time.nanosec + (input_scan.time_increment * 10e9)); // convert time increment to nanoseconds
           }
           else{
             filtered_scan.ranges[count] = input_scan.ranges[i];
