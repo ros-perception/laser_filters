@@ -6,3 +6,4 @@ scan_to_scan_filter_chain:
       params:
         lower_angle: -1.52
         upper_angle: 1.52
+        
