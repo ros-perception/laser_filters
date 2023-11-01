@@ -71,7 +71,7 @@ namespace laser_filters
 
         double start_angle = input_scan.angle_min;
         double current_angle = input_scan.angle_min;
-        builtin_interfaces::msg::Time start_time = input_scan.header.stamp;
+        rclcpp::Time start_time = input_scan.header.stamp;
         unsigned int count = 0;
         //loop through the scan and truncate the beginning and the end of the scan as necessary
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
@@ -79,7 +79,7 @@ namespace laser_filters
           if(start_angle < lower_angle_){
             start_angle += input_scan.angle_increment;
             current_angle += input_scan.angle_increment;
-            start_time.set__sec(start_time.sec + input_scan.time_increment);
+            start_time += rclcpp::Duration::from_seconds(input_scan.time_increment);
           }
           else{
             filtered_scan.ranges[count] = input_scan.ranges[i];
