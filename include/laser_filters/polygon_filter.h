@@ -65,7 +65,7 @@ namespace laser_filters
 class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan> {
 public:
   virtual bool configure();
-  virtual void configure(PolygonFilterConfig& config) { reconfigureCB(); }
+  // virtual void configure(PolygonFilterConfig& config) { reconfigureCB(); }
 
   virtual bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) { return false; }
 
@@ -91,10 +91,10 @@ protected:
 
 class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
+  bool configure() override;
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) override;
 
 private:
-  // configuration
   laser_geometry::LaserProjection projector_;
   // tf listener to transform scans into the polygon_frame
   std::shared_ptr<tf2_ros::Buffer> buffer_;
