@@ -28,29 +28,29 @@
  */
 
 
-#include "ros/ros.h"
-#include "sensor_msgs/msg/laser_scan.hpp"
-#include "message_filters/subscriber.h"
-#include "tf2/message_filter.h"
-#include "tf2/transform_listener.h"
-#include <filters/filter_chain.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
-#if BUILDING_NODELET
-#include <nodelet/nodelet.h>
-#include <pluginlib/class_list_macros.hpp>
-#endif
+// TF
+#include <tf2_ros/transform_listener.h>
+#include "tf2_ros/message_filter.h"
+
+#include "message_filters/subscriber.h"
+
+#include "filters/filter_chain.hpp"
 
 class ScanToScanFilterChain
 {
 protected:
   // Our NodeHandle
-  ros::NodeHandle nh_;
-  ros::NodeHandle private_nh_;
+  rclcpp::Node::SharedPtr nh_;
 
   // Components for tf::MessageFilter
-  tf::TransformListener *tf_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_;
+  tf2_ros::Buffer buffer_;
+
   message_filters::Subscriber<sensor_msgs::msg::LaserScan> scan_sub_;
-  tf::MessageFilter<sensor_msgs::msg::LaserScan> *tf_filter_;
+  std::shared_ptr<tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>> tf_filter_;
   double tf_filter_tolerance_;
 
   // Filter Chain
@@ -58,113 +58,79 @@ protected:
 
   // Components for publishing
   sensor_msgs::msg::LaserScan msg_;
-  ros::Publisher output_pub_;
-
-  // Deprecation helpers
-  ros::Timer deprecation_timer_;
-  bool  using_filter_chain_deprecated_;
+  rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr output_pub_;
 
 public:
   // Constructor
-  ScanToScanFilterChain(const ros::NodeHandle& nh = {}, const ros::NodeHandle& pnh = {"~"}) :
-    nh_(nh),
-    private_nh_(pnh),
-    tf_(nullptr),
-    scan_sub_(nh_, "scan", 50),
-    tf_filter_(nullptr),
-    filter_chain_("sensor_msgs::msg::LaserScan")
+  ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
+      : nh_(node),
+        tf_(NULL),
+        buffer_(nh_->get_clock()),
+        scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data),
+        tf_filter_(NULL),
+        filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
-    
-    using_filter_chain_deprecated_ = private_nh_.hasParam("filter_chain");
+    filter_chain_.configure("", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
 
-    if (using_filter_chain_deprecated_)
-      filter_chain_.configure("filter_chain", private_nh_);
-    else
-      filter_chain_.configure("scan_filter_chain", private_nh_);
-    
     std::string tf_message_filter_target_frame;
-
-    if (private_nh_.hasParam("tf_message_filter_target_frame"))
+    if (nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame))
     {
-      private_nh_.getParam("tf_message_filter_target_frame", tf_message_filter_target_frame);
 
-      private_nh_.param("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
+      nh_->get_parameter_or("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
 
-      tf_ = new tf::TransformListener();
-      tf_filter_ = new tf::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, *tf_, "", 50);
+      tf_.reset(new tf2_ros::TransformListener(buffer_));
+      tf_filter_.reset(new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(scan_sub_, buffer_, "", 50, nh_));
       tf_filter_->setTargetFrame(tf_message_filter_target_frame);
-      tf_filter_->setTolerance(ros::Duration(tf_filter_tolerance_));
+      tf_filter_->setTolerance(std::chrono::duration<double>(tf_filter_tolerance_));
 
       // Setup tf::MessageFilter generates callback
-      tf_filter_->registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, boost::placeholders::_1));
+      tf_filter_->registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
     }
     else 
     {
       // Pass through if no tf_message_filter_target_frame
-      scan_sub_.registerCallback(boost::bind(&ScanToScanFilterChain::callback, this, boost::placeholders::_1));
+      scan_sub_.registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
     }
     
     // Advertise output
-    output_pub_ = nh_.advertise<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
-
-    // Set up deprecation printout
-    deprecation_timer_ = nh_.createTimer(ros::Duration(5.0), boost::bind(&ScanToScanFilterChain::deprecation_warn, this, boost::placeholders::_1));
+    output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
   }
 
   // Destructor
   ~ScanToScanFilterChain()
   {
     if (tf_filter_)
-      delete tf_filter_;
+      tf_filter_.reset();
     if (tf_)
-      delete tf_;
-  }
-  
-  // Deprecation warning callback
-  void deprecation_warn(const ros::TimerEvent& e)
-  {
-    if (using_filter_chain_deprecated_)
-      ROS_WARN("Use of '~filter_chain' parameter in scan_to_scan_filter_chain has been deprecated. Please replace with '~scan_filter_chain'.");
+      tf_.reset();
   }
 
   // Callback
-  void callback(const sensor_msgs::msg::LaserScan::ConstPtr& msg_in)
+  void callback(const std::shared_ptr<const sensor_msgs::msg::LaserScan>& msg_in)
   {
     // Run the filter chain
     if (filter_chain_.update(*msg_in, msg_))
     {
       //only publish result if filter succeeded
-      output_pub_.publish(msg_);
-    } else {
-      ROS_ERROR_THROTTLE(1, "Filtering the scan from time %i.%i failed.", msg_in->header.stamp.sec, msg_in->header.stamp.nsec);
+      output_pub_->publish(msg_);
     }
   }
 };
 
-#if BUILDING_NODELET
-
-class ScanToScanFilterChainNodelet : public nodelet::Nodelet
-{
-  std::unique_ptr<ScanToScanFilterChain> chain_;
-
-  void onInit() override {
-    chain_ = std::unique_ptr<ScanToScanFilterChain>(new ScanToScanFilterChain(getNodeHandle(), getPrivateNodeHandle()));
-  }
-};
-
-PLUGINLIB_EXPORT_CLASS(ScanToScanFilterChainNodelet, nodelet::Nodelet)
-
-#else
-
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "scan_to_scan_filter_chain");
-  
-  ScanToScanFilterChain t;
-  ros::spin();
-  
+  rclcpp::init(argc, argv);
+  auto nh = rclcpp::Node::make_shared("scan_to_scan_filter_chain");
+  ScanToScanFilterChain t(nh);
+
+  rclcpp::WallRate loop_rate(200);
+  while (rclcpp::ok()) {
+
+    rclcpp::spin_some(nh);
+    loop_rate.sleep();
+
+  }
+
   return 0;
 }
-
-#endif

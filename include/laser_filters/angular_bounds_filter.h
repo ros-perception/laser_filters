@@ -38,6 +38,7 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_H
 
 #include <filters/filter_base.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
@@ -53,8 +54,9 @@ namespace laser_filters
         lower_angle_ = 0;
         upper_angle_ = 0;
 
-        if(!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_)){
-          ROS_ERROR("Both the lower_angle and upper_angle parameters must be set to use this filter.");
+        if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
+        {
+          RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -69,57 +71,32 @@ namespace laser_filters
 
         double start_angle = input_scan.angle_min;
         double current_angle = input_scan.angle_min;
-        ros::Time start_time = input_scan.header.stamp;
+        rclcpp::Time start_time = input_scan.header.stamp;
         unsigned int count = 0;
         //loop through the scan and truncate the beginning and the end of the scan as necessary
         for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-          if(input_scan.angle_increment > 0){ //if the laserscanner turns counterclockwise
-            //wait until we get to our desired starting angle
-            if(start_angle < lower_angle_){
-              start_angle += input_scan.angle_increment;
-              current_angle += input_scan.angle_increment;
-              start_time += ros::Duration(input_scan.time_increment);
-            }
-            else{
-              filtered_scan.ranges[count] = input_scan.ranges[i];
-
-              //make sure  that we don't update intensity data if its not available
-              if(input_scan.intensities.size() > i)
-                filtered_scan.intensities[count] = input_scan.intensities[i];
-
-              count++;
-
-              //check if we need to break out of the loop, basically if the next increment will put us over the threshold
-              if(current_angle + input_scan.angle_increment > upper_angle_){
-                break;
-              }
-              current_angle += input_scan.angle_increment;
-            }
+          //wait until we get to our desired starting angle
+          if(start_angle < lower_angle_){
+            start_angle += input_scan.angle_increment;
+            current_angle += input_scan.angle_increment;
+            start_time += rclcpp::Duration::from_seconds(input_scan.time_increment);
           }
-          else{ //the laserscanner turns clockwise
-            //wait until we get to our desired starting angle
-            if(start_angle > upper_angle_){
-              start_angle += input_scan.angle_increment;
-              current_angle += input_scan.angle_increment;
-              start_time += ros::Duration(input_scan.time_increment);
+          else{
+            filtered_scan.ranges[count] = input_scan.ranges[i];
+
+            //make sure  that we don't update intensity data if its not available
+            if(input_scan.intensities.size() > i)
+              filtered_scan.intensities[count] = input_scan.intensities[i];
+
+            count++;
+
+            //check if we need to break out of the loop, basically if the next increment will put us over the threshold
+            if(current_angle + input_scan.angle_increment > upper_angle_){
+              break;
             }
-            else{
-              filtered_scan.ranges[count] = input_scan.ranges[i];
 
-              //make sure  that we don't update intensity data if its not available
-              if(input_scan.intensities.size() > i)
-                filtered_scan.intensities[count] = input_scan.intensities[i];
+            current_angle += input_scan.angle_increment;
 
-              count++;
-
-              //check if we need to break out of the loop, basically if the next increment will put us over the threshold
-              if(current_angle + input_scan.angle_increment < lower_angle_){
-                break;
-              }
-
-              current_angle += input_scan.angle_increment;
-
-            }
           }
         }
 
@@ -139,7 +116,7 @@ namespace laser_filters
         if(input_scan.intensities.size() >= count)
           filtered_scan.intensities.resize(count);
 
-        ROS_DEBUG("Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
+        RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
 
         return true;
 

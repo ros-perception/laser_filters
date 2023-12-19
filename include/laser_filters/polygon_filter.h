@@ -46,17 +46,19 @@
 #include <filters/filter_base.hpp>
 
 #include <sensor_msgs/msg/laser_scan.hpp>
-#include <laser_geometry/laser_geometry.h>
+#include <sensor_msgs/point_cloud_conversion.hpp>
+#include <laser_geometry/laser_geometry.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <geometry_msgs/msg/polygon.hpp>
 #include <geometry_msgs/msg/polygon_stamped.hpp>
 
-#include <tf2_ros/transform_listener.h>
-#include <tf2_ros/transform_datatypes.h>
+#include <tf2/convert.h>
+#include <tf2_ros/buffer.h>
 #include <boost/thread.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
 
-
+typedef tf2::Vector3 Point;
 namespace laser_filters
 {
 /**
@@ -70,21 +72,21 @@ public:
   virtual bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) { return false; }
 
 protected:
-  rclcpp::Publisher polygon_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr polygon_pub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
-  geometry_msgs::Polygon polygon_;
+  geometry_msgs::msg::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
   bool is_polygon_published_ = false;
   
   rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
-  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
+  virtual rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
 
   // checks if points in polygon
-  bool inPolygon(tf::Point& point) const;
+  bool inPolygon(const Point& point) const;
 
   void publishPolygon();
 };
@@ -112,6 +114,7 @@ public:
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan) override;
   
 protected:
+  bool transformPolygon(const std::string &input_scan_frame_id);
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters) override;
 
 private:
@@ -123,6 +126,11 @@ private:
   bool is_polygon_transformed_;
 
   void checkCoSineMap(const sensor_msgs::msg::LaserScan& input_scan);
+  geometry_msgs::msg::PointStamped createPointStamped(const double &x, 
+                                                      const double &y,
+                                                      const double &z,
+                                                      const builtin_interfaces::msg::Time &stamp,
+                                                      const std::string &frame_id);
 };
 }
 #endif /* polygon_filter.h */

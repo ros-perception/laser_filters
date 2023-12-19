@@ -32,7 +32,6 @@
 #include <math.h>
 
 #include <laser_filters/sector_filter.h>
-#include <ros/node_handle.h>
 
 namespace laser_filters
 {
@@ -43,52 +42,79 @@ LaserScanSectorFilter::LaserScanSectorFilter()
 
 bool LaserScanSectorFilter::configure()
 {
-  ros::NodeHandle private_nh("~" + getName());
-  dyn_server_.reset(new dynamic_reconfigure::Server<SectorFilterConfig>(own_mutex_, private_nh));
-  dynamic_reconfigure::Server<SectorFilterConfig>::CallbackType f;
-  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
-  dyn_server_->setCallback(f);
+  node_ = std::make_shared<rclcpp::Node>(getName());
+  // dynamic reconfigure parameters callback:
+  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+            std::bind(&LaserScanSectorFilter::reconfigureCB, this, std::placeholders::_1));
 
-  getParam("angle_min", config_.angle_min);
-  getParam("angle_max", config_.angle_max);
-  getParam("range_min", config_.range_min);
-  getParam("range_max", config_.range_max);
-  getParam("clear_inside", config_.clear_inside);
-  getParam("invert", config_.invert);
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_min"), angle_min_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given angle_min.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_max"), angle_max_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given angle_max.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("range_min"), range_min_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given range_min.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("range_max"), range_max_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given range_max.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("clear_inside"), clear_inside_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given clear_inside.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given invert.\n");
+    return false;
+  }
 
-  ROS_INFO("clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
-
-  dyn_server_->updateConfig(config_);
+  RCLCPP_INFO(logging_interface_->get_logger(), "clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
   return true;
 }
 
-void LaserScanSectorFilter::reconfigureCB(SectorFilterConfig& config, uint32_t level)
+rcl_interfaces::msg::SetParametersResult LaserScanSectorFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
-  config_ = config;
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      if(parameter.get_name() == "angle_min"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          angle_min_ = parameter.as_double();
+      else if(parameter.get_name() == "angle_max" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          angle_max_ = parameter.as_double();
+      else if(parameter.get_name() == "range_min" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          range_min_ = parameter.as_double();
+      else if(parameter.get_name() == "range_max" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          range_max_ = parameter.as_double();
+      else if(parameter.get_name() == "clear_inside" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          clear_inside_ = parameter.as_bool();
+      else if(parameter.get_name() == "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          invert_ = parameter.as_bool();
+      else
+        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+    }
+  return result;
 }
 
 bool LaserScanSectorFilter::isClearInside()
 {
-  bool clear_inside = config_.clear_inside;
-  bool invert = config_.invert;
-
-  clear_inside = invert ? false : clear_inside;
-
-  return clear_inside;
+  return invert_ ? false : clear_inside_;
 }
 
 bool LaserScanSectorFilter::update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
 {
   filtered_scan = input_scan; //copy entire message
-
-  double angle_min = config_.angle_min;
-  double angle_max = config_.angle_max;
-  double range_min = config_.range_min;
-  double range_max = config_.range_max;
   bool clear_inside = isClearInside();
 
-  double angle_delta = angle_max - angle_min;
-  if (angle_max < angle_min)
+  double angle_delta = angle_max_ - angle_min_;
+  if (angle_max_ < angle_min_)
   {
     angle_delta += M_PI * 2;
   }
@@ -101,16 +127,16 @@ bool LaserScanSectorFilter::update(const sensor_msgs::msg::LaserScan& input_scan
     current_angle = (i == 0) ? current_angle : (current_angle + input_scan.angle_increment);
 
     double current_range = input_scan.ranges[i];
-    double current_angle_delta = current_angle - angle_min;
-    if ((angle_max < angle_min) && (current_angle_delta < 0))
+    double current_angle_delta = current_angle - angle_min_;
+    if ((angle_max_ < angle_min_) && (current_angle_delta < 0))
     {
       current_angle_delta += M_PI * 2;
     }
 
     if (clear_inside != ((current_angle_delta > 0)
                       && (current_angle_delta < angle_delta)
-                      && (current_range > range_min)
-                      && (current_range < range_max)))
+                      && (current_range > range_min_)
+                      && (current_range < range_max_)))
     {
       continue;
     }
@@ -123,7 +149,7 @@ bool LaserScanSectorFilter::update(const sensor_msgs::msg::LaserScan& input_scan
     count++;
   }
 
-  ROS_DEBUG("Filtered out %u points from the laser scan.", count);
+  RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
 
   return true;
 }

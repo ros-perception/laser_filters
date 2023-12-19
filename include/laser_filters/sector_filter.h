@@ -32,9 +32,6 @@
 #ifndef LASER_SCAN_SECTOR_FILTER_IN_PLACE_H
 #define LASER_SCAN_SECTOR_FILTER_IN_PLACE_H
 
-#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
-#include <laser_filters/SectorFilterConfig.h>
-
 #include <filters/filter_base.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp> 
 
@@ -52,11 +49,16 @@ public:
   virtual ~LaserScanSectorFilter(){}
 
 private:
-  ddynamic_reconfigure::DDynamicReconfigure dyn_server_;
-  void reconfigureCB();
-  boost::recursive_mutex own_mutex_;
+  double angle_min_;
+  double angle_max_;
+  double range_min_;
+  double range_max_;
+  bool clear_inside_;
+  bool invert_;
 
-  SectorFilterConfig config_ = SectorFilterConfig::__getDefault__();
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
 };
 
 } // end namespace laser_filters

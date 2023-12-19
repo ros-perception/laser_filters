@@ -40,7 +40,7 @@
 #include <set>
 
 #include <filters/filter_base.hpp>
-#include <sensor_msgs//msg/laser_scan.hpp"
+#include <sensor_msgs/msg/laser_scan.hpp>
 #include "angles/angles.h"
 
 namespace laser_filters{
@@ -69,14 +69,14 @@ public:
     max_radius_ = 0.1;//default value
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_radius"), max_radius_))
     {
-      ROS_ERROR("Error: BlobFilter was not given min_radius.\n");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BlobFilter was not given min_radius.\n");
       return false;
     }
 
     min_points_ = 5;//default value
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_points"), min_points_))
     {
-      ROS_INFO("Error: BlobFilter was not given min_points.\n");
+      RCLCPP_INFO(logging_interface_->get_logger(), "Error: BlobFilter was not given min_points.\n");
       return false;
     }
     return true;
@@ -137,12 +137,12 @@ public:
             if ( radius < fabs(center_y - y) ) radius = fabs(center_y - y) ;
         }
 
-        ROS_DEBUG_STREAM("blob center " << center_x << " " << center_y << ", radius " << radius << ", num of ponits " << size);
+        RCLCPP_DEBUG_STREAM(logging_interface_->get_logger(), "blob center " << center_x << " " << center_y << ", radius " << radius << ", num of ponits " << size);
         if ( radius < max_radius_ ) {
             indices_to_publish.insert(range_blobs[i][0] + size/2);
         }
     }
-    ROS_DEBUG("ScanBlobFilter  %d Points from scan with min radius: %.2f, num of pints: %d", (int)indices_to_publish.size(), max_radius_, min_points_);
+    RCLCPP_DEBUG(logging_interface_->get_logger(), "ScanBlobFilter  %d Points from scan with min radius: %.2f, num of pints: %d", (int)indices_to_publish.size(), max_radius_, min_points_);
     for ( std::set<int>::iterator it = indices_to_publish.begin(); it != indices_to_publish.end(); ++it)
       {
 	scan_out.ranges[*it] = fabs(scan_in.ranges[*it]); // valid only the ranges that passwd the test (*)

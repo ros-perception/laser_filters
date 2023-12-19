@@ -41,11 +41,12 @@ This is useful for ground plane extraction
 
 **/
 
-#include "laser_geometry/laser_geometry.h"
+// #include <laser_geometry/laser_geometry.hpp>
 #include <filters/filter_base.hpp>
-#include "tf2/transform_listener.h"
 #include "sensor_msgs/msg/point_cloud.hpp"
-#include "ros/ros.h"
+#include "geometry_msgs/msg/point32.hpp"
+#include <tf2/convert.h>
+#include <tf2_ros/buffer.h>
 
 namespace laser_filters
 {
@@ -54,14 +55,16 @@ class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::P
 {
 public:
   PointCloudFootprintFilter() {
-    ROS_WARN("PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
+    RCLCPP_WARN(logging_interface_->get_logger(), "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
   }
 
   bool configure()
   {
+    node_ = std::make_shared<rclcpp::Node>(getName());
+    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
-      ROS_ERROR("PointCloudFootprintFilter needs inscribed_radius to be set");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "PointCloudFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
@@ -75,18 +78,20 @@ public:
   bool update(const sensor_msgs::msg::PointCloud& input_scan, sensor_msgs::msg::PointCloud& filtered_scan)
   {
     if(&input_scan == &filtered_scan){
-      ROS_ERROR("This filter does not currently support in place copying");
+      RCLCPP_ERROR(logging_interface_->get_logger(), "This filter does not currently support in place copying");
       return false;
     }
-    sensor_msgs::PointCloud laser_cloud;
+    sensor_msgs::msg::PointCloud laser_cloud;
 
     try{
-      tf_.transformPointCloud("base_link", input_scan, laser_cloud);
+      geometry_msgs::msg::TransformStamped transform = buffer_->lookupTransform("base_link", input_scan.header.frame_id,
+                     tf2::TimePointZero);
+      tf2::doTransform(input_scan, laser_cloud, transform);
     }
-    catch(tf::TransformException& ex){
-      ROS_ERROR("Transform unavailable %s", ex.what());
+    catch(tf2::TransformException& ex){
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Transform unavailable %s", ex.what());
       return false;
-    }
+    }  
 
     filtered_scan.header = input_scan.header;
     filtered_scan.points.resize (input_scan.points.size());
@@ -116,15 +121,15 @@ public:
   }
 
 
-  bool inFootprint(const geometry_msgs::Point32& scan_pt){
+  bool inFootprint(const geometry_msgs::msg::Point32& scan_pt){
     if(scan_pt.x < -1.0 * inscribed_radius_ || scan_pt.x > inscribed_radius_ || scan_pt.y < -1.0 * inscribed_radius_ || scan_pt.y > inscribed_radius_)
       return false;
     return true;
   }
 
 protected:
-  tf2::TransformListener tf_;
-  laser_geometry::LaserProjection projector_;
+  rclcpp::Node::SharedPtr node_;
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
   double inscribed_radius_;
 } ;
 

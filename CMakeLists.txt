@@ -13,6 +13,7 @@ set(DEPENDENCIES
   sensor_msgs 
   rclcpp 
   tf2 
+  tf2_ros
   filters 
   message_filters
   laser_geometry 
@@ -46,32 +47,32 @@ endforeach ()
 # Build
 ##############################################################################
 
-# add_library(pointcloud_filters src/pointcloud_filters.cpp)
-# target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
-# ament_target_dependencies(pointcloud_filters ${DEPENDENCIES})
+add_library(pointcloud_filters src/pointcloud_filters.cpp)
+target_link_libraries(pointcloud_filters ${catkin_LIBRARIES})
+ament_target_dependencies(pointcloud_filters ${DEPENDENCIES})
 
 add_library(laser_scan_filters
-  # src/laser_scan_filters.cpp
+  src/laser_scan_filters.cpp
   src/median_filter.cpp
   src/array_filter.cpp
   src/box_filter.cpp
-  # src/polygon_filter.cpp
+  src/polygon_filter.cpp
   src/scan_shadow_detector.cpp
   src/scan_shadows_filter.cpp
   src/speckle_filter.cpp
-  # src/intensity_filter.cpp
-  # src/sector_filter.cpp
+  src/intensity_filter.cpp
+  src/sector_filter.cpp
 )
 ament_target_dependencies(laser_scan_filters ${DEPENDENCIES})
 target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-# add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
-# ament_target_dependencies(scan_to_cloud_filter_chain ${DEPENDENCIES})
-# target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(scan_to_cloud_filter_chain src/scan_to_cloud_filter_chain.cpp)
+ament_target_dependencies(scan_to_cloud_filter_chain ${DEPENDENCIES})
+target_link_libraries(scan_to_cloud_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
-# add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
-# ament_target_dependencies(scan_to_scan_filter_chain ${DEPENDENCIES})
-# target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(scan_to_scan_filter_chain src/scan_to_scan_filter_chain.cpp)
+ament_target_dependencies(scan_to_scan_filter_chain ${DEPENDENCIES})
+target_link_libraries(scan_to_scan_filter_chain ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 # add_library(${PROJECT_NAME}_nodelets
 #   src/scan_to_cloud_filter_chain.cpp
@@ -79,9 +80,9 @@ target_link_libraries(laser_scan_filters ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 # target_link_libraries(${PROJECT_NAME}_nodelets ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 # target_compile_definitions(${PROJECT_NAME}_nodelets PRIVATE BUILDING_NODELET=1)
 
-# add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
-# ament_target_dependencies(generic_laser_filter_node ${DEPENDENCIES})
-# target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+add_executable(generic_laser_filter_node src/generic_laser_filter_node.cpp)
+ament_target_dependencies(generic_laser_filter_node ${DEPENDENCIES})
+target_link_libraries(generic_laser_filter_node ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 # add_dependencies(laser_scan_filters ${PROJECT_NAME}_gencfg)
 
 # if (CATKIN_ENABLE_TESTING)
@@ -117,10 +118,10 @@ pluginlib_export_plugin_description_file(filters laser_filters_plugins.xml)
 # ament_auto_package(INSTALL_TO_SHARE examples)
 
 install(TARGETS 
-  # pointcloud_filters 
+  pointcloud_filters 
   laser_scan_filters 
-  # scan_to_cloud_filter_chain
-  # scan_to_scan_filter_chain
+  scan_to_cloud_filter_chain
+  scan_to_scan_filter_chain
   # ${PROJECT_NAME}_nodelets
   # generic_laser_filter_node
   ARCHIVE DESTINATION lib

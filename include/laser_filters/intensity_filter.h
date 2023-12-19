@@ -38,10 +38,8 @@
 
 #pragma once
 
-#include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 #include <filters/filter_base.hpp>
-#include <laser_filters/IntensityFilterConfig.h>
-#include <sensor_msgs/msg/laser_can.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {
@@ -53,10 +51,14 @@ public:
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan);
 
 private:
-  void reconfigureCB();
-  ddynamic_reconfigure::DDynamicReconfigure dyn_server_;
-  boost::recursive_mutex own_mutex_;
-
-  IntensityFilterConfig config_ = IntensityFilterConfig::__getDefault__();
+  double lower_threshold_;
+  double upper_threshold_;
+  bool invert_;
+  bool filter_override_range_;
+  bool filter_override_intensity_;
+ 
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
 };
 }

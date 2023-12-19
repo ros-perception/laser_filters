@@ -46,6 +46,8 @@
 #include <sstream>
 #include <vector>
 
+using namespace std::literals;
+
 /** @brief Same as sign(x) but returns 0 if x is 0. */
 inline double sign0(double x)
 {
@@ -185,15 +187,15 @@ std::vector<std::vector<float> > parseVVF(const std::string& input, std::string&
   return result;
 }
 
-geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, const geometry_msgs::Polygon& last_polygon)
+geometry_msgs::msg::Polygon makePolygonFromString(const std::string& polygon_string, const geometry_msgs::msg::Polygon& last_polygon)
 {
   std::string error;
   std::vector<std::vector<float> > vvf = parseVVF(polygon_string, error);
 
     if (error != "")
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error parsing polygon parameter: '%s'", error.c_str());
-      RCLCPP_ERROR(logging_interface_->get_logger(), " Polygon string was '%s'.", polygon_string.c_str());
+      // RCLCPP_ERROR(logging_interface_->get_logger(), "Error parsing polygon parameter: '%s'", error.c_str());
+      // RCLCPP_ERROR(logging_interface_->get_logger(), " Polygon string was '%s'.", polygon_string.c_str());
       return last_polygon;
     }
 
@@ -203,7 +205,7 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, 
     // convert vvf into points.
     if (vvf.size() < 3 && vvf.size() > 0)
     {
-      RCLCPP_WARN(logging_interface_->get_logger(), "You must specify at least three points for the robot polygon");
+      // RCLCPP_WARN(logging_interface_->get_logger(), "You must specify at least three points for the robot polygon");
       return last_polygon;
     }
 
@@ -218,8 +220,8 @@ geometry_msgs::Polygon makePolygonFromString(const std::string& polygon_string, 
       }
       else
       {
-        RCLCPP_ERROR(logging_interface_->get_logger(), "Points in the polygon specification must be pairs of numbers. Found a point with %d numbers.",
-                   int(vvf[ i ].size()));
+        // RCLCPP_ERROR(logging_interface_->get_logger(), "Points in the polygon specification must be pairs of numbers. Found a point with %d numbers.",
+                  //  int(vvf[ i ].size()));
         return last_polygon;
       }
     }
@@ -257,32 +259,30 @@ bool LaserScanPolygonFilterBase::configure()
   polygon_padding_ = 0;
   if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon"), polygon_string))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: PolygonFilter was not given polygon.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: PolygonFilter was not given polygon.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon_frame"), polygon_frame_))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: PolygonFilter was not given polygon_frame.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: PolygonFilter was not given polygon_frame.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert_filter_))
   {
-    RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter invert filter not set, assuming false.\n");
+    RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter invert filter not set, assuming false.\n");
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon_padding"), polygon_padding_))
   {
-    RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter polygon_padding not set, assuming 0. \n");
+    RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter polygon_padding not set, assuming 0. \n");
   }
   polygon_ = makePolygonFromString(polygon_string, polygon_);
   padPolygon(polygon_, polygon_padding_);
   
-  auto qos = rclcpp::QoS(rclcpp::KeepLast(1))
-  qos.transient_local();
-  polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", qos)
+  polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
   is_polygon_published_ = false;
   
   return true;
 }
 
 // See https://web.cs.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html
-bool LaserScanPolygonFilterBase::inPolygon(tf::Point& point) const {
+bool LaserScanPolygonFilterBase::inPolygon(const Point& point) const {
   int i, j;
   bool c = false;
 
@@ -303,36 +303,36 @@ void LaserScanPolygonFilterBase::publishPolygon()
   {
     geometry_msgs::msg::PolygonStamped polygon_stamped;
     polygon_stamped.header.frame_id = polygon_frame_;
-    polygon_stamped.header.stamp = ros::Time::now();
+    polygon_stamped.header.stamp = node_->get_clock()->now();
     polygon_stamped.polygon = polygon_;
-    polygon_pub_.publish(polygon_stamped);
+    polygon_pub_->publish(polygon_stamped);
     is_polygon_published_ = true;
   }
 }
 
-rcl_interfaces::msg::SetParametersResult LaserScanPolygonFilterBase::reconfigureCB(std::vector<rclcpp::Parameter> parameters);
+rcl_interfaces::msg::SetParametersResult LaserScanPolygonFilterBase::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
   auto result = rcl_interfaces::msg::SetParametersResult();
   result.successful = true;
 
   for (auto parameter : parameters)
   {
-    RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+    RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
     if(parameter.get_name() == "polygon"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
-      std::string parameter_string = parameter.as_string();
-      polygon_ = makePolygonFromString(polygon_string, polygon_)
+      std::string polygon_string = parameter.as_string();
+      polygon_ = makePolygonFromString(polygon_string, polygon_);
     }
     else if(parameter.get_name() == "polygon_frame" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
       polygon_frame_ = parameter.as_string();
     }
     else if(parameter.get_name() == "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL){
-      invert_filter_ = parameter.as_boolean();
+      invert_filter_ = parameter.as_bool();
     }
     else if(parameter.get_name() == "polygon_padding" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE){
       polygon_padding_ = parameter.as_double();
     }
     else{
-      RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+      RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
     }
   }
   padPolygon(polygon_, polygon_padding_);
@@ -340,11 +340,13 @@ rcl_interfaces::msg::SetParametersResult LaserScanPolygonFilterBase::reconfigure
   return result;
 }
 
-void LaserScanPolygonFilter::configure()
+bool LaserScanPolygonFilter::configure()
 {
-  LaserScanPolygonFilterBase::configure();
+  bool result = LaserScanPolygonFilterBase::configure();
   buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+  return result;
 }
+
 bool LaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_scan,
                                     sensor_msgs::msg::LaserScan& output_scan)
 {
@@ -376,7 +378,7 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_sca
     projector_.transformLaserScanToPointCloud(polygon_frame_, input_scan, laser_cloud, *buffer_);
   }
   catch(tf2::TransformException& ex){
-    RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), .3, "Ignoring Scan: Waiting for TF");
+    RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *node_->get_clock(), 300, "Ignoring Scan: Waiting for TF");
     return false;
   }
 
@@ -387,7 +389,7 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_sca
 
   if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1)
   {
-    RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), .3, "x, y, z and index fields are required, skipping scan");
+    RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *node_->get_clock(), 300, "x, y, z and index fields are required, skipping scan");
   }
 
   const int i_idx_offset = laser_cloud.fields[i_idx_c].offset;
@@ -413,7 +415,7 @@ bool LaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& input_sca
     float z = *((float*)(&laser_cloud.data[z_idx]));
     int index = *((int*)(&laser_cloud.data[i_idx]));
 
-    tf::Point point(x, y, z);
+    Point point(x, y, z);
 
     if (!invert_filter_)
     {
@@ -483,61 +485,11 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& inp
                                           sensor_msgs::msg::LaserScan& output_scan)
 {
   boost::recursive_mutex::scoped_lock lock(own_mutex_);
-
   publishPolygon();
 
-  if (!is_polygon_transformed_) {
-    tf::TransformListener transform_listener;
-
-    std::string error_msg;
-    RCLCPP_DEBUG(logging_interface_->get_logger(),
-      "waitForTransform %s -> %s",
-      polygon_frame_.c_str(), input_scan.header.frame_id.c_str()
-    );
-    
-    bool success = transform_listener.waitForTransform(
-      input_scan.header.frame_id, polygon_frame_,
-      ros::Time(),       // No restrictions on transform time. It is static.
-      ros::Duration(transform_timeout_),
-      ros::Duration(0),  // This setting has no effect
-      &error_msg
-    );
-
-    if (!success)
-    {
-      RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(),
-          1, "StaticLaserScanPolygonFilter",
-          "Could not get transform, ignoring laser scan! %s", error_msg.c_str()
-      );
-      return false;
-    }
-    else
-    {
-      RCLCPP_INFO(logging_interface_->get_logger(), "Obtained transform");
-    }
-
-    try {
-      // Transform each point of polygon. This includes multiple type convertions because of transformPoint API requiring Stamped<Point>
-      // which does not in turn expose coordinate values
-      for (int i = 0; i < polygon_.points.size(); ++i)
-      {
-        tf::Point point(polygon_.points[i].x, polygon_.points[i].y, 0);
-        tf::Stamped<tf::Point> point_stamped(point, ros::Time(), polygon_frame_);
-        tf::Stamped<tf::Point> point_stamped_new;
-        transform_listener.transformPoint(input_scan.header.frame_id, point_stamped, point_stamped_new);
-        geometry_msgs::msg::PointStamped result_point;
-        tf::pointStampedTFToMsg(point_stamped_new, result_point);
-        polygon_.points[i].x = result_point.point.x;
-        polygon_.points[i].y = result_point.point.y;
-      }
-
-      is_polygon_transformed_ = true;
-    }
-    catch (tf::TransformException& ex)
-    {
-      RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(), 1, "StaticLaserScanPolygonFilter", "Exception while transforming polygon");
-      return false;
-    }
+  if (!is_polygon_transformed_) 
+  {
+    if (!transformPolygon(input_scan.header.frame_id)) return false;
   }
 
   output_scan = input_scan;
@@ -552,7 +504,7 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& inp
 
     float x = co_sine_map_(i, 0) * range;
     float y = co_sine_map_(i, 1) * range;
-    tf::Point point(x, y, 0);
+    Point point(x, y, 0);
 
     if (invert_filter_ != inPolygon(point))
     {
@@ -565,9 +517,62 @@ bool StaticLaserScanPolygonFilter::update(const sensor_msgs::msg::LaserScan& inp
   return true;
 }
 
-rcl_interfaces::msg::SetParametersResult StaticLaserScanPolygonFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters);
+bool StaticLaserScanPolygonFilter::transformPolygon(const std::string &scan_frame_id)
+{
+  tf2_ros::Buffer buffer(node_->get_clock());
+
+  std::string error_msg;
+  RCLCPP_DEBUG(logging_interface_->get_logger(),
+    "waitForTransform %s -> %s",
+    polygon_frame_.c_str(), scan_frame_id.c_str()
+  );
+  
+  geometry_msgs::msg::TransformStamped transform;
+  try
+  {
+    transform = buffer.lookupTransform(scan_frame_id,
+      polygon_frame_,
+      tf2::TimePointZero,
+      tf2::durationFromSec(transform_timeout_));
+  }
+  catch(tf2::TransformException& ex)
+  {
+    RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(),
+        *node_->get_clock(), 1000,
+        "StaticLaserScanPolygonFilter",
+        "Could not get transform, ignoring laser scan! %s", ex.what());
+        return false;
+  }
+
+  RCLCPP_INFO(logging_interface_->get_logger(), "Obtained transform");
+  for (int i = 0; i < polygon_.points.size(); ++i)
+  {
+    geometry_msgs::msg::PointStamped point_in = createPointStamped(polygon_.points[i].x, polygon_.points[i].y, 0, transform.header.stamp, polygon_frame_);
+    geometry_msgs::msg::PointStamped point_out;
+    tf2::doTransform(point_in, point_out, transform);
+    polygon_.points[i].x = point_out.point.x;
+    polygon_.points[i].y = point_out.point.y;
+  }
+  is_polygon_transformed_ = true;
+  return true;
+}
+geometry_msgs::msg::PointStamped StaticLaserScanPolygonFilter::createPointStamped(const double &x, 
+                                                                                  const double &y,
+                                                                                  const double &z,
+                                                                                  const builtin_interfaces::msg::Time &stamp,
+                                                                                  const std::string & frame_id)
+{
+  geometry_msgs::msg::PointStamped point;
+  point.point.x = x;
+  point.point.y = y;
+  point.point.z = z;
+  point.header.stamp = stamp;
+  point.header.frame_id = frame_id;
+  return point;
+}
+rcl_interfaces::msg::SetParametersResult StaticLaserScanPolygonFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
   is_polygon_transformed_ = false;
-  LaserScanPolygonFilterBase::reconfigureCB(parameters);
+  return LaserScanPolygonFilterBase::reconfigureCB(parameters);
 }
 }

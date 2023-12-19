@@ -114,7 +114,7 @@ rcl_interfaces::msg::SetParametersResult ScanShadowsFilter::reconfigureCB(std::v
 
     for (auto parameter : parameters)
     {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == "min_angle"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
           min_angle_ = parameter.as_double();
       else if(parameter.get_name() == "max_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
@@ -126,7 +126,7 @@ rcl_interfaces::msg::SetParametersResult ScanShadowsFilter::reconfigureCB(std::v
       else if(parameter.get_name() == "remove_shadow_start_point" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
           remove_shadow_start_point_ = parameter.as_bool();
       else
-        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
     }
     shadow_detector_.configure(
         angles::from_degrees(min_angle_),

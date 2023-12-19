@@ -52,9 +52,9 @@ LaserScanBoxFilter::LaserScanBoxFilter(){
 }
 
 bool LaserScanBoxFilter::configure(){
-   node_ = std::make_shared<rclcpp::Node>(getName());
+  node_ = std::make_shared<rclcpp::Node>(getName());
   // dynamic reconfigure parameters callback:
-  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+  on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
             std::bind(&LaserScanBoxFilter::reconfigureCB, this, std::placeholders::_1));
 
   buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
@@ -64,35 +64,35 @@ bool LaserScanBoxFilter::configure(){
   bool invert = false;
   if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("box_frame"), box_frame_))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given box_frame.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given box_frame.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_x"), max_x))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given max_x.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given max_x.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_y"), max_y))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given max_y.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given max_y.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_z"), max_z))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given max_z.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given max_z.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_x"), min_x))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given min_x.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given min_x.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_y"), min_y))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given min_y.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given min_y.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_z"), min_z))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given min_z.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given min_z.\n");
     return false;
   }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert))
   {
-    RCLCPP_ERROR(node_->get_logger(), "Error: BoxFilter was not given invert.\n");
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: BoxFilter was not given invert.\n");
     return false;
   }
   remove_box_points_ = not invert;
@@ -104,11 +104,11 @@ bool LaserScanBoxFilter::configure(){
   min_.setY(min_y);
   min_.setZ(min_z);
 
-  RCLCPP_INFO(node_->get_logger(), "BOX filter started");
-  RCLCPP_INFO(node_->get_logger(), "Box frame is: %s", box_frame_.c_str());
-  RCLCPP_INFO(node_->get_logger(), "Box: x_min %f, x_max, %f, y_min, %f, y_max, %f, min_z %f, max_z %f", min_.getX(),
+  RCLCPP_INFO(logging_interface_->get_logger(), "BOX filter started");
+  RCLCPP_INFO(logging_interface_->get_logger(), "Box frame is: %s", box_frame_.c_str());
+  RCLCPP_INFO(logging_interface_->get_logger(), "Box: x_min %f, x_max, %f, y_min, %f, y_max, %f, min_z %f, max_z %f", min_.getX(),
    max_.getX(), min_.getY(), max_.getY(), min_.getZ(), max_.getZ());
-  RCLCPP_INFO(node_->get_logger(), "Box filter invert: %d", !remove_box_points_);
+  RCLCPP_INFO(logging_interface_->get_logger(), "Box filter invert: %d", !remove_box_points_);
   return true;
 }
 
@@ -129,7 +129,7 @@ bool LaserScanBoxFilter::update(
     &error_msg
   );
   if(!success){
-    RCLCPP_WARN(node_->get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+    RCLCPP_WARN(logging_interface_->get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
     return false;
   }
 
@@ -139,12 +139,12 @@ bool LaserScanBoxFilter::update(
   }
   catch(tf2::TransformException& ex){
     if(up_and_running_){
-      RCLCPP_WARN_THROTTLE(node_->get_logger(), steady_clock, 1, "Dropping Scan: Tansform unavailable %s", ex.what());
+      RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(), steady_clock, 1, "Dropping Scan: Tansform unavailable %s", ex.what());
       return true;
     }
     else
     {
-      RCLCPP_INFO_THROTTLE(node_->get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
+      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
     }
     return false;
   }
@@ -160,7 +160,7 @@ bool LaserScanBoxFilter::update(
     !(iter_y != iter_y.end()) || 
     !(iter_z != iter_z.end()))
   {
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");
+    RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");
   }
 
   for (;
@@ -195,7 +195,7 @@ rcl_interfaces::msg::SetParametersResult LaserScanBoxFilter::reconfigureCB(std::
 
     for (auto parameter : parameters)
     {
-      RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == "box_frame"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
           box_frame_ = parameter.as_string();
       else if(parameter.get_name() == "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
@@ -216,7 +216,7 @@ rcl_interfaces::msg::SetParametersResult LaserScanBoxFilter::reconfigureCB(std::
       else if(parameter.get_name() == "min_z" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
           min_.setZ(parameter.as_double());
       else
-        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
     }
 
   return result;

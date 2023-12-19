@@ -37,7 +37,6 @@
 *********************************************************************/
 
 #include <laser_filters/intensity_filter.h>
-#include <ros/node_handle.h>
 
 namespace laser_filters
 {
@@ -47,19 +46,33 @@ LaserScanIntensityFilter::LaserScanIntensityFilter()
 
 bool LaserScanIntensityFilter::configure()
 {
-  ros::NodeHandle private_nh("~" + getName());
-  dyn_server_.reset(new dynamic_reconfigure::Server<IntensityFilterConfig>(own_mutex_, private_nh));
-  dynamic_reconfigure::Server<IntensityFilterConfig>::CallbackType f;
-  f = [this](auto& config, auto level){ reconfigureCB(config, level); };
-  dyn_server_->setCallback(f);
 
-  getParam("lower_threshold", config_.lower_threshold);
-  getParam("upper_threshold", config_.upper_threshold);
-  getParam("invert", config_.invert);
+  node_ = std::make_shared<rclcpp::Node>(getName());
+  // dynamic reconfigure parameters callback:
+  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+            std::bind(&LaserScanIntensityFilter::reconfigureCB, this, std::placeholders::_1));
 
-  getParam("filter_override_range", config_.filter_override_range);
-  getParam("filter_override_intensity", config_.filter_override_intensity);
-  dyn_server_->updateConfig(config_);
+  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("lower_threshold"), lower_threshold_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanIntensityFilter was not given lower_threshold.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("upper_threshold"), upper_threshold_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanIntensityFilter was not given upper_threshold.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanIntensityFilter was not given invert.\n");
+    return false;
+  }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_override_range"), filter_override_range_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanIntensityFilter was not given filter_override_range.\n");
+    return false;
+  }  if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_override_intensity"), filter_override_intensity_))
+  {
+    RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanIntensityFilter was not given filter_override_intensity.\n");
+    return false;
+  }
   return true;
 }
 
@@ -77,27 +90,27 @@ bool LaserScanIntensityFilter::update(const sensor_msgs::msg::LaserScan& input_s
 
     // Is this reading below our lower threshold?
     // Is this reading above our upper threshold?
-    bool filter = intensity <= config_.lower_threshold || intensity >= config_.upper_threshold;
-    if (config_.invert)
+    bool filter = intensity <= lower_threshold_ || intensity >= upper_threshold_;
+    if (invert_)
     {
       filter = !filter;
     }
 
     if (filter)
     {
-      if (config_.filter_override_range)
+      if (filter_override_range_)
       {
         // If so, then make it an invalid value (NaN)
         range = std::numeric_limits<float>::quiet_NaN();
       }
-      if (config_.filter_override_intensity)
+      if (filter_override_intensity_)
       {
         intensity = 0.0;  // Not intense
       }
     }
     else
     {
-      if (config_.filter_override_intensity)
+      if (filter_override_intensity_)
       {
         intensity = 1.0;  // Intense
       }
@@ -107,13 +120,32 @@ bool LaserScanIntensityFilter::update(const sensor_msgs::msg::LaserScan& input_s
   auto end = std::chrono::high_resolution_clock::now();
   auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-  ROS_DEBUG_NAMED("LaserScanIntensityFilter", "LaserScanIntensityFilter update took %lu microseconds", update_elapsed);
+  RCLCPP_DEBUG(logging_interface_->get_logger(), "LaserScanIntensityFilter update took %lu microseconds", update_elapsed);
   
   return true;
 }
 
-void LaserScanIntensityFilter::reconfigureCB(IntensityFilterConfig& config, uint32_t level)
+rcl_interfaces::msg::SetParametersResult LaserScanIntensityFilter::reconfigureCB(std::vector<rclcpp::Parameter> parameters)
 {
-  config_ = config;
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      if(parameter.get_name() == "lower_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          lower_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == "upper_threshold" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          upper_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          invert_ = parameter.as_bool();
+      else if(parameter.get_name() == "filter_override_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          filter_override_range_ = parameter.as_bool();
+      else if(parameter.get_name() == "filter_override_intensity" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          filter_override_intensity_ = parameter.as_bool();
+      else
+        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+    }
+  return result;
 }
 }

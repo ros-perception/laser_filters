@@ -53,7 +53,7 @@
 #include "sensor_msgs/point_cloud2_iterator.hpp"
 #include <laser_geometry/laser_geometry.hpp>
 
-#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
@@ -94,7 +94,6 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     rclcpp::Node::SharedPtr node_;
     rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
     rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
-    boost::recursive_mutex own_mutex_;
 };
 
 }
