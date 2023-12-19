@@ -44,9 +44,8 @@ ScanShadowsFilter::~ScanShadowsFilter()
     
 bool ScanShadowsFilter::configure()
 {
-  node_ = std::make_shared<rclcpp::Node>(getName());
   // dynamic reconfigure parameters callback:
-  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+  on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
             std::bind(&ScanShadowsFilter::reconfigureCB, this, std::placeholders::_1));
 
 

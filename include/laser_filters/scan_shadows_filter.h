@@ -71,7 +71,6 @@ public:
    */
   bool update(const sensor_msgs::msg::LaserScan& scan_in, sensor_msgs::msg::LaserScan& scan_out);
 private:  
-  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
   boost::recursive_mutex own_mutex_;

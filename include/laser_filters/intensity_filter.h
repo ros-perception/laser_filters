@@ -57,7 +57,6 @@ private:
   bool filter_override_range_;
   bool filter_override_intensity_;
  
-  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
 };

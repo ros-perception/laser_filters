@@ -42,9 +42,8 @@ LaserScanSectorFilter::LaserScanSectorFilter()
 
 bool LaserScanSectorFilter::configure()
 {
-  node_ = std::make_shared<rclcpp::Node>(getName());
   // dynamic reconfigure parameters callback:
-  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+  on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
             std::bind(&LaserScanSectorFilter::reconfigureCB, this, std::placeholders::_1));
 
   if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_min"), angle_min_))

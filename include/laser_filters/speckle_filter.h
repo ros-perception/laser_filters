@@ -175,7 +175,6 @@ private:
   double max_range_difference_ = 0;
   int filter_window_ = 0;
 
-  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters);
   boost::recursive_mutex own_mutex_;

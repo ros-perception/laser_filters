@@ -46,10 +46,8 @@ LaserScanIntensityFilter::LaserScanIntensityFilter()
 
 bool LaserScanIntensityFilter::configure()
 {
-
-  node_ = std::make_shared<rclcpp::Node>(getName());
   // dynamic reconfigure parameters callback:
-  on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+  on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
             std::bind(&LaserScanIntensityFilter::reconfigureCB, this, std::placeholders::_1));
 
   if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("lower_threshold"), lower_threshold_))
