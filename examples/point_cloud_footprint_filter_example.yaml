@@ -1,5 +1,7 @@
 cloud_filter_chain:
-- type: laser_filters/PointCloudFootprintFilter
-  name: footprint_filter
-  params:
-    inscribed_radius: 0.325
+  ros__parameters:
+    filter1:
+      type: laser_filters/PointCloudFootprintFilter
+      name: footprint_filter
+      params:
+        inscribed_radius: 0.325

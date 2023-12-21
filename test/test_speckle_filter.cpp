@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <laser_filters/speckle_filter.h>
-#include "sensor_msgs/LaserScan.h"
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 /*
 Notes:
@@ -9,14 +9,14 @@ Notes:
   outlier window validator yet.
 */
 
-sensor_msgs::LaserScan create_message(
-    float ranges[], int num_beams
+sensor_msgs::msg::LaserScan create_message(
+    float ranges[], int num_beams, rclcpp::Time stamp
 ) {
-    sensor_msgs::LaserScan msg;
+    sensor_msgs::msg::LaserScan msg;
 
     std::vector<float> v_range(ranges, ranges + num_beams);
 
-    msg.header.stamp = ros::Time::now();
+    msg.header.stamp = stamp;
     msg.header.frame_id = "laser";
     msg.angle_min = -.5;
     msg.angle_max = .5;
@@ -52,7 +52,6 @@ void expect_ranges_equal(const std::vector<float> &actual, const std::vector<flo
 
 TEST(SpeckleFilter_Distance, SingleSpeckle) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
 
     config.filter_type = laser_filters::SpeckleFilter_Distance;
     config.max_range = 2.0;

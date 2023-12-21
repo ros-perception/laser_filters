@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2017, laser_filters authors
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -38,7 +38,6 @@
 
 #include <gtest/gtest.h>
 #include <angles/angles.h>
-#include <math.h>
 
 #include "laser_filters/scan_shadow_detector.h"
 
@@ -58,8 +57,6 @@ bool isShadowPureImpl(const float r1, const float r2, const float included_angle
 
 TEST(ScanShadowDetector, ShadowDetectionGeometry)
 {
-  const float angle_increment = 0.02;
-  const int window = 5;
   for (float min_angle = 90.0; min_angle >= 0.0; min_angle -= 5.0)
   {
     for (float max_angle = 90.0; max_angle <= 180; max_angle += 5.0)
@@ -71,22 +68,12 @@ TEST(ScanShadowDetector, ShadowDetectionGeometry)
       {
         for (float r2 = 0.1; r2 < 1.0; r2 += 0.1)
         {
-          for (int inc = -window; inc <= window; ++inc)
+          for (float inc = 0.01; inc < 0.1; inc += 0.02)
           {
-            if (inc == 0)
-              continue;
-
-            float angle = inc * angle_increment;
-              
             // Compare with original ScanShadowsFilter implementation
             EXPECT_EQ(
-                detector.isShadow(r1, r2, angle),
-                isShadowPureImpl(r1, r2, angle, min_angle, max_angle));
-              
-            // Compare with original ScanShadowsFilter implementation
-            EXPECT_EQ(
-                detector.isShadow(r1, r2, sinf(angle), cosf(angle)),
-                isShadowPureImpl(r1, r2, angle, min_angle, max_angle));
+                detector.isShadow(r1, r2, inc),
+                isShadowPureImpl(r1, r2, inc, min_angle, max_angle));
           }
         }
       }

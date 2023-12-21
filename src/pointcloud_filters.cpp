@@ -27,8 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sensor_msgs/msg/point_cloud.hpp>
-// #include "sensor_msgs/msg/point_cloud.hpp"
+#include "sensor_msgs/msg/point_cloud.hpp"
 #include "laser_filters/point_cloud_footprint_filter.h"
 #include "pluginlib/class_list_macros.hpp"
 
