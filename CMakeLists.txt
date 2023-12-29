@@ -13,10 +13,16 @@ ament_auto_find_build_dependencies()
 ##############################################################################
 
 ament_auto_add_library(laser_scan_filters SHARED src/laser_scan_filters.cpp)
+ament_auto_add_library(laser_filter_chains SHARED
+                         src/scan_to_cloud_filter_chain.cpp
+                         src/scan_to_scan_filter_chain.cpp)
+rclcpp_components_register_nodes(laser_filter_chains
+                                 "laser_filters::ScanToCloudFilterChain"
+                                 "laser_filters::ScanToScanFilterChain")
 
 set(FILTER_CHAINS
-    scan_to_cloud_filter_chain
-    scan_to_scan_filter_chain
+    scan_to_cloud_filter_chain_node
+    scan_to_scan_filter_chain_node
     generic_laser_filter_node
 )
 foreach(FILTER_CHAIN ${FILTER_CHAINS})
