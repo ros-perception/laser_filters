@@ -45,7 +45,7 @@ This is useful for ground plane extraction
 #include <filters/filter_base.hpp>
 #include "sensor_msgs/msg/point_cloud.hpp"
 #include "geometry_msgs/msg/point32.hpp"
-#include <tf2/convert.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
 
 namespace laser_filters

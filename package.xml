@@ -23,6 +23,7 @@
   <depend>sensor_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>tf2_kdl</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
 

@@ -4,8 +4,6 @@ project(laser_filters)
 ##############################################################################
 # Find dependencies
 ##############################################################################
-find_package(ament_cmake_auto REQUIRED)
-# ament_auto_find_build_dependencies()
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
@@ -13,6 +11,8 @@ ament_auto_find_build_dependencies()
 ##############################################################################
 # Build
 ##############################################################################
+
+ament_auto_add_library(pointcloud_filters SHARED src/pointcloud_filters.cpp)
 
 ament_auto_add_library(laser_scan_filters SHARED src/laser_scan_filters.cpp)
 

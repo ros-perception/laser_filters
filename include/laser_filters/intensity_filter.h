@@ -38,20 +38,16 @@
 
 #pragma once
 
-**/
-
 #include "filters/filter_base.hpp"
 
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 namespace laser_filters
 {
+
 class LaserScanIntensityFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-  LaserScanIntensityFilter();
-  bool configure();
-  bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan);
 
   double lower_threshold_ ;
   double upper_threshold_ ;
