@@ -15,4 +15,8 @@ def generate_launch_description():
                     "examples", "shadow_filter_example.yaml",
                 ])],
         )
+<<<<<<< HEAD
     ])
+=======
+    ])
+>>>>>>> ros2

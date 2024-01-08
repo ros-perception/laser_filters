@@ -2,6 +2,60 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.7 (2023-07-31)
+------------------
+* Escape invalid xml in laser_filters_plugins.xml
+* Contributors: Calder Phillips-Grafflin
+
+2.0.6 (2023-03-18)
+------------------
+* Added declaration of parameters
+* Reduce computation cost of ScanShadowsFilter
+* Update scan_to_cloud_filter_chain.cpp
+  As of Eloquent a timer interface is required for the tf buffer.
+  https://docs.ros.org/en/galactic/Releases/Release-Eloquent-Elusor.html#tf2-buffer
+* Contributors: Atsushi Watanabe, Jon Binney, Jonathan Binney, Riccardo Tornese, brandonbeggs
+
+2.0.5 (2022-05-26)
+------------------
+* Remove remaining uses of boost.
+  All of that functionality is now available in std:: .  Also, this
+  should fix the build on RHEL.
+* Contributors: Chris Lalancette
+
+2.0.4 (2022-04-08)
+------------------
+* Add a sensor_msgs dependency to test_scan_filter_chain
+* adding support for invert-parameter to select if points within or outside of box are kept
+* Contributors: Chris Lalancette, Jonathan Binney, Nikolas Engelhard
+
+2.0.3 (2021-10-19)
+------------------
+* Add top level license file
+  The license is the same as it always has been; this commmit just copies
+  the license text from the source files into a top level LICENSE file to
+  make it clear.
+* Contributors: Jon Binney
+
+2.0.1 (2021-10-18)
+------------------
+* Add build depend on ament_cmake_auto
+* Contributors: Jon Binney
+
+2.0.0 (2021-10-13)
+------------------
+* Enable CI for foxy, galactic and rolling distros
+* Remove unneeded find_package of pcl_conversions
+* Port speckle filter to ros2
+* Remove pointcloud footprint filter
+  It has been deprecated for years, and is the only filter that depends on
+  pcl_ros. Removing it means we don't have to install the 500MB of
+  dependencies that pcl brings in on CI.
+* ROS2 migration (foxy)
+* Make laser_filters build for ros2 (on windows 10)
+* Updated deprecated pluginlib macros to avoid warning messages
+* Contributors: Brian Fjeldstad, Jon Binney, Jonathan Binney, Nick Lamprianidis, Nicolas Limpert, Patrick Lascombe, Rein Appeldoorn
+
 1.10.0 (2023-06-20)
 -------------------
 * feat(filters): Debug log filter duration (`#1 <https://github.com/eurogroep/laser_filters/issues/1>`_)

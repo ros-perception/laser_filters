@@ -1,0 +1,38 @@
+name: Build and run ROS2 tests
+
+on:
+  push:
+    branches: [ ros2 ]
+  pull_request:
+    branches: [ ros2 ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rosdistro: [foxy, galactic, humble, rolling]
+
+    runs-on: ubuntu-latest
+
+    continue-on-error: true
+
+    container:
+      # There don't seem to be ROS perception docker images for ros2 yet, so we
+      # use the base imageand install the rest of the dependencies using rosdep
+      # each time.
+      image: ros:${{ matrix.rosdistro }}-ros-base
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: src/laser_filters
+
+    - name: Install dependencies
+      run: rosdep update --include-eol-distros && apt-get update && rosdep install --from-path . -i -y --rosdistro ${{ matrix.rosdistro }}
+
+    - name: Build tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && colcon build --event-handlers console_cohesion+
+
+    - name: Run tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && colcon test --event-handlers console_cohesion+ && colcon test-result
+

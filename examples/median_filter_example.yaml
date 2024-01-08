@@ -1,0 +1,20 @@
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      type: laser_filters/LaserArrayFilter
+      name: median
+      params: 
+        range_filter_chain:
+          filter1: 
+            name: median
+            type: filters/MultiChannelMedianFilterFloat 
+            params:
+              number_of_observations: 5
+              unused: 10
+        intensity_filter_chain:
+          filter1:
+            name: median
+            type: filters/MultiChannelMedianFilterFloat 
+            params:
+              number_of_observations: 5
+              unused: 10

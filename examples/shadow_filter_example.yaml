@@ -1,18 +1,32 @@
+<<<<<<< HEAD
 scan_filter_chain:
+=======
+scan_to_scan_filter_chain:
+>>>>>>> ros2
   ros__parameters:
     filter1:
       name: shadows
       type: laser_filters/ScanShadowsFilter
       params:
+<<<<<<< HEAD
         min_angle: 10
         max_angle: 170
+=======
+        min_angle: 10.
+        max_angle: 170.
+>>>>>>> ros2
         neighbors: 20
         window: 1
     filter2:
       name: dark_shadows
       type: laser_filters/LaserScanIntensityFilter
       params: 
+<<<<<<< HEAD
         lower_threshold: 100
         upper_threshold: 10000
+=======
+        lower_threshold: 100.
+        upper_threshold: 10000.
+>>>>>>> ros2
         disp_histogram: 0
 

@@ -1,10 +1,10 @@
-<package format="3"> 
+<package format="3">
   <name>laser_filters</name>
   <description>
     Assorted filters designed to operate on 2D planar laser scanners,
     which use the sensor_msgs/LaserScan type.
   </description>
-  <version>1.10.0</version>
+  <version>2.0.7</version>
   <maintainer email="jon.binney@gmail.com">Jon Binney</maintainer>
   <author>Tully Foote</author>
   <license>BSD</license>
@@ -23,14 +23,10 @@
   <depend>sensor_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
-  <depend>ddynamic_reconfigure</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
-    <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags=""/>
-    <filters plugin="${prefix}/laser_filters_plugins.xml"/>
-    <!--nodelet plugin="${prefix}/nodelets.xml"/-->
   </export>
 </package>

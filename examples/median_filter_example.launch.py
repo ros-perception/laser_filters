@@ -12,11 +12,7 @@ def generate_launch_description():
             parameters=[
                 PathJoinSubstitution([
                     get_package_share_directory("laser_filters"),
-                    "examples", "range_filter_example.yaml",
+                    "examples", "median_filter_example.yaml",
                 ])],
         )
-<<<<<<< HEAD
     ])
-=======
-    ])
->>>>>>> ros2

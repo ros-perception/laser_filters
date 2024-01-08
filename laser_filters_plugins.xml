@@ -1,5 +1,5 @@
 <class_libraries>
-  <library path="laser_filters">
+  <library path="laser_scan_filters">
     <class name="laser_filters/LaserArrayFilter" type="laser_filters::LaserArrayFilter" 
 	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
@@ -7,7 +7,7 @@
       </description>
     </class>
     <class name="laser_filters/LaserScanIntensityFilter" type="laser_filters::LaserScanIntensityFilter" 
-	    base_class_type="filters::FilterBase<&lt;>sensor_msgs::msg::LaserScan&gt;">
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
 	This is a filter which filters sensor_msgs::msg::LaserScan messages based on intensity
       </description>

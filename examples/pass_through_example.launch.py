@@ -15,4 +15,8 @@ def generate_launch_description():
                     "examples", "pass_through_example.yaml",
                 ])],
         )
+<<<<<<< HEAD
     ])
+=======
+    ])
+>>>>>>> ros2
