@@ -10,13 +10,12 @@ Notes:
 */
 
 sensor_msgs::msg::LaserScan create_message(
-    float ranges[], int num_beams, rclcpp::Time stamp
+    float ranges[], int num_beams
 ) {
     sensor_msgs::msg::LaserScan msg;
 
     std::vector<float> v_range(ranges, ranges + num_beams);
 
-    msg.header.stamp = stamp;
     msg.header.frame_id = "laser";
     msg.angle_min = -.5;
     msg.angle_max = .5;
@@ -52,19 +51,20 @@ void expect_ranges_equal(const std::vector<float> &actual, const std::vector<flo
 
 TEST(SpeckleFilter_Distance, SingleSpeckle) {
     laser_filters::LaserScanSpeckleFilter filter;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1, 1, 0.5, 1, 1, 1, 1, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -75,20 +75,20 @@ TEST(SpeckleFilter_Distance, SingleSpeckle) {
 
 TEST(SpeckleFilter_Distance, TwoDistantSpeckles) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1, 1, 0.5, 1, 1, 1, 0.5, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -99,20 +99,20 @@ TEST(SpeckleFilter_Distance, TwoDistantSpeckles) {
 
 TEST(SpeckleFilter_Distance, TwoNearSpeckles) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1, 1, 0.5, 1, 0.5, 1, 1, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -123,20 +123,20 @@ TEST(SpeckleFilter_Distance, TwoNearSpeckles) {
 
 TEST(SpeckleFilter_Distance, TwoSpecklesAtEdge) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1.2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1.2};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -147,20 +147,20 @@ TEST(SpeckleFilter_Distance, TwoSpecklesAtEdge) {
 
 TEST(SpeckleFilter_Distance, SinglePeak) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -171,20 +171,21 @@ TEST(SpeckleFilter_Distance, SinglePeak) {
 
 TEST(SpeckleFilter_Distance, TwoFarPeaks) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
+
 
     float ranges[] = {1, 1, 1, 1, 3, 1, 1, 1, 3, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -195,20 +196,20 @@ TEST(SpeckleFilter_Distance, TwoFarPeaks) {
 
 TEST(SpeckleFilter_Distance, TwoNearPeaks) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1, 1, 3, 1, 3, 1, 1, 1, 1};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -219,20 +220,20 @@ TEST(SpeckleFilter_Distance, TwoNearPeaks) {
 
 TEST(SpeckleFilter_Distance, TwoPeaksAtEdge) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -243,20 +244,20 @@ TEST(SpeckleFilter_Distance, TwoPeaksAtEdge) {
 
 TEST(SpeckleFilter_Distance, MultiplePlateausNoSpeckles) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 2;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 2));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {1, 1, 1.2, 1.2, 1.2, 0.7, 0.7, 0.9, 0.9, 0.9, 0.9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -267,20 +268,21 @@ TEST(SpeckleFilter_Distance, MultiplePlateausNoSpeckles) {
 
 TEST(SpeckleFilter_Distance, MultiplePlateausBiggerWindow) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 3;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window",3));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
+
 
     float ranges[] = {1, 1, 1.2, 1.2, 1.2, 0.7, 0.7, 0.9, 0.9, 0.9, 0.9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -292,17 +294,17 @@ TEST(SpeckleFilter_Distance, MultiplePlateausBiggerWindow) {
 #ifdef ENABLE_PERFORMANCE
 TEST(SpeckleFilter_Distance, Performance) {
     laser_filters::LaserScanSpeckleFilter filter;
-    laser_filters::SpeckleFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.filter_type = laser_filters::SpeckleFilter_Distance;
-    config.max_range = 2.0;
-    config.max_range_difference = 0.1;
-    config.filter_window = 8;
+    config.push_back(rclcpp::Parameter("filter_type", laser_filters::SpeckleFilterType::Distance));
+    config.push_back(rclcpp::Parameter("max_range", 2.0));
+    config.push_back(rclcpp::Parameter("max_range_difference", 0.1));
+    config.push_back(rclcpp::Parameter("filter_window", 8));
 
-    filter.configure(config);
+    filter.reconfigureCB(config);
 
     float ranges[] = {};
-    sensor_msgs::LaserScan input_scan[2];
+    sensor_msgs::msg::LaserScan input_scan[2];
     input_scan[0] = create_message(ranges, 0);
     int num_samples = 1024;
     int next_index = 0;
@@ -328,8 +330,8 @@ TEST(SpeckleFilter_Distance, Performance) {
     input_scan[1] = input_scan[0];
     std::reverse(input_scan[1].ranges.begin(), input_scan[1].ranges.end());
 
-    sensor_msgs::LaserScan output_scan;
-    sensor_msgs::LaserScan expected_scan[2];
+    sensor_msgs::msg::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan expected_scan[2];
     float expected_data[2][num_samples];
 
     // Create expected output by running filter once.
@@ -351,7 +353,6 @@ TEST(SpeckleFilter_Distance, Performance) {
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc, argv, "test_speckle_filter");
-    ros::Time::init();
+    rclcpp::init(argc, argv);
     return RUN_ALL_TESTS();
 }

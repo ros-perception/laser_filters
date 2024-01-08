@@ -1,17 +1,17 @@
 #include <gtest/gtest.h>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <cmath>
 #include "laser_filters/scan_shadows_filter.h"
-#include "sensor_msgs/LaserScan.h"
+#include "sensor_msgs/msg/laser_scan.hpp"
+#include <pluginlib/class_loader.hpp>
 
-sensor_msgs::LaserScan create_message(
+sensor_msgs::msg::LaserScan create_message(
     float ranges[], int num_beams
 ) {
-    sensor_msgs::LaserScan msg;
+    sensor_msgs::msg::LaserScan msg;
 
     std::vector<float> v_range(ranges, ranges + num_beams);
 
-    msg.header.stamp = ros::Time::now();
     msg.header.frame_id = "laser";
     // Use a small beam so that angle_increment remains small (realistic) also with few points
     msg.angle_min = -M_PI / 12;
@@ -48,22 +48,21 @@ void expect_ranges_equal(const std::vector<float> &actual, const std::vector<flo
 
 TEST(ScanShadowsFilter, NoShadows) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+     std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 1;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 1));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {9, 9, 9, 9, 9, 9, 9, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
-        ranges, sizeof(ranges) / sizeof(float)
+    sensor_msgs::msg::LaserScan input_scan = create_message(
+         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
-
+    sensor_msgs::msg::LaserScan output_scan;
     filter.update(input_scan, output_scan);
 
     float expected[] = {9, 9, 9, 9, 9, 9, 9, 9, 9, 9};
@@ -73,23 +72,22 @@ TEST(ScanShadowsFilter, NoShadows) {
 
 TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
-
+    filter.reconfigureCB(config);
     // This input data is very much simplified. The range-5 points represent a nearby object, and
     // the range-9 points a wall.
     float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -102,21 +100,21 @@ TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow) {
 
 TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_8_172) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 8.0;
-    config.max_angle = 172.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 8.0));
+    config.push_back(rclcpp::Parameter("max_angle", 172.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
-
+    filter.reconfigureCB(config);
+    
     float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -128,21 +126,21 @@ TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_8_172) {
 
 TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_5_175) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 5.0;
-    config.max_angle = 175.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 5.0));
+    config.push_back(rclcpp::Parameter("max_angle", 175.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -154,21 +152,21 @@ TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_5_175) {
 
 TEST(ScanShadowsFilter, DistanceDeltaWithoutShadowFlipped_Angles_5_175) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 5.0;
-    config.max_angle = 175.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 5.0));
+    config.push_back(rclcpp::Parameter("max_angle", 175.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {9, 9, 9, 9, 9, 5, 5, 5, 5, 5};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -180,21 +178,20 @@ TEST(ScanShadowsFilter, DistanceDeltaWithoutShadowFlipped_Angles_5_175) {
 
 TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_3_177) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 3.0;
-    config.max_angle = 177.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 3.0));
+    config.push_back(rclcpp::Parameter("max_angle", 177.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {5, 5, 5, 5, 5, 9, 9, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
-        ranges, sizeof(ranges) / sizeof(float)
-    );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan input_scan = create_message(
+        ranges, sizeof(ranges) / sizeof(float));
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -206,23 +203,23 @@ TEST(ScanShadowsFilter, DistanceDeltaWithoutShadow_Angles_3_177) {
 
 TEST(ScanShadowsFilter, SingleBackwardShadow_NoNeighbours) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     // This input data is very much simplified. The range-5 points represent a nearby object, and
     // the range-9 points a wall. The range-7 point is a shadow.
     float ranges[] = {5, 5, 5, 5, 5, 9, 7, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -234,21 +231,21 @@ TEST(ScanShadowsFilter, SingleBackwardShadow_NoNeighbours) {
 
 TEST(ScanShadowsFilter, SingleBackwardShadow_OneNeighbour) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 1;
-    config.window = 1;
-    config.remove_shadow_start_point = false;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 1));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", false));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {5, 5, 5, 5, 5, 9, 7, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -261,23 +258,23 @@ TEST(ScanShadowsFilter, SingleBackwardShadow_OneNeighbour) {
 
 TEST(ScanShadowsFilter, SingleForwardShadow_NoNeighbours) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 0;
-    config.window = 1;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 0));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     // This input data is very much simplified. The range-5 points represent a nearby object, and
     // the range-9 points a wall. The range-3 point is a shadow.
     float ranges[] = {5, 5, 5, 5, 5, 9, 3, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -289,21 +286,21 @@ TEST(ScanShadowsFilter, SingleForwardShadow_NoNeighbours) {
 
 TEST(ScanShadowsFilter, SingleForwardShadow_OneNeighbour) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 1;
-    config.window = 1;
-    config.remove_shadow_start_point = false;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 1));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", false));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {5, 5, 5, 5, 5, 9, 3, 9, 9, 9};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -316,21 +313,21 @@ TEST(ScanShadowsFilter, SingleForwardShadow_OneNeighbour) {
 
 TEST(ScanShadowsFilter, SingleForwardShadow_AngleIncrementChanged) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 1;
-    config.window = 1;
-    config.remove_shadow_start_point = false;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 1));
+    config.push_back(rclcpp::Parameter("window", 1));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", false));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {5, 5, 5, 5, 5, 4, 4, 4, 4, 4};
-    sensor_msgs::LaserScan input_scan = create_message(
+    sensor_msgs::msg::LaserScan input_scan = create_message(
         ranges, sizeof(ranges) / sizeof(float)
     );
-    sensor_msgs::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan output_scan;
 
     filter.update(input_scan, output_scan);
 
@@ -352,18 +349,18 @@ TEST(ScanShadowsFilter, SingleForwardShadow_AngleIncrementChanged) {
 #ifdef ENABLE_PERFORMANCE
 TEST(ScanShadowsFilter, Performance) {
     laser_filters::ScanShadowsFilter filter;
-    laser_filters::ScanShadowsFilterConfig config;
+    std::vector<rclcpp::Parameter> config;
 
-    config.min_angle = 15.0;
-    config.max_angle = 165.0;
-    config.neighbors = 2;
-    config.window = 2;
-    config.remove_shadow_start_point = true;
+    config.push_back(rclcpp::Parameter("min_angle", 15.0));
+    config.push_back(rclcpp::Parameter("max_angle", 165.0));
+    config.push_back(rclcpp::Parameter("neighbors", 2));
+    config.push_back(rclcpp::Parameter("window", 2));
+    config.push_back(rclcpp::Parameter("remove_shadow_start_point", true));
 
-    filter.reconfigureCB(config, 0);
+    filter.reconfigureCB(config);
 
     float ranges[] = {};
-    sensor_msgs::LaserScan input_scan[2];
+    sensor_msgs::msg::LaserScan input_scan[2];
     input_scan[0] = create_message(ranges, 0);
     int num_samples = 1024;
     int next_index = 0;
@@ -390,8 +387,8 @@ TEST(ScanShadowsFilter, Performance) {
     input_scan[1] = input_scan[0];
     std::reverse(input_scan[1].ranges.begin(), input_scan[1].ranges.end());
 
-    sensor_msgs::LaserScan output_scan;
-    sensor_msgs::LaserScan expected_scan[2];
+    sensor_msgs::msg::LaserScan output_scan;
+    sensor_msgs::msg::LaserScan expected_scan[2];
     float expected_data[2][num_samples];
 
     // Create expected output by running filter once.
@@ -412,8 +409,8 @@ TEST(ScanShadowsFilter, Performance) {
 #endif
 
 int main(int argc, char **argv) {
+
     testing::InitGoogleTest(&argc, argv);
-    ros::init(argc, argv, "test_scan_shadows_filter");
-    ros::Time::init();
+    rclcpp::init(argc, argv);
     return RUN_ALL_TESTS();
 }

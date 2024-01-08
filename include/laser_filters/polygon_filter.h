@@ -216,9 +216,9 @@ class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::
 public:
   virtual bool configure()
   {
-     node_ = std::make_shared<rclcpp::Node>(getName());
+    node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
 
 
@@ -265,7 +265,8 @@ protected:
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   virtual rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
   {
-     auto result = rcl_interfaces::msg::SetParametersResult();
+    boost::recursive_mutex::scoped_lock lock(own_mutex_);
+    auto result = rcl_interfaces::msg::SetParametersResult();
     result.successful = true;
 
     for (auto parameter : parameters)
