@@ -255,7 +255,7 @@ public:
     return true;
   }
 
-  virtual void footprintCB(const geometry_msgs::Polygon &polygon)
+  virtual void footprintCB(const geometry_msgs::msg::Polygon &polygon)
   {
     if(polygon.points.size() < 3)
     {
@@ -505,7 +505,7 @@ public:
     return true;
     }
 
-  void footprintCB(const geometry_msgs::Polygon &polygon)
+  void footprintCB(const geometry_msgs::msg::Polygon &polygon)
   {
     is_polygon_transformed_ = false;
     LaserScanPolygonFilterBase::footprintCB(polygon);
