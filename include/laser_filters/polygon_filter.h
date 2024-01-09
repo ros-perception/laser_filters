@@ -225,6 +225,11 @@ public:
     std::string polygon_string;
     invert_filter_ = false;
     polygon_padding_ = 0;
+    std::string footprint_topic = "base_footprint_exclude";
+    if(!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("footprint_topic"), footprint_topic))
+    {
+      RCLCPP_WARN(logging_interface_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
+    }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon"), polygon_string))
     {
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: PolygonFilter was not given polygon.\n");
@@ -243,16 +248,29 @@ public:
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
     
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, &LaserScanPolygonFilterBase::footprintCB, this);
     polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
     
     return true;
   }
 
+  virtual void footprintCB(const geometry_msgs::Polygon &polygon)
+  {
+    if(polygon.points.size() < 3)
+    {
+      RCLCPP_WARN(logging_interface_->get_logger(), "Footprint needs at least three points for the robot polygon, ignoring message");
+      return;
+    }
+    polygon_ = polygon;
+    padPolygon(polygon_, polygon_padding_);
+    is_polygon_published_ = false;
+  }
   virtual bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan) { return false; }
 
 protected:
   rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr polygon_pub_;
+  rclcpp::Subscriber<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
@@ -486,6 +504,12 @@ public:
 
     return true;
     }
+
+  void footprintCB(const geometry_msgs::Polygon &polygon)
+  {
+    is_polygon_transformed_ = false;
+    LaserScanPolygonFilterBase::footprintCB(polygon);
+  }
   
 protected:
   bool transformPolygon(const std::string &input_scan_frame_id)
