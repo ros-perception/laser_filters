@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-scan_filter_chain:
-=======
 scan_to_scan_filter_chain:
->>>>>>> ros2
   ros__parameters:
     filter1:
       type: laser_filters/LaserArrayFilter
@@ -11,29 +7,11 @@ scan_to_scan_filter_chain:
         range_filter_chain:
           filter1:
             name: median_5
-<<<<<<< HEAD
-            type: laser_filters/MultiChannelMedianFilterFloat 
-=======
             type: filters/MultiChannelMedianFilterFloat 
->>>>>>> ros2
             params:
               number_of_observations: 5
               unused: 10
         intensity_filter_chain:
-<<<<<<< HEAD
-          filter1:
-            name: median_5
-            type: laser_filters/MultiChannelMedianFilterFloat 
-            params:
-              number_of_observations: 5
-              unused: 10
-    filter2:
-      name: intensity
-      type: laser_filters/LaserScanIntensityFilter
-      params:
-        lower_threshold: 8000
-        upper_threshold: 100000
-=======
           filter2:
             name: median_5
             type: filters/MultiChannelMedianFilterFloat 
@@ -46,30 +24,19 @@ scan_to_scan_filter_chain:
       params:
         lower_threshold: 8000.
         upper_threshold: 100000.
->>>>>>> ros2
         disp_histogram: 0
     filter3:
       name: shadows
       type: laser_filters/ScanShadowsFilter
       params:
-<<<<<<< HEAD
-        min_angle: 10
-        max_angle: 170
-=======
         min_angle: 10.
         max_angle: 170.
->>>>>>> ros2
         neighbors: 20
         window: 0
     filter4:
       name: dark_shadows
       type: laser_filters/LaserScanIntensityFilter
       params: 
-<<<<<<< HEAD
-        lower_threshold: 100
-        upper_threshold: 10000
-=======
         lower_threshold: 100.
         upper_threshold: 10000.
->>>>>>> ros2
         disp_histogram: 0

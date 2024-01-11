@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-scan_filter_chain:
-=======
 scan_to_scan_filter_chain:
->>>>>>> ros2
   ros__parameters:
     filter1:
       name: box_filter

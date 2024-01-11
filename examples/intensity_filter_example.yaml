@@ -1,21 +1,9 @@
-<<<<<<< HEAD
-scan_filter_chain:
-=======
 scan_to_scan_filter_chain:
->>>>>>> ros2
   ros__parameters:
     filter1:
       name: intensity
       type: laser_filters/LaserScanIntensityFilter
       params:
-<<<<<<< HEAD
-        lower_threshold: 8000
-        upper_threshold: 100000
-        invert: false
-        filter_override_range: true
-        filter_override_intensity: false
-=======
         lower_threshold: 8000.
         upper_threshold: 100000.
         disp_histogram: 0
->>>>>>> ros2

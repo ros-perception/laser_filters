@@ -303,6 +303,8 @@ private:
   double max_range = 0;
   double max_range_difference = 0;
   int filter_window = 0;
+    // Work area. Vector re-used by update() to avoid repeated dynamic memory allocations
+  std::vector<bool> valid_ranges_work_;
   rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 };

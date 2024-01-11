@@ -15,8 +15,4 @@ def generate_launch_description():
                     "examples", "multiple_filters_example.yaml",
                 ])],
         )
-<<<<<<< HEAD
     ])
-=======
-    ])
->>>>>>> ros2

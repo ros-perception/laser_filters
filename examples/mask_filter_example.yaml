@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-scan_filter_chain:
-=======
 scan_to_scan_filter_chain:
->>>>>>> ros2
   ros__parameters:
     filter1:
       name: mask
@@ -10,16 +6,6 @@ scan_to_scan_filter_chain:
       params:
         masks:
           laser:
-<<<<<<< HEAD
-          - 100
-          - 101
-          - 102
-          - 103
-          - 104
-          - 1000
-          - 1001
-          - 1002
-=======
           - 100.
           - 101.
           - 102.
@@ -28,4 +14,3 @@ scan_to_scan_filter_chain:
           - 1000.
           - 1001.
           - 1002.
->>>>>>> ros2

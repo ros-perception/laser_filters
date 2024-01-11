@@ -47,6 +47,9 @@ This is useful for ground plane extraction
 #include "geometry_msgs/msg/point32.hpp"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+
+
 
 namespace laser_filters
 {
@@ -62,6 +65,7 @@ public:
   {
     node_ = std::make_shared<rclcpp::Node>(getName());
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
       RCLCPP_ERROR(logging_interface_->get_logger(), "PointCloudFootprintFilter needs inscribed_radius to be set");
@@ -130,6 +134,7 @@ public:
 protected:
   rclcpp::Node::SharedPtr node_;
   std::shared_ptr<tf2_ros::Buffer> buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   double inscribed_radius_;
 } ;
 

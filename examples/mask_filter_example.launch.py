@@ -15,8 +15,4 @@ def generate_launch_description():
                     "examples", "mask_filter_example.yaml",
                 ])],
         )
-<<<<<<< HEAD
     ])
-=======
-    ])
->>>>>>> ros2

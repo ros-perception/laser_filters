@@ -60,6 +60,7 @@
 
 
 typedef tf2::Vector3 Point;
+using std::placeholders::_1;
 
 /** @brief Same as sign(x) but returns 0 if x is 0. */
 inline double sign0(double x)
@@ -217,10 +218,11 @@ public:
   virtual bool configure()
   {
     node_ = std::make_shared<rclcpp::Node>(getName());
+    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
-
 
     std::string polygon_string;
     invert_filter_ = false;
@@ -248,14 +250,14 @@ public:
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
     
-    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, &LaserScanPolygonFilterBase::footprintCB, this);
+    // footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
     
     return true;
   }
 
-  virtual void footprintCB(const geometry_msgs::msg::Polygon &polygon)
+  void footprintCB(const geometry_msgs::msg::Polygon &polygon)
   {
     if(polygon.points.size() < 3)
     {
@@ -270,7 +272,7 @@ public:
 
 protected:
   rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr polygon_pub_;
-  rclcpp::Subscriber<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
@@ -280,6 +282,10 @@ protected:
   bool is_polygon_published_ = false;
   
   rclcpp::Node::SharedPtr node_;
+  // tf listener to transform scans into the right frame
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   virtual rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
   {
@@ -289,7 +295,7 @@ protected:
 
     for (auto parameter : parameters)
     {
-      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter LALALALA " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == "polygon"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
         std::string polygon_string = parameter.as_string();
         polygon_ = makePolygonFromString(polygon_string, polygon_);
@@ -347,8 +353,7 @@ class LaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
   bool configure() override
   {
-     bool result = LaserScanPolygonFilterBase::configure();
-    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    bool result = LaserScanPolygonFilterBase::configure();
     return result;
   }
 
@@ -447,8 +452,6 @@ public:
 
 private:
   laser_geometry::LaserProjection projector_;
-  // tf listener to transform scans into the polygon_frame
-  std::shared_ptr<tf2_ros::Buffer> buffer_;
 };
 
 /**
@@ -514,8 +517,6 @@ public:
 protected:
   bool transformPolygon(const std::string &input_scan_frame_id)
   {
-    tf2_ros::Buffer buffer(node_->get_clock());
-
     std::string error_msg;
     RCLCPP_DEBUG(logging_interface_->get_logger(),
       "waitForTransform %s -> %s",
@@ -525,7 +526,7 @@ protected:
     geometry_msgs::msg::TransformStamped transform;
     try
     {
-      transform = buffer.lookupTransform(input_scan_frame_id,
+      transform = buffer_->lookupTransform(input_scan_frame_id,
         polygon_frame_,
         tf2::TimePointZero,
         tf2::durationFromSec(transform_timeout_));

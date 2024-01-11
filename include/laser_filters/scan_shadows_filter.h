@@ -73,7 +73,8 @@ public:
   /**@b Configure the filter from XML */
   bool configure()
   {
-    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
+    node_ = std::make_shared<rclcpp::Node>(getName());
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
             std::bind(&ScanShadowsFilter::reconfigureCB, this, std::placeholders::_1));
 
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
@@ -221,6 +222,7 @@ private:
   float angle_increment_;
   std::vector<float> sin_map_;
   std::vector<float> cos_map_;
+  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
   void prepareForInput(const float angle_increment) {

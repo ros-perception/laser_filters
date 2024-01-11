@@ -8,7 +8,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package="laser_filters",
-            executable="scan_to_scan_filter_chain",
+            executable="scan_to_cloud_filter_chain",
             parameters=[
                 PathJoinSubstitution([
                     get_package_share_directory("laser_filters"),

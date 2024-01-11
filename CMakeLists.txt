@@ -30,7 +30,7 @@ endforeach()
 ##############################################################################
 
 pluginlib_export_plugin_description_file(filters laser_filters_plugins.xml)
-ament_auto_package(INSTALL_TO_SHARE examples)
+ament_auto_package(INSTALL_TO_SHARE examples test)
 
 ##############################################################################
 # Test
@@ -92,4 +92,8 @@ if(BUILD_TESTING)
             --gtest_output=xml:${RESULT_FILENAME}
         RESULT_FILE ${RESULT_FILENAME}
     )
+
+    find_package(launch_testing_ament_cmake)
+    add_launch_test(test/test_polygon_filter.test.py)
+    add_launch_test(test/test_speckle_filter.test.py)
 endif()

@@ -112,7 +112,7 @@ TEST(ScanToScanFilterChain, IntensityFilter)
   msg_in = gen_msg(node->now());
 
   EXPECT_TRUE(filter_chain_.update(msg_in, msg_out));
-  // expect_ranges_eq(msg_out.ranges, expected_msg.ranges);
+  expect_ranges_eq(msg_out.ranges, expected_msg.ranges);
 
   filter_chain_.clear();
 }
