@@ -250,29 +250,30 @@ public:
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
     
-    // footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
     
     return true;
   }
 
-  void footprintCB(const geometry_msgs::msg::Polygon &polygon)
+  void footprintCB(const geometry_msgs::msg::Polygon::SharedPtr polygon)
   {
-    if(polygon.points.size() < 3)
+    if(polygon->points.size() < 3)
     {
       RCLCPP_WARN(logging_interface_->get_logger(), "Footprint needs at least three points for the robot polygon, ignoring message");
       return;
     }
-    polygon_ = polygon;
+    polygon_ = *polygon;
     padPolygon(polygon_, polygon_padding_);
     is_polygon_published_ = false;
   }
   virtual bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan) { return false; }
 
 protected:
+  rclcpp::Node::SharedPtr node_;
   rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr polygon_pub_;
-  // rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
@@ -281,7 +282,7 @@ protected:
   bool invert_filter_;
   bool is_polygon_published_ = false;
   
-  rclcpp::Node::SharedPtr node_;
+
   // tf listener to transform scans into the right frame
   std::shared_ptr<tf2_ros::Buffer> buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
@@ -464,14 +465,14 @@ class StaticLaserScanPolygonFilter : public LaserScanPolygonFilterBase {
 public:
   bool configure() override
   {
+    bool result = LaserScanPolygonFilterBase::configure();
     is_polygon_transformed_ = false;
     transform_timeout_ = 5; // Default
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("transform_timeout"), transform_timeout_))
     {
       RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
-    // footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>("test", 1, std::bind(&LaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
-    return LaserScanPolygonFilterBase::configure();
+    return result;
   }
 
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan) override
@@ -509,7 +510,7 @@ public:
     return true;
     }
 
-  void footprintCB(const geometry_msgs::msg::Polygon &polygon)
+  void footprintCB(const geometry_msgs::msg::Polygon::SharedPtr polygon)
   {
     is_polygon_transformed_ = false;
     LaserScanPolygonFilterBase::footprintCB(polygon);
