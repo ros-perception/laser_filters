@@ -272,7 +272,7 @@ public:
 
 protected:
   rclcpp::Publisher<geometry_msgs::msg::PolygonStamped>::SharedPtr polygon_pub_;
-  rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
+  // rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   boost::recursive_mutex own_mutex_;
   // configuration
   std::string polygon_frame_;
@@ -470,6 +470,7 @@ public:
     {
       RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
+    // footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>("test", 1, std::bind(&LaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
     return LaserScanPolygonFilterBase::configure();
   }
 
@@ -560,7 +561,7 @@ protected:
 
 private:
   double transform_timeout_;
-
+  rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   Eigen::ArrayXXd co_sine_map_;
   float co_sine_map_angle_min_;
   float co_sine_map_angle_max_;

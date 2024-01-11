@@ -70,7 +70,8 @@ class TestSpeckleFilter(unittest.TestCase):
             else:
                 self.assertEqual(scan_range, expected_scan_range)
 
-        expected_scan_ranges = [1, 1, 1, 1, float('nan'), 1, 1, 1, 1, 1, 1]
+        # NOTE: This is the actual behavior you would get in ROS1, but there was a bug because of which it would never go into euclidean mode
+        expected_scan_ranges = [float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan')]
         for scan_range, expected_scan_range in zip(node.msg_euclid.ranges, expected_scan_ranges):
             if math.isnan(expected_scan_range) or math.isnan(scan_range):
                 self.assertEqual(math.isnan(expected_scan_range), math.isnan(scan_range))
