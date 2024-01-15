@@ -7,4 +7,4 @@ scan_to_scan_filter_chain:
         polygon_frame: base_link
         polygon: '[[0.0, 0.0], [0.1, 0.1]]'
         invert: false
-        homies: true
+        footprint_topic: base_footprint_exclude

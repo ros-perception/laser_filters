@@ -227,10 +227,15 @@ public:
     std::string polygon_string;
     invert_filter_ = false;
     polygon_padding_ = 0;
-    std::string footprint_topic = "base_footprint_exclude";
+    std::string footprint_topic;
     if(!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("footprint_topic"), footprint_topic))
     {
       RCLCPP_WARN(logging_interface_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
+    }
+    // PASSING DEFAULT OR CHECKING WHETHER PARAM EXISTS IN YAML DOESN'T ACTUALLY WORK
+    if(footprint_topic=="")
+    {
+      footprint_topic = "base_footprint_exclude";
     }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon"), polygon_string))
     {
@@ -562,7 +567,6 @@ protected:
 
 private:
   double transform_timeout_;
-  rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr footprint_sub_;
   Eigen::ArrayXXd co_sine_map_;
   float co_sine_map_angle_min_;
   float co_sine_map_angle_max_;
