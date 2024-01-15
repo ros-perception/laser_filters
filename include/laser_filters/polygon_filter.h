@@ -221,7 +221,7 @@ public:
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
 
     std::string polygon_string;

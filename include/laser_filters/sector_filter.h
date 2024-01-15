@@ -45,9 +45,8 @@ public:
 
   bool configure()
   {
-    node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
               std::bind(&LaserScanSectorFilter::reconfigureCB, this, std::placeholders::_1));
 
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_min"), angle_min_))
@@ -141,7 +140,6 @@ private:
   bool clear_inside_;
   bool invert_;
 
-  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
