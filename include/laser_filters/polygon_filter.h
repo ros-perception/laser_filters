@@ -221,7 +221,7 @@ public:
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
 
     std::string polygon_string;
@@ -301,7 +301,6 @@ protected:
 
     for (auto parameter : parameters)
     {
-      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter LALALALA " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == "polygon"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
         std::string polygon_string = parameter.as_string();
         polygon_ = makePolygonFromString(polygon_string, polygon_);

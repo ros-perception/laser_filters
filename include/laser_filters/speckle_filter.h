@@ -174,26 +174,27 @@ public:
 
   ///////////////////////////////////////////////////////////////
   bool configure(){
+    node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = params_interface_->add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
             std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
 
     // get params
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: SpeckleFilter was not given filter_type.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given filter_type.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range"), max_range))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: SpeckleFilter was not given max_range.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given max_range.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("max_range_difference"), max_range_difference))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: SpeckleFilter was not given max_range_difference.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given max_range_difference.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_window"), filter_window))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: SpeckleFilter was not given filter_window.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: SpeckleFilter was not given filter_window.\n");
       return false;
     }
 
@@ -304,6 +305,7 @@ private:
   int filter_window = 0;
     // Work area. Vector re-used by update() to avoid repeated dynamic memory allocations
   std::vector<bool> valid_ranges_work_;
+  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 };
 }
