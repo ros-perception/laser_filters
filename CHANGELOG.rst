@@ -56,6 +56,10 @@ Changelog for package laser_filters
 * Updated deprecated pluginlib macros to avoid warning messages
 * Contributors: Brian Fjeldstad, Jon Binney, Jonathan Binney, Nick Lamprianidis, Nicolas Limpert, Patrick Lascombe, Rein Appeldoorn
 
+1.11.0 (2023-12-19)
+-------------------
+* feat(footprint-listener): Add subscriber for footprint topic (`#2 <https://github.com/eurogroep/laser_filters/pull/2>`_)
+
 1.10.0 (2023-06-20)
 -------------------
 * feat(filters): Debug log filter duration (`#1 <https://github.com/eurogroep/laser_filters/issues/1>`_)
