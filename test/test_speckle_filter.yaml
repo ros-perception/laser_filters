@@ -1,4 +1,4 @@
-laser_filter_distance:  
+laser_filter_distance:
   ros__parameters:
     filter1:
       name: speckle_filter
@@ -9,7 +9,7 @@ laser_filter_distance:
         max_range_difference: 0.1
         filter_window: 2
 
-laser_filter_euclidean:  
+laser_filter_euclidean:
   ros__parameters:
     filter1:
       name: speckle_filter

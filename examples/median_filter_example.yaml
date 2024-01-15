@@ -3,18 +3,18 @@ scan_to_scan_filter_chain:
     filter1:
       type: laser_filters/LaserArrayFilter
       name: median
-      params: 
+      params:
         range_filter_chain:
-          filter1: 
+          filter1:
             name: median
-            type: filters/MultiChannelMedianFilterFloat 
+            type: filters/MultiChannelMedianFilterFloat
             params:
               number_of_observations: 5
               unused: 10
         intensity_filter_chain:
           filter1:
             name: median
-            type: filters/MultiChannelMedianFilterFloat 
+            type: filters/MultiChannelMedianFilterFloat
             params:
               number_of_observations: 5
               unused: 10
