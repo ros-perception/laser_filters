@@ -61,6 +61,7 @@ public:
   double laser_max_range_;        // Used in laser scan projection
   double min_angle_, max_angle_;  // Filter angle threshold
   int window_, neighbors_;
+  bool remove_shadow_start_point_;
 
   ScanShadowDetector shadow_detector_;
 
@@ -91,6 +92,11 @@ public:
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("neighbors"), neighbors_))
     {
       RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given neighbors.\n");
+    }
+    remove_shadow_start_point_ = false;  // default value
+    if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("remove_shadow_start_point"), remove_shadow_start_point_))
+    {
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: ShadowsFilter was not given remove_shadow_start_point.\n");
     }
 
     if (min_angle_ < 0)
@@ -162,12 +168,19 @@ public:
               indices_to_delete.insert(index);
             }
           }
+          if (remove_shadow_start_point_)
+          {
+              scan_out.ranges[i] = std::numeric_limits<float>::quiet_NaN(); 
+          }
         }
       }
     }
 
-    RCLCPP_DEBUG(logging_interface_->get_logger(), "ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d",
-                 (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
+    if(logging_interface_!= nullptr) 
+    {
+      RCLCPP_DEBUG(logging_interface_->get_logger(), "ScanShadowsFilter removing %d Points from scan with min angle: %.2f, max angle: %.2f, neighbors: %d, and window: %d",
+                  (int)indices_to_delete.size(), min_angle_, max_angle_, neighbors_, window_);
+    } 
     for (std::set<int>::iterator it = indices_to_delete.begin(); it != indices_to_delete.end(); ++it)
     {
       scan_out.ranges[*it] = std::numeric_limits<float>::quiet_NaN();  // Failed test to set the ranges to invalid value
@@ -175,6 +188,30 @@ public:
     return true;
   }
 
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      if(parameter.get_name() == "min_angle"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          min_angle_ = parameter.as_double();
+      else if(parameter.get_name() == "max_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_angle_ = parameter.as_double();
+      else if(parameter.get_name() == "neighbors" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          neighbors_ = parameter.as_int();
+      else if(parameter.get_name() == "window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          window_ = parameter.as_int();
+      else if(parameter.get_name() == "remove_shadow_start_point" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+          remove_shadow_start_point_ = parameter.as_bool(); 
+    }
+    shadow_detector_.configure(
+        angles::from_degrees(min_angle_),
+        angles::from_degrees(max_angle_));
+
+    return result;
+  }
   ////////////////////////////////////////////////////////////////////////////////
 };
 }
