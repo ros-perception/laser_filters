@@ -253,18 +253,6 @@ public:
     return true;
   }
 
-  ////////////////////////////////////////////////////
-
-
-private:
-  WindowValidator* validator_;
-  int filter_type = 0;
-  double max_range = 0;
-  double max_range_difference = 0;
-  int filter_window = 0;
-  rclcpp::Node::SharedPtr node_;
-  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
-
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
   {
       auto result = rcl_interfaces::msg::SetParametersResult();
@@ -272,7 +260,8 @@ private:
 
       for (auto parameter : parameters)
       {
-        RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+        if(node_ != nullptr)
+          RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
         if(parameter.get_name() == "filter_type"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
             filter_type = parameter.as_int();
         else if(parameter.get_name() == "max_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
@@ -282,7 +271,7 @@ private:
         else if(parameter.get_name() == "filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
             filter_window = parameter.as_int();
         else
-          RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+          if(node_ != nullptr) RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
       }
 
     switch (filter_type) {
@@ -310,6 +299,17 @@ private:
 
   }
 
+  ////////////////////////////////////////////////////
+
+
+private:
+  WindowValidator* validator_;
+  int filter_type = 0;
+  double max_range = 0;
+  double max_range_difference = 0;
+  int filter_window = 0;
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 };
 }
 #endif /* speckle_filter.h */
