@@ -1,8 +1,0 @@
-scan_filter_chain:
-- name: speckle_filter
-  type: laser_filters/LaserScanSpeckleFilter
-  params:
-    filter_type: 0
-    max_range: 2.0
-    max_range_difference: 0.1
-    filter_window: 2

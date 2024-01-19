@@ -65,4 +65,5 @@ if(BUILD_TESTING)
 
     find_package(launch_testing_ament_cmake)
     add_launch_test(test/test_polygon_filter.test.py)
+    add_launch_test(test/test_speckle_filter.test.py)
 endif()
