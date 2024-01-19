@@ -82,6 +82,10 @@
       base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>This is a filter which extract blob object (human's foot, chair's foot) from a laser.</description>
     </class>
+    <class name="laser_filters/LaserScanSectorFilter" type="laser_filters::LaserScanSectorFilter"
+      base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
+      <description>This is a filter that removes points in a laser scan inside/outside of a circle sector.</description>
+    </class>
     <class name="laser_filters/LaserScanPolygonFilter" type="laser_filters::LaserScanPolygonFilter"
       base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>This is a filter that removes points in a laser scan inside of a polygon.</description>
