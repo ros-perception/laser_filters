@@ -76,7 +76,7 @@ public:
       return false;
     }
 
-    RCLCPP_INFO(logging_interface_->get_logger(), "clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
+    RCLCPP_DEBUG(logging_interface_->get_logger(), "clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
     return true;
   }
 

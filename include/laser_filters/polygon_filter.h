@@ -157,8 +157,6 @@ geometry_msgs::msg::Polygon makePolygonFromString(const std::string& polygon_str
 
     if (error != "")
     {
-      // RCLCPP_ERROR(logging_interface_->get_logger(), "Error parsing polygon parameter: '%s'", error.c_str());
-      // RCLCPP_ERROR(logging_interface_->get_logger(), " Polygon string was '%s'.", polygon_string.c_str());
       return last_polygon;
     }
 
@@ -168,7 +166,6 @@ geometry_msgs::msg::Polygon makePolygonFromString(const std::string& polygon_str
     // convert vvf into points.
     if (vvf.size() < 3 && vvf.size() > 0)
     {
-      // RCLCPP_WARN(logging_interface_->get_logger(), "You must specify at least three points for the robot polygon");
       return last_polygon;
     }
 
@@ -183,8 +180,6 @@ geometry_msgs::msg::Polygon makePolygonFromString(const std::string& polygon_str
       }
       else
       {
-        // RCLCPP_ERROR(logging_interface_->get_logger(), "Points in the polygon specification must be pairs of numbers. Found a point with %d numbers.",
-                  //  int(vvf[ i ].size()));
         return last_polygon;
       }
     }
@@ -232,7 +227,7 @@ public:
     {
       RCLCPP_WARN(logging_interface_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
     }
-    // PASSING DEFAULT OR CHECKING WHETHER PARAM EXISTS IN YAML DOESN'T ACTUALLY WORK
+    // Set default footprint topic
     if(footprint_topic=="")
     {
       footprint_topic = "base_footprint_exclude";

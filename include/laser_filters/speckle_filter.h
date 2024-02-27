@@ -268,6 +268,8 @@ public:
             max_range_difference = parameter.as_double();
         else if(parameter.get_name() == "filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
             filter_window = parameter.as_int();
+        else
+          if(node_ != nullptr) RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
       }
 
     switch (filter_type) {
@@ -303,8 +305,6 @@ private:
   double max_range = 0;
   double max_range_difference = 0;
   int filter_window = 0;
-    // Work area. Vector re-used by update() to avoid repeated dynamic memory allocations
-  std::vector<bool> valid_ranges_work_;
   rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 };
