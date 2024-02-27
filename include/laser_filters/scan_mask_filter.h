@@ -58,7 +58,7 @@ public:
   bool configure()
   {
     std::string key_masks = param_prefix_ + "masks";
-    for (auto i : params_interface_->get_parameter_overrides())
+    for (auto i : node_->get_node_parameters_interface()->get_parameter_overrides())
     {
       if (i.first.find(key_masks) == 0)
       {
@@ -72,7 +72,7 @@ public:
           masks_[frame_id].push_back(id);
         }
         RCLCPP_INFO(
-            logging_interface_->get_logger(),
+            node_->get_logger(),
             "LaserScanMaskFilter: %s: %d directions will be masked.",
             frame_id.c_str(), (int)masks_[frame_id].size());
       }
@@ -81,7 +81,7 @@ public:
     if (masks_.empty())
     {
       RCLCPP_ERROR(
-          logging_interface_->get_logger(),
+          node_->get_logger(),
           "LaserScanMaskFilter: masks is not defined in the config.");
       return false;
     }
@@ -99,7 +99,7 @@ public:
     if (masks_.find(data_out.header.frame_id) == masks_.end())
     {
       RCLCPP_WARN(
-          logging_interface_->get_logger(),
+          node_->get_logger(),
           "LaserScanMaskFilter: frame_id %s is not registered.",
           data_out.header.frame_id.c_str());
       return true;

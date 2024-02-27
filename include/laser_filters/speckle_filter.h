@@ -174,7 +174,6 @@ public:
 
   ///////////////////////////////////////////////////////////////
   bool configure(){
-    node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
     on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
             std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
@@ -268,8 +267,6 @@ public:
             max_range_difference = parameter.as_double();
         else if(parameter.get_name() == "filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
             filter_window = parameter.as_int();
-        else
-          if(node_ != nullptr) RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
       }
 
     switch (filter_type) {
@@ -305,7 +302,8 @@ private:
   double max_range = 0;
   double max_range_difference = 0;
   int filter_window = 0;
-  rclcpp::Node::SharedPtr node_;
+    // Work area. Vector re-used by update() to avoid repeated dynamic memory allocations
+  std::vector<bool> valid_ranges_work_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 };
 }

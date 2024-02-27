@@ -45,38 +45,37 @@ public:
 
   bool configure()
   {
-    node_ = std::make_shared<rclcpp::Node>(getName());
     // dynamic reconfigure parameters callback:
     on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
               std::bind(&LaserScanSectorFilter::reconfigureCB, this, std::placeholders::_1));
 
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_min"), angle_min_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given angle_min.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given angle_min.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("angle_max"), angle_max_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given angle_max.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given angle_max.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("range_min"), range_min_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given range_min.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given range_min.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("range_max"), range_max_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given range_max.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given range_max.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("clear_inside"), clear_inside_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given clear_inside.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given clear_inside.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: LaserScanSectorFilter was not given invert.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: LaserScanSectorFilter was not given invert.\n");
       return false;
     }
 
-    RCLCPP_DEBUG(logging_interface_->get_logger(), "clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
+    RCLCPP_INFO(node_->get_logger(), "clear_inside(!invert): %s", (isClearInside() ? "true" : "false"));
     return true;
   }
 
@@ -126,7 +125,7 @@ public:
       count++;
     }
 
-    RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
+    RCLCPP_DEBUG(node_->get_logger(), "Filtered out %u points from the laser scan.", count);
 
     return true;
   }
@@ -141,7 +140,6 @@ private:
   bool clear_inside_;
   bool invert_;
 
-  rclcpp::Node::SharedPtr node_;
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
 
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
@@ -151,7 +149,7 @@ private:
 
     for (auto parameter : parameters)
     {
-      RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      RCLCPP_INFO_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == "angle_min"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
           angle_min_ = parameter.as_double();
       else if(parameter.get_name() == "angle_max" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
@@ -165,7 +163,7 @@ private:
       else if(parameter.get_name() == "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
           invert_ = parameter.as_bool();
       else
-        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
     }
     return result;
   }

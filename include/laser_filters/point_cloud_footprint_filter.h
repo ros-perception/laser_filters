@@ -58,17 +58,16 @@ class PointCloudFootprintFilter : public filters::FilterBase<sensor_msgs::msg::P
 {
 public:
   PointCloudFootprintFilter() {
-    RCLCPP_WARN(logging_interface_->get_logger(), "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
+    RCLCPP_WARN(node_->get_logger(), "PointCloudFootprintFilter has been deprecated.  Please use PR2PointCloudFootprintFilter instead.\n");
   }
 
   bool configure()
   {
-    node_ = std::make_shared<rclcpp::Node>(getName());
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "PointCloudFootprintFilter needs inscribed_radius to be set");
+      RCLCPP_ERROR(node_->get_logger(), "PointCloudFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
@@ -82,7 +81,7 @@ public:
   bool update(const sensor_msgs::msg::PointCloud& input_scan, sensor_msgs::msg::PointCloud& filtered_scan)
   {
     if(&input_scan == &filtered_scan){
-      RCLCPP_ERROR(logging_interface_->get_logger(), "This filter does not currently support in place copying");
+      RCLCPP_ERROR(node_->get_logger(), "This filter does not currently support in place copying");
       return false;
     }
     sensor_msgs::msg::PointCloud laser_cloud;
@@ -93,7 +92,7 @@ public:
       tf2::doTransform(input_scan, laser_cloud, transform);
     }
     catch(tf2::TransformException& ex){
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Transform unavailable %s", ex.what());
+      RCLCPP_ERROR(node_->get_logger(), "Transform unavailable %s", ex.what());
       return false;
     }  
 
@@ -132,7 +131,6 @@ public:
   }
 
 protected:
-  rclcpp::Node::SharedPtr node_;
   std::shared_ptr<tf2_ros::Buffer> buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   double inscribed_radius_;

@@ -125,9 +125,9 @@ public:
 
     cloud_pub_ = nh_->create_publisher<sensor_msgs::msg::PointCloud2>("cloud_filtered", 10);
 
-    cloud_filter_chain_.configure("cloud_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
+    cloud_filter_chain_.configure("cloud_filter_chain", nh_);
 
-    scan_filter_chain_.configure("scan_filter_chain", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
+    scan_filter_chain_.configure("scan_filter_chain", nh_);
   }
 
   ////////////////////////////////////////////////////////////////////////////////

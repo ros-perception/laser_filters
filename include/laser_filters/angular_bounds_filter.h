@@ -56,7 +56,7 @@ namespace laser_filters
 
         if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
         {
-          RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
+          RCLCPP_ERROR(node_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -116,7 +116,7 @@ namespace laser_filters
         if(input_scan.intensities.size() >= count)
           filtered_scan.intensities.resize(count);
 
-        RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
+        RCLCPP_DEBUG(node_->get_logger(), "Filtered out %d points from the laser scan.", (int)input_scan.ranges.size() - (int)count);
 
         return true;
 

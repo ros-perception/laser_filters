@@ -72,11 +72,11 @@ public:
     //   delete intensity_filter_;
 
     range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!range_filter_->configure(num_ranges_, param_prefix_ + "range_filter_chain", logging_interface_, params_interface_))
+    if (!range_filter_->configure(num_ranges_, param_prefix_ + "range_filter_chain", node_))
       return false;
 
     intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-    if (!intensity_filter_->configure(num_ranges_, param_prefix_ + "intensity_filter_chain", logging_interface_, params_interface_))
+    if (!intensity_filter_->configure(num_ranges_, param_prefix_ + "intensity_filter_chain", node_))
       return false;
 
     return true;
@@ -90,7 +90,7 @@ public:
   {
     if (!this->configured_)
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "LaserArrayFilter not configured");
+      RCLCPP_ERROR(node_->get_logger(), "LaserArrayFilter not configured");
       return false;
     }
 
@@ -101,7 +101,7 @@ public:
     {
       num_ranges_ = scan_in.ranges.size();
 
-      RCLCPP_INFO(logging_interface_->get_logger(), "LaserArrayFilter cleaning and reallocating due to larger scan size");
+      RCLCPP_INFO(node_->get_logger(), "LaserArrayFilter cleaning and reallocating due to larger scan size");
 
       configure();
     }

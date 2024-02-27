@@ -82,7 +82,7 @@ public:
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
-    filter_chain_.configure("", nh_->get_node_logging_interface(), nh_->get_node_parameters_interface());
+    filter_chain_.configure("", nh_);
 
     // Setup tf::MessageFilter for input
     tf_filter_.registerCallback(std::bind(&GenericLaserScanFilterNode::callback, this, std::placeholders::_1));
