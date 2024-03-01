@@ -121,7 +121,14 @@ namespace laser_filters
 
       return true;
     }
-
+  
+    rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+    {
+      auto result = rcl_interfaces::msg::SetParametersResult();
+      result.successful = range_filter_->reconfigureCB(parameters).successful || intensity_filter_->reconfigureCB(parameters).successful;
+      return result;
+    }
+    
   private:
     unsigned int filter_length_; ///How many scans to average over
     unsigned int num_ranges_;    /// How many data point are in each row

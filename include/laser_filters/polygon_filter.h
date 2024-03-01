@@ -219,10 +219,7 @@ public:
   {
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
     tf_listener_= std::make_shared<tf2_ros::TransformListener>(*buffer_);
-    // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
-              std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
-
+  
     std::string polygon_string;
     invert_filter_ = false;
     polygon_padding_ = 0;
@@ -299,6 +296,7 @@ protected:
 
     for (auto parameter : parameters)
     {
+      RCLCPP_WARN_STREAM(node_->get_logger(), "Got parameter: "<<parameter.get_name());
       if(parameter.get_name() == "polygon"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
         std::string polygon_string = parameter.as_string();
         polygon_ = makePolygonFromString(polygon_string, polygon_);
@@ -313,7 +311,7 @@ protected:
         polygon_padding_ = parameter.as_double();
       }
       else{
-        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
       }
     }
     padPolygon(polygon_, polygon_padding_);

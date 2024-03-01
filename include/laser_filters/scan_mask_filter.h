@@ -116,6 +116,15 @@ public:
 
     return true;
   }
+
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = configure();
+    return result;
+  }
+
+
 };
 
 }  // namespace laser_filters

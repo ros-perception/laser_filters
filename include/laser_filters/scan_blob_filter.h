@@ -150,6 +150,24 @@ public:
     return true;
   }
 
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      if(parameter.get_name() == param_prefix_+"max_radius"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        max_radius_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"min_points" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+        min_points_ = parameter.as_int();
+      else{
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+      }
+    }
+    return result;
+  }
+
   ////////////////////////////////////////////////////////////////////////////////
 
 } ;

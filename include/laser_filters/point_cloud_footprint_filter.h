@@ -130,6 +130,22 @@ public:
     return true;
   }
 
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      if(parameter.get_name() == param_prefix_+"inscribed_radius"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        inscribed_radius_ = parameter.as_double();
+      else{
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+      }
+    }
+    return result;
+  }
+  
 protected:
   std::shared_ptr<tf2_ros::Buffer> buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;

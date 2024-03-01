@@ -124,5 +124,25 @@ public:
     }
     return true;
   }
+
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      if(parameter.get_name() == param_prefix_+"lower_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        lower_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"upper_threshold" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        upper_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"disp_hist_" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+        disp_hist_ = parameter.as_int();
+      else{
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+      }
+    }
+    return result;
+  }
 };
 }

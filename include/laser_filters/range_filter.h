@@ -109,6 +109,31 @@ public:
 
     return true;
   }
+  
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+    auto result = rcl_interfaces::msg::SetParametersResult();
+    result.successful = true;
+
+    for (auto parameter : parameters)
+    {
+      if(parameter.get_name() == param_prefix_+"lower_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        lower_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"upper_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        upper_threshold_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"lower_replacement_value"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        lower_replacement_value_ = parameter.as_double();
+      else if(parameter.get_name() == param_prefix_+"upper_replacement_value"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+        upper_replacement_value_ = static_cast<float>(parameter.as_double());
+      else if(parameter.get_name() == param_prefix_+"use_message_range_limits"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+        use_message_range_limits_ = static_cast<float>(parameter.as_bool());
+      else{
+        RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+      }
+    }
+    return result;
+  }
+  
 } ;
 
 }

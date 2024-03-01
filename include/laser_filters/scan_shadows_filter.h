@@ -73,9 +73,6 @@ public:
   /**@b Configure the filter from XML */
   bool configure()
   {
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
-            std::bind(&ScanShadowsFilter::reconfigureCB, this, std::placeholders::_1));
-
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("min_angle"), min_angle_))
     {
       RCLCPP_ERROR(node_->get_logger(), "Error: ShadowsFilter was not given min_angle.\n");
@@ -127,7 +124,6 @@ public:
         angles::from_degrees(min_angle_),
         angles::from_degrees(max_angle_));
     angle_increment_=0;
-    RCLCPP_INFO(node_->get_logger(), "In shadow configure done");
 
     return true;
   }

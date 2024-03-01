@@ -174,10 +174,6 @@ public:
 
   ///////////////////////////////////////////////////////////////
   bool configure(){
-    // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
-            std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
-
     // get params
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
     {
@@ -259,15 +255,19 @@ public:
 
       for (auto parameter : parameters)
       {
-        if(parameter.get_name() == "filter_type"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
-            filter_type = parameter.as_int();
-        else if(parameter.get_name() == "max_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
-            max_range = parameter.as_double();
-        else if(parameter.get_name() == "max_range_difference" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
-            max_range_difference = parameter.as_double();
-        else if(parameter.get_name() == "filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
-            filter_window = parameter.as_int();
+        if(parameter.get_name() == param_prefix_+"filter_type"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          filter_type = parameter.as_int();
+        else if(parameter.get_name() == param_prefix_+"max_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_range = parameter.as_double();
+        else if(parameter.get_name() == param_prefix_+"max_range_difference" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_range_difference = parameter.as_double();
+        else if(parameter.get_name() == param_prefix_+"filter_window" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+          filter_window = parameter.as_int();
+        else{
+          RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+        }
       }
+      
 
     switch (filter_type) {
       case laser_filters::SpeckleFilterType::RadiusOutlier:
