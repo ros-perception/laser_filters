@@ -274,6 +274,8 @@ bool LaserScanPolygonFilterBase::configure()
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
 
+  padPolygon(polygon_, polygon_padding);
+
   polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
   is_polygon_published_ = false;
 
