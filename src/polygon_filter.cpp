@@ -273,6 +273,7 @@ bool LaserScanPolygonFilterBase::configure()
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
 
+  // Calling setCallback(f) here calls reconfigureCB() which updates the polygon padding.
   dyn_server_->setCallback(f);
 
   polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
