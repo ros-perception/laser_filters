@@ -258,7 +258,6 @@ bool LaserScanPolygonFilterBase::configure()
   dyn_server_.reset(new dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>(own_mutex_, private_nh));
   dynamic_reconfigure::Server<laser_filters::PolygonFilterConfig>::CallbackType f;
   f = [this](auto& config, auto level){ reconfigureCB(config, level); };
-  dyn_server_->setCallback(f);
 
   bool polygon_set = getParam("polygon", polygon_xmlrpc);
   bool polygon_frame_set = getParam("polygon_frame", polygon_frame_);
@@ -273,6 +272,9 @@ bool LaserScanPolygonFilterBase::configure()
   param_config.polygon_padding = polygon_padding;
   param_config.invert = invert_filter_;
   dyn_server_->updateConfig(param_config);
+
+  // Calling setCallback(f) here calls reconfigureCB() which updates the polygon padding.
+  dyn_server_->setCallback(f);
 
   polygon_pub_ = private_nh.advertise<geometry_msgs::PolygonStamped>("polygon", 1, true);
   is_polygon_published_ = false;
