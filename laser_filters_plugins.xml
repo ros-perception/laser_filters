@@ -30,6 +30,12 @@
       This is a filter that will generate range readings for error readings in a scan by interpolating between valid readings on either side of the error
       </description>
     </class>
+    <class name="laser_filters/LaserScanBinningFilter" type="laser_filters::LaserScanBinningFilter" 
+	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
+      <description>
+	      This is a filter that bins laser scans such that the output always contains a fixed number of measurements.
+      </description>
+    </class>
     <class name="laser_filters/LaserScanAngularBoundsFilter" type="laser_filters::LaserScanAngularBoundsFilter" 
 	    base_class_type="filters::FilterBase&lt;sensor_msgs::msg::LaserScan&gt;">
       <description>
