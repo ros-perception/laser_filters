@@ -90,8 +90,6 @@ public:
       // Calculate the bin index.
       unsigned int bin_index = static_cast<unsigned int>(floor(i * input_scan.angle_increment / filtered_scan.angle_increment));
 
-      // printf("i: %d, bin_index: %d\n", i, bin_index);
-
       // Copy the range and intensity values.
       filtered_scan.ranges[bin_index] = input_scan.ranges[i];
       filtered_scan.intensities[bin_index] = input_scan.intensities[i];
