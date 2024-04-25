@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef BINNING_FILTER_H
-#define BINNING_FILTER_H
+#ifndef LASER_SCAN_BINNING_FILTER_H
+#define LASER_SCAN_BINNING_FILTER_H
 /**
 \author Anthony Goeckner
 @b LaserScanBinningFilter splits input scans into bins, ensuring that every output scan has the exact same number of readings as the number of bins.
@@ -73,8 +73,6 @@ public:
     // Set up filtered_scan.
     filtered_scan.ranges.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
     filtered_scan.intensities.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
-    filtered_scan.angle_min = 0.0;
-    filtered_scan.angle_max = 2.0 * M_PI;
     filtered_scan.angle_increment = 2.0 * M_PI / static_cast<float>(num_bins_);
 
     unsigned int i = 0;
@@ -84,13 +82,13 @@ public:
       double angle = fmodf(input_scan.angle_min + input_scan.angle_increment * i, 2.0 * M_PI);
 
       // Calculate the bin index.
-      unsigned int bin_index = static_cast<unsigned int>(floor((input_scan.angle_min + input_scan.angle_increment * i) / filtered_scan.angle_increment));
+      unsigned int bin_index = static_cast<unsigned int>(floor(angle / filtered_scan.angle_increment));
 
       // Copy the range and intensity values.
       filtered_scan.ranges[bin_index] = input_scan.ranges[i];
       filtered_scan.intensities[bin_index] = input_scan.intensities[i];
 
-      i++;
+      i ++;
     }
     return true;
   }
@@ -98,4 +96,4 @@ public:
 
 }
 
-#endif // LASER_SCAN_INTENSITY_FILTER_H
+#endif // LASER_SCAN_BINNING_FILTER_H
