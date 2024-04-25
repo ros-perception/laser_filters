@@ -55,8 +55,13 @@ public:
 
   bool configure()
   {
-    num_bins_ = 360;
-    getParam("num_bins", num_bins_);
+    this->num_bins_ = 359;
+    getParam("num_bins", this->num_bins_);
+    
+    if(this->num_bins_ == 360)
+    {
+      RCLCPP_WARN(this->logging_interface_->get_logger(), "num_bins is set to 360. If this is a 360-degree scan, consider setting num_bins to 359 instead.");
+    }
 
     return true;
   }
@@ -70,19 +75,22 @@ public:
     // Copy data first.
     filtered_scan = input_scan;
 
+    // Determine original scan arc.
+    float scan_arc = input_scan.angle_max - input_scan.angle_min;
+
     // Set up filtered_scan.
-    filtered_scan.ranges.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
-    filtered_scan.intensities.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
-    filtered_scan.angle_increment = 2.0 * M_PI / static_cast<float>(num_bins_);
+    filtered_scan.ranges.assign(this->num_bins_, std::numeric_limits<float>::quiet_NaN());
+    filtered_scan.intensities.assign(this->num_bins_, std::numeric_limits<float>::quiet_NaN());
+    filtered_scan.angle_increment = scan_arc / static_cast<float>(this->num_bins_);
+    filtered_scan.angle_max = filtered_scan.angle_min + this->num_bins_ * filtered_scan.angle_increment;
 
     unsigned int i = 0;
     while(i < input_scan.ranges.size())
     {
-      // Calculate angle.
-      double angle = fmodf(input_scan.angle_min + input_scan.angle_increment * i, 2.0 * M_PI);
-
       // Calculate the bin index.
-      unsigned int bin_index = static_cast<unsigned int>(floor(angle / filtered_scan.angle_increment));
+      unsigned int bin_index = static_cast<unsigned int>(floor(i * input_scan.angle_increment / filtered_scan.angle_increment));
+
+      // printf("i: %d, bin_index: %d\n", i, bin_index);
 
       // Copy the range and intensity values.
       filtered_scan.ranges[bin_index] = input_scan.ranges[i];
@@ -90,6 +98,7 @@ public:
 
       i ++;
     }
+    
     return true;
   }
 };
