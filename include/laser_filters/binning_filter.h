@@ -84,7 +84,7 @@ public:
       double angle = fmodf(input_scan.angle_min + input_scan.angle_increment * i, 2.0 * M_PI);
 
       // Calculate the bin index.
-      unsigned int bin_index = static_cast<unsigned int>(floor((input_scan.angle_min + input_scan.angle_increment * i) / filtered_scan.angle_increment));
+      unsigned int bin_index = static_cast<unsigned int>(floor(angle / filtered_scan.angle_increment));
 
       // Copy the range and intensity values.
       filtered_scan.ranges[bin_index] = input_scan.ranges[i];
