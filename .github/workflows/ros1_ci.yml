@@ -1,0 +1,30 @@
+name: Build and run ROS tests
+
+on:
+  push:
+    branches: [ noetic-devel ]
+  pull_request:
+    branches: [ noetic-devel ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rosdistro: [noetic]
+
+    runs-on: ubuntu-latest
+
+    continue-on-error: true
+
+    container:
+      # The perception docker images includes laser_geometry, which we need.
+      image: ros:${{ matrix.rosdistro }}-perception
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: src/laser_filters
+
+    - name: Build and run tests
+      run: . /opt/ros/${{ matrix.rosdistro }}/setup.sh && src/laser_filters/ci.sh
+

@@ -53,7 +53,7 @@ namespace laser_filters
     LaserMedianFilter()
         : num_ranges_(1), /*parameter_value_(),*/ range_filter_(NULL), intensity_filter_(NULL)
     {
-      RCLCPP_WARN(logging_interface_->get_logger(), "LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");
+      RCLCPP_WARN(node_->get_logger(), "LaserMedianFilter has been deprecated.  Please use LaserArrayFilter instead.\n");
     };
     ~LaserMedianFilter()
     {
@@ -73,13 +73,13 @@ namespace laser_filters
       if (range_filter_)
         delete range_filter_;
       range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-      if (!range_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+      if (!range_filter_->configure(num_ranges_, "internal_filter", node_))
         return false;
 
       if (intensity_filter_)
         delete intensity_filter_;
       intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-      if (!intensity_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+      if (!intensity_filter_->configure(num_ranges_, "internal_filter", node_))
         return false;
       return true;
     };
@@ -92,7 +92,7 @@ namespace laser_filters
     {
       if (!this->configured_)
       {
-        RCLCPP_ERROR(logging_interface_->get_logger(), "LaserMedianFilter not configured");
+        RCLCPP_ERROR(node_->get_logger(), "LaserMedianFilter not configured");
         return false;
       }
       std::lock_guard<std::mutex> lock(data_lock);
@@ -100,18 +100,18 @@ namespace laser_filters
 
       if (scan_in.ranges.size() != num_ranges_) //Reallocating
       {
-        RCLCPP_INFO(logging_interface_->get_logger(), "Laser filter clearning and reallocating due to larger scan size");
+        RCLCPP_INFO(node_->get_logger(), "Laser filter clearning and reallocating due to larger scan size");
         delete range_filter_;
         delete intensity_filter_;
 
         num_ranges_ = scan_in.ranges.size();
 
         range_filter_ = new filters::MultiChannelFilterChain<float>("float");
-        if (!range_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+        if (!range_filter_->configure(num_ranges_, "internal_filter", node_))
           return false;
 
         intensity_filter_ = new filters::MultiChannelFilterChain<float>("float");
-        if (!intensity_filter_->configure(num_ranges_, "internal_filter", logging_interface_, params_interface_))
+        if (!intensity_filter_->configure(num_ranges_, "internal_filter", node_))
           return false;
       }
 
@@ -121,7 +121,14 @@ namespace laser_filters
 
       return true;
     }
-
+  
+    rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+    {
+      auto result = rcl_interfaces::msg::SetParametersResult();
+      result.successful = range_filter_->reconfigureCB(parameters).successful || intensity_filter_->reconfigureCB(parameters).successful;
+      return result;
+    }
+    
   private:
     unsigned int filter_length_; ///How many scans to average over
     unsigned int num_ranges_;    /// How many data point are in each row

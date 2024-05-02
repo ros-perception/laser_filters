@@ -1,0 +1,7 @@
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      type: laser_filters/PointCloudFootprintFilter
+      name: footprint_filter
+      params:
+        inscribed_radius: 0.325

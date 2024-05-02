@@ -55,7 +55,7 @@ namespace laser_filters
 
         if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
         {
-          RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
+          RCLCPP_ERROR(node_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
 
@@ -81,10 +81,28 @@ namespace laser_filters
           current_angle += input_scan.angle_increment;
         }
 
-        RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
+        RCLCPP_DEBUG(node_->get_logger(), "Filtered out %u points from the laser scan.", count);
 
         return true;
 
+      }
+  
+      rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+      {
+        auto result = rcl_interfaces::msg::SetParametersResult();
+        result.successful = true;
+
+        for (auto parameter : parameters)
+        {
+          if(parameter.get_name() == param_prefix_+"lower_angle"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            lower_angle_ = parameter.as_double();
+          else if(parameter.get_name() == param_prefix_+"upper_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            upper_angle_ = parameter.as_double();
+          else{
+            RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+          }
+        }
+        return result;
       }
   };
 };

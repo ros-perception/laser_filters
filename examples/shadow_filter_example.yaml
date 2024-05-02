@@ -11,8 +11,7 @@ scan_to_scan_filter_chain:
     filter2:
       name: dark_shadows
       type: laser_filters/LaserScanIntensityFilter
-      params: 
+      params:
         lower_threshold: 100.
         upper_threshold: 10000.
         disp_histogram: 0
-

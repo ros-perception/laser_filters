@@ -3,10 +3,11 @@ intensity_filter_chain:
     filter1:
       name: intensity_threshold
       type: laser_filters/LaserScanIntensityFilter
-      params: 
+      params:
         lower_threshold: 0.5
         upper_threshold: 3.0
-        disp_histogram: 1
+        filter_override_range: true
+        filter_override_intensity: true
 
 bad_filter_chain:
   ros__parameters:
@@ -40,15 +41,15 @@ array_filter_chain:
     filter1:
       type: laser_filters/LaserArrayFilter
       name: laser_mean_filter
-      params: 
+      params:
         range_filter_chain:
-          filter1: 
+          filter1:
             name: mean_2
-            type: filters/MultiChannelMeanFilterFloat 
+            type: filters/MultiChannelMeanFilterFloat
             params:
               number_of_observations: 3
         intensity_filter_chain:
-          filter1: 
+          filter1:
             name: mean_2
             type: filters/MultiChannelMeanFilterFloat
             params:
@@ -56,12 +57,11 @@ array_filter_chain:
 
 mask_filter_chain:
   ros__parameters:
-    filter1: 
+    filter1:
       name: mask
       type: laser_filters/LaserScanMaskFilter
       params:
         masks:
           laser:
-          - 1.
-          - 5.
-
+            - 1.
+            - 5.

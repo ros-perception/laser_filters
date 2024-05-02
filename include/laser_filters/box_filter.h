@@ -199,6 +199,36 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
       return true;
     }
 
+    rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+    {
+      auto result = rcl_interfaces::msg::SetParametersResult();
+      result.successful = true;
+
+      for (auto parameter : parameters)
+      {
+        if(parameter.get_name() == param_prefix_+"box_frame"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING)
+          box_frame_ = parameter.as_string();
+        else if(parameter.get_name() == param_prefix_+"max_x" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_.setX(parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"max_y" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_.setY(parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"max_z" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          max_.setZ(parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"min_x" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          min_.setX(parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"min_y" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          min_.setY(parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"min_z" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+          min_.setZ( parameter.as_double());
+        else if(parameter.get_name() == param_prefix_+"invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+          remove_box_points_ = not parameter.as_bool();
+        else{
+          RCLCPP_WARN_STREAM(node_->get_logger(), "Unknown parameter: "<<parameter.get_name());
+        }
+      }
+      return result;
+    }
+
   private:
     bool inBox(Point &point)
     {

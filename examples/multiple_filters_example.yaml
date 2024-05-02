@@ -3,22 +3,22 @@ scan_to_scan_filter_chain:
     filter1:
       type: laser_filters/LaserArrayFilter
       name: laser_median_5
-      params: 
+      params:
         range_filter_chain:
           filter1:
             name: median_5
-            type: filters/MultiChannelMedianFilterFloat 
+            type: filters/MultiChannelMedianFilterFloat
             params:
               number_of_observations: 5
               unused: 10
         intensity_filter_chain:
           filter2:
             name: median_5
-            type: filters/MultiChannelMedianFilterFloat 
+            type: filters/MultiChannelMedianFilterFloat
             params:
               number_of_observations: 5
               unused: 10
-    filter2: 
+    filter2:
       name: intensity
       type: laser_filters/LaserScanIntensityFilter
       params:
@@ -36,7 +36,7 @@ scan_to_scan_filter_chain:
     filter4:
       name: dark_shadows
       type: laser_filters/LaserScanIntensityFilter
-      params: 
+      params:
         lower_threshold: 100.
         upper_threshold: 10000.
         disp_histogram: 0

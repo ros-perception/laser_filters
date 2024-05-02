@@ -82,8 +82,7 @@ TEST(ScanToScanFilterChain, BadConfiguration)
         std::make_shared<rclcpp::Node>("bad_filter_chain");
     filter_chain_.configure(
         "",
-        node->get_node_logging_interface(),
-        node->get_node_parameters_interface());
+        node);
   }
   catch (const pluginlib::LibraryLoadException &)
   {
@@ -106,8 +105,7 @@ TEST(ScanToScanFilterChain, IntensityFilter)
       std::make_shared<rclcpp::Node>("intensity_filter_chain");
   EXPECT_TRUE(filter_chain_.configure(
       "",
-      node->get_node_logging_interface(),
-      node->get_node_parameters_interface()));
+      node));
 
   msg_in = gen_msg(node->now());
 
@@ -129,8 +127,7 @@ TEST(ScanToScanFilterChain, InterpFilter)
       std::make_shared<rclcpp::Node>("interp_filter_chain");
   EXPECT_TRUE(filter_chain_.configure(
       "",
-      node->get_node_logging_interface(),
-      node->get_node_parameters_interface()));
+      node));
 
   msg_in = gen_msg(node->now());
 
@@ -156,8 +153,7 @@ TEST(ScanToScanFilterChain, ShadowFilter)
       std::make_shared<rclcpp::Node>("shadow_filter_chain");
   EXPECT_TRUE(filter_chain_.configure(
       "",
-      node->get_node_logging_interface(),
-      node->get_node_parameters_interface()));
+      node));
 
   msg_in = gen_msg(node->now());
 
@@ -180,8 +176,7 @@ TEST(ScanToScanFilterChain, ArrayFilter)
       std::make_shared<rclcpp::Node>("array_filter_chain");
   EXPECT_TRUE(filter_chain_.configure(
       "",
-      node->get_node_logging_interface(),
-      node->get_node_parameters_interface()));
+      node));
 
   msg_in = gen_msg(node->now());
 
@@ -214,8 +209,7 @@ TEST(ScanToScanFilterChain, MaskFilter)
       std::make_shared<rclcpp::Node>("mask_filter_chain");
   EXPECT_TRUE(filter_chain_.configure(
       "",
-      node->get_node_logging_interface(),
-      node->get_node_parameters_interface()));
+      node));
 
   msg_in = gen_msg(node->now());
 
