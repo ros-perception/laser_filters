@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2.1.0 (2024-05-02)
+------------------
+* Added reconfigure callbacks for all filters
+* Changed filter base interface
+* Added launch tests
 
 2.0.7 (2023-07-31)
 ------------------
