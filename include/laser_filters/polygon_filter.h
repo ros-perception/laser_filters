@@ -223,15 +223,14 @@ public:
     std::string polygon_string;
     invert_filter_ = false;
     polygon_padding_ = 0;
-    std::string footprint_topic;
-    if(!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("footprint_topic"), footprint_topic))
+    if(!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("footprint_topic"), footprint_topic_))
     {
       RCLCPP_WARN(node_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
     }
     // PASSING DEFAULT OR CHECKING WHETHER PARAM EXISTS IN YAML DOESN'T ACTUALLY WORK
-    if(footprint_topic=="")
+    if(footprint_topic_=="")
     {
-      footprint_topic = "base_footprint_exclude";
+      footprint_topic_ = "base_footprint_exclude";
     }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon"), polygon_string))
     {
@@ -251,7 +250,6 @@ public:
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
     
-    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
     
@@ -280,6 +278,7 @@ protected:
   geometry_msgs::msg::Polygon polygon_;
   double polygon_padding_;
   bool invert_filter_;
+  std::string footprint_topic_;
   bool is_polygon_published_ = false;
   
 
@@ -322,7 +321,7 @@ protected:
   // checks if points in polygon
   bool inPolygon(const Point& point) const
   {
-     int i, j;
+    int i, j;
     bool c = false;
 
     for (i = 0, j = polygon_.points.size() - 1; i < polygon_.points.size(); j = i++)
@@ -355,6 +354,7 @@ public:
   bool configure() override
   {
     bool result = LaserScanPolygonFilterBase::configure();
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -472,6 +472,7 @@ public:
     {
       RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
