@@ -1,11 +1,17 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2.1.1 (2024-05-06)
+------------------
+* fix(polygon_filter): Fixed footprint subscriber for static polygon filter
+* Contributors: Berend Kupers
+
 2.1.0 (2024-05-02)
 ------------------
 * Added reconfigure callbacks for all filters
 * Changed filter base interface
 * Added launch tests
+* Contributors: Berend Kupers
 
 2.0.7 (2023-07-31)
 ------------------
