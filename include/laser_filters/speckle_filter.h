@@ -214,6 +214,9 @@ public:
         break;
     }
 
+    post_set_parameters_callback_handle_ = params_interface_->add_post_set_parameters_callback(
+            std::bind(&LaserScanSpeckleFilter::reconfigureCB, this, std::placeholders::_1));
+
     return true;
   }
   /////////////////////////////////////////////////////
@@ -248,11 +251,8 @@ public:
     return true;
   }
 
-  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  void reconfigureCB(std::vector<rclcpp::Parameter> parameters)
   {
-      auto result = rcl_interfaces::msg::SetParametersResult();
-      result.successful = true;
-
       for (auto parameter : parameters)
       {
         if(logging_interface_ != nullptr)
@@ -289,9 +289,6 @@ public:
       default:
         break;
     }
-
-    return result;
-
   }
 
   ////////////////////////////////////////////////////
@@ -303,6 +300,7 @@ private:
   double max_range = 0;
   double max_range_difference = 0;
   int filter_window = 0;
+  rclcpp::node_interfaces::PostSetParametersCallbackHandle::SharedPtr post_set_parameters_callback_handle_;
 };
 }
 #endif /* speckle_filter.h */
