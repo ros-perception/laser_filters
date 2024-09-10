@@ -174,6 +174,18 @@ public:
 
   ///////////////////////////////////////////////////////////////
   bool configure(){
+
+    #ifdef RCLCPP_SUPPORTS_POST_SET_PARAMS_CALLBACK
+    // Declare parameters as writeable. Otherwise, the first time we call FilterBase::getParam() for each one,
+    // it will get declared as write only.
+    rcl_interfaces::msg::ParameterDescriptor desc;
+    desc.read_only = true;
+    params_interface_->declare_parameter("filter_type", rclcpp::ParameterType::PARAMETER_INTEGER, desc);
+    params_interface_->declare_parameter("max_range", rclcpp::ParameterType::PARAMETER_DOUBLE, desc);
+    params_interface_->declare_parameter("max_range_difference", rclcpp::ParameterType::PARAMETER_DOUBLE, desc);
+    params_interface_->declare_parameter("filter_window", rclcpp::ParameterType::PARAMETER_INTEGER, desc);
+    #endif
+
     // get params
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("filter_type"), filter_type))
     {
