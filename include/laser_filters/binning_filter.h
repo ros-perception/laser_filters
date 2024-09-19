@@ -73,15 +73,24 @@ public:
     // Set up filtered_scan.
     filtered_scan.ranges.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
     filtered_scan.intensities.assign(num_bins_, std::numeric_limits<float>::quiet_NaN());
-    filtered_scan.angle_min = 0.0;
-    filtered_scan.angle_max = 2.0 * M_PI;
     filtered_scan.angle_increment = 2.0 * M_PI / static_cast<float>(num_bins_);
 
+    // Need to account for case where scan wraps around, causing the data at angle 0 to actually occur
+    // at the end of the scan. Therefore, we need to adjust the starting point of the scan.
+    double angle_overlap = fmodf(input_scan.angle_increment * input_scan.ranges.size(), 2.0 * M_PI);
+
+    // Update the scan time and angle_min to the oldest reading which will not be overlapped by a newer one.
+    filtered_scan.scan_time = input_scan.scan_time + input_scan.time_increment * angle_overlap / input_scan.angle_increment;
+    filtered_scan.time_increment = input_scan.time_increment * (num_bins_ * 2.0 * M_PI) / (input_scan.ranges.size() * input_scan.angle_increment);
+    filtered_scan.angle_min = fmodf(input_scan.angle_min + angle_overlap, 2.0 * M_PI);
+    filtered_scan.angle_max = filtered_scan.angle_min + 2.0 * M_PI;
+
+    // Assign data to bins.
     unsigned int i = 0;
     while(i < input_scan.ranges.size())
     {
       // Calculate angle.
-      double angle = fmodf(input_scan.angle_min + input_scan.angle_increment * i, 2.0 * M_PI);
+      double angle = fmodf(input_scan.angle_min + angle_overlap + input_scan.angle_increment * i, 2.0 * M_PI);
 
       // Calculate the bin index.
       unsigned int bin_index = static_cast<unsigned int>(floor(angle / filtered_scan.angle_increment));
