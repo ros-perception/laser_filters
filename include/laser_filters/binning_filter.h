@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 * 
-*  Copyright (c) 2024, Anthony Goeckner <anthony.goeckner@northwestern.edu>
+*  Copyright (c) 2024, Anthony Goeckner <anthony.goeckner@gmail.com>
 *  All rights reserved.
 * 
 *  Redistribution and use in source and binary forms, with or without
