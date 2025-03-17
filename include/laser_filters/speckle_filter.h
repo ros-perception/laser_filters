@@ -220,6 +220,14 @@ public:
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& output_scan){
     output_scan = input_scan;
     std::vector<bool> valid_ranges(output_scan.ranges.size(), false);
+
+    /*Check if range size is big enough to use the filter window */
+    if (output_scan.ranges.size() <= filter_window + 1)
+    {
+      RCLCPP_ERROR(node_->get_logger(), "Scan ranges size is too small for set window: size = %i, window = %i", output_scan.ranges.size(), filter_window);
+      return false;
+    }
+
     for (size_t idx = 0; idx < output_scan.ranges.size() - filter_window + 1; ++idx)
     {
       bool window_valid = validator_->checkWindowValid(
