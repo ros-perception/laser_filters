@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -27,17 +27,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include <diagnostic_updater/diagnostic_updater.hpp>
+#include <diagnostic_updater/update_functions.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
-
 // TF
 #include <tf2_ros/transform_listener.h>
-#include "tf2_ros/message_filter.h"
-
-#include "message_filters/subscriber.h"
 
 #include "filters/filter_chain.hpp"
+#include "message_filters/subscriber.h"
+#include "tf2_ros/message_filter.h"
 
 class ScanToScanFilterChain
 {
@@ -60,23 +59,32 @@ protected:
   sensor_msgs::msg::LaserScan msg_;
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr output_pub_;
 
+  //!
+  //! \brief diagnostic_updater_
+  //!
+  diagnostic_updater::Heartbeat heartbeat_diagnostics_;
+  diagnostic_updater::Updater diagnostic_updater_;
+
 public:
   // Constructor
   ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
-      : nh_(node),
-        tf_(NULL),
-        buffer_(nh_->get_clock()),
-        scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data),
-        tf_filter_(NULL),
-        filter_chain_("sensor_msgs::msg::LaserScan")
+    : diagnostic_updater_(node)
+    , nh_(node)
+    , tf_(NULL)
+    , buffer_(nh_->get_clock())
+    , scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data)
+    , tf_filter_(NULL)
+    , filter_chain_("sensor_msgs::msg::LaserScan")
   {
+    diagnostic_updater_.setHardwareID("None");
+    diagnostic_updater_.add(heartbeat_diagnostics_);
+
     // Configure filter chain
     filter_chain_.configure("", nh_);
 
     std::string tf_message_filter_target_frame;
     if (nh_->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame))
     {
-
       nh_->get_parameter_or("tf_message_filter_tolerance", tf_filter_tolerance_, 0.03);
 
       tf_.reset(new tf2_ros::TransformListener(buffer_));
@@ -87,12 +95,12 @@ public:
       // Setup tf::MessageFilter generates callback
       tf_filter_->registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
     }
-    else 
+    else
     {
       // Pass through if no tf_message_filter_target_frame
       scan_sub_.registerCallback(std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
     }
-    
+
     // Advertise output
     output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
   }
@@ -112,24 +120,23 @@ public:
     // Run the filter chain
     if (filter_chain_.update(*msg_in, msg_))
     {
-      //only publish result if filter succeeded
+      // only publish result if filter succeeded
       output_pub_->publish(msg_);
     }
   }
 };
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   auto nh = rclcpp::Node::make_shared("scan_to_scan_filter_chain");
   ScanToScanFilterChain t(nh);
 
   rclcpp::WallRate loop_rate(200);
-  while (rclcpp::ok()) {
-
+  while (rclcpp::ok())
+  {
     rclcpp::spin_some(nh);
     loop_rate.sleep();
-
   }
 
   return 0;
