@@ -27,7 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include <diagnostic_updater/diagnostic_updater.hpp>
+#include <diagnostic_updater/update_functions.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
@@ -60,16 +61,27 @@ protected:
   sensor_msgs::msg::LaserScan msg_;
   rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr output_pub_;
 
+  //!
+  //! \brief diagnostic_updater_
+  //!
+  diagnostic_updater::Heartbeat heartbeat_diagnostics_;
+  diagnostic_updater::Updater diagnostic_updater_;
+
 public:
   // Constructor
   ScanToScanFilterChain(rclcpp::Node::SharedPtr node)
-      : nh_(node),
+      : diagnostic_updater_(node),
+        nh_(node),
         tf_(NULL),
         buffer_(nh_->get_clock()),
         scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data),
         tf_filter_(NULL),
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
+    // Heartbeat diagnostics
+    diagnostic_updater_.setHardwareID("None");
+    diagnostic_updater_.add(heartbeat_diagnostics_);
+    
     // Configure filter chain
     filter_chain_.configure("", nh_);
 
