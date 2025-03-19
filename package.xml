@@ -14,6 +14,8 @@
   <build_depend>ament_cmake_auto</build_depend>
 
   <depend>angles</depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>diagnostic_updater</depend>
   <depend>filters</depend>
   <depend>laser_geometry</depend>
   <depend>message_filters</depend>
