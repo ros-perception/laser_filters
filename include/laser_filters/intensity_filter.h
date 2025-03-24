@@ -55,15 +55,24 @@ public:
   double upper_threshold_ ;
   int disp_hist_ ;
   bool disp_hist_enabled_;
+  bool invert_;
+  bool filter_override_range_;
+  bool filter_override_intensity_;
 
   bool configure()
   {
     lower_threshold_ = 8000.0;
     upper_threshold_ = 100000.0;
     disp_hist_ = 1;
+    invert_ = false;
+    filter_override_range_ = true;
+    filter_override_intensity_ = false;
     getParam("lower_threshold", lower_threshold_);
     getParam("upper_threshold", upper_threshold_) ;
     getParam("disp_histogram",  disp_hist_) ;
+    getParam("invert", invert_);
+    getParam("filter_override_range", filter_override_range_);
+    getParam("filter_override_intensity", filter_override_intensity_);
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
@@ -89,11 +98,31 @@ public:
     {
       // Is this reading below our lower threshold?
       // Is this reading above our upper threshold?
-      if (filtered_scan.intensities[i] <= lower_threshold_ ||
-          filtered_scan.intensities[i] >= upper_threshold_)
+      bool filter = filtered_scan.intensities[i] <= lower_threshold_ || filtered_scan.intensities[i] >= upper_threshold_;
+
+      if (invert_)
       {
-        // If so, then make it an invalid value (NaN)
-        filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+        filter = !filter;
+      }
+
+      if (filter)
+      {
+        if (filter_override_range_)
+        {
+          // If so, then make it an invalid value (NaN)
+          filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+        }
+        if (filter_override_intensity_)
+        {
+          filtered_scan.intensities[i] = 0.0;  // Not intense
+        }
+      }
+      else
+      {
+          if (filter_override_intensity_)
+          {
+            filtered_scan.intensities[i] = 1.0;  // Intense
+          }
       }
 
       // Calculate histogram
