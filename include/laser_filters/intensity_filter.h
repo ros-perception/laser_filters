@@ -155,7 +155,36 @@ public:
     }
     return true;
   }
+
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+      auto result = rcl_interfaces::msg::SetParametersResult();
+      result.successful = true;
+
+      for (auto parameter : parameters)
+      {
+          if(logging_interface_ != nullptr)
+              RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+          if(parameter.get_name() == param_prefix_ + "lower_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+              lower_threshold_ = parameter.as_double();
+          else if(parameter.get_name() == param_prefix_ + "upper_threshold" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+              upper_threshold_ = parameter.as_double();
+          else if(parameter.get_name() == param_prefix_ + "disp_hist" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+              disp_hist_ = parameter.as_int();
+          else if(parameter.get_name() == param_prefix_ + "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              invert_ = parameter.as_bool();
+          else if(parameter.get_name() == param_prefix_ + "filter_override_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              filter_override_range_ = parameter.as_bool();
+          else if(parameter.get_name() == param_prefix_ + "filter_override_intensity" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              filter_override_intensity_ = parameter.as_bool();
+          else
+          if(logging_interface_ != nullptr) RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+      }
+
+      return result;
+  }
 };
+
 }
 
 #endif // LASER_SCAN_INTENSITY_FILTER_H
