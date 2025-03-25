@@ -1,6 +1,18 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2.1.2 (2025-03-19)
+------------------
+- Merge pull request #10 from eurogroep/fix/add-hearbeat-diagnostics.
+  [Jeanine van Bruggen]
+
+  feat(scan_to_scan_filter_chain): added hearbeat diagnostics
+- Added diagnostics. [Jeanine van Bruggen]
+- Added hearbeat diagnostics. [Jeanine van Bruggen]
+- Check window size with range size (#9) [Jeanine van Bruggen, Jeanine
+  van Bruggen]
+- Fix warn message (#8) [Jeanine van Bruggen, Jeanine van Bruggen]
+
 2.1.1 (2024-05-06)
 ------------------
 * fix(polygon_filter): Fixed footprint subscriber for static polygon filter
