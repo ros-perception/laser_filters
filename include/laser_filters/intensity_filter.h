@@ -61,18 +61,12 @@ public:
 
   bool configure()
   {
-    lower_threshold_ = 8000.0;
-    upper_threshold_ = 100000.0;
-    disp_hist_ = 1;
-    invert_ = false;
-    filter_override_range_ = true;
-    filter_override_intensity_ = false;
-    getParam("lower_threshold", lower_threshold_);
-    getParam("upper_threshold", upper_threshold_) ;
-    getParam("disp_histogram",  disp_hist_) ;
-    getParam("invert", invert_);
-    getParam("filter_override_range", filter_override_range_);
-    getParam("filter_override_intensity", filter_override_intensity_);
+    getParam("lower_threshold", lower_threshold_, 8000.0);
+    getParam("upper_threshold", upper_threshold_, 100000.0) ;
+    getParam("disp_histogram",  disp_hist_, 1) ;
+    getParam("invert", invert_, false);
+    getParam("filter_override_range", filter_override_range_, true);
+    getParam("filter_override_intensity", filter_override_intensity_, false);
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
