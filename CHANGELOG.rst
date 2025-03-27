@@ -2,6 +2,91 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.8 (2024-11-12)
+------------------
+* Merge pull request `#202 <https://github.com/ros-perception/laser_filters/issues/202>`_ from Oscar-Robotics/ros2
+  Using NaN instead of range_max+1 to remove scans in angular_bounds_filter_in_place
+* Merge branch 'ros2' of https://github.com/Oscar-Robotics/laser_filters into ros2
+* added comment
+* adding replace_with_nan param
+* Merge pull request `#203 <https://github.com/ros-perception/laser_filters/issues/203>`_ from jonbinney/bugfix/add-launch-testing-depend
+  Add missing dependency on ament launch testing
+* Add missing dependency on ament launch testing
+* Merge pull request `#189 <https://github.com/ros-perception/laser_filters/issues/189>`_ from eurogroep/feat/ros2-port-all-filters
+  Feature: ros2 port for all filters
+* Merge pull request `#201 <https://github.com/ros-perception/laser_filters/issues/201>`_ from YBachmann/spatial_median_filter
+  Spatial median filter
+* Added example launchfiles (xml+py) and example parameter yaml file. Added comment and warning when ensuring window_size\_ is odd
+* Merge pull request `#7 <https://github.com/ros-perception/laser_filters/issues/7>`_ from jonbinney/fix-port-all-filters-test
+  Fix race condition in tests
+* using NaN instead of range_max+1 to remove scans
+* Fix race condition in tests
+  We need to publish scans repeatedly in case the filter chain runs and
+  processes the output scan before we finish subscribing to that topic.
+* Durability policy for publisher in speckle filter test
+* Fix typo
+* Expand description of filter in laser_filters_plugins.xml
+* Don´t declare+initialize window_size before getParam call
+* Use nan and infinity values for the median if they make up the majority of the window
+* Merge pull request `#162 <https://github.com/ros-perception/laser_filters/issues/162>`_ from wolfv/do_not_use_not
+  Do not use "not" as it is not defined in MSVC
+* Removed unused file
+* Removed node interface
+* Fixed test
+* Merge branch 'spatial_median_filter' of https://github.com/YBachmann/laser_filters into spatial_median_filter
+* Revert "Initial version for distance moving window filter."
+  This reverts commit 16118ea4a86e6794a9b3f7ec118c1dc2140e1307.
+* Merge branch 'ros-perception:ros2' into spatial_median_filter
+* Added LaserScanMedianFilter
+* Merge pull request `#195 <https://github.com/ros-perception/laser_filters/issues/195>`_ from bjsowa/lazy-subscription
+  Add Lazy subscription
+* Keep the old publisher QoS settings
+* Initial version for distance moving window filter.
+* Check rclcpp version instead of ROS distribution
+  Co-authored-by: Jonathan Binney <jon.binney@gmail.com>
+* Add lazy subscription to filter chains
+* Merge pull request `#199 <https://github.com/ros-perception/laser_filters/issues/199>`_ from bjsowa/sort-up-ros-parameters
+  Sort up ROS parameters for filter chains
+* Merge pull request `#198 <https://github.com/ros-perception/laser_filters/issues/198>`_ from bjsowa/use-templated-node-executables
+  Create node executables using rclcpp_component macros
+* Merge remote-tracking branch 'origin' into sort-up-ros-parameters
+* Add a comment about rclcpp components macro
+* Merge pull request `#197 <https://github.com/ros-perception/laser_filters/issues/197>`_ from bjsowa/shared-from-this-fix
+  Don't use shared_from_this in the constructor
+* Merge remote-tracking branch 'upstream/ros2' into feat/ros2-port-all-filters
+* Create node executables using rclcpp_component macros
+* Don't use shared_from_this in the constructor
+* Sort up ROS parameters for filter chains
+* Merge pull request `#196 <https://github.com/ros-perception/laser_filters/issues/196>`_ from jonbinney/update-ros2-test-distros
+  Update list of ros2 distros to test on
+* Update list of ros2 distros to test on
+* Merge pull request `#188 <https://github.com/ros-perception/laser_filters/issues/188>`_ from jcarlosgm30/feature/component-support
+  feature: components support
+* Copy getPointCloud2FieldIndex function
+* Added dependency
+* Changed RCLCPP_WARN_THROTTLE
+  Co-authored-by: Błażej Sowa <bsowa123@gmail.com>
+* Update include/laser_filters/polygon_filter.h
+  Co-authored-by: Błażej Sowa <bsowa123@gmail.com>
+* feat: components support
+* file reorganization: filter chains as libraries
+* Port scan shadows filter unit tests to ROS2
+* Port speckle filter unit tests to ROS2
+* Port speckle filter launch tests to ROS2
+* Removed commented print statements
+* Port sector filter to ROS2
+* Port scan blob filter to ROS2
+* Port polygon filter to ROS2
+* Merge pull request `#186 <https://github.com/ros-perception/laser_filters/issues/186>`_ from JosefGst/time_stamp
+  Fix time stamp issue for angular filter
+* change to rclcpp Time
+* add endline
+* do time math with duration
+* add angular filter example
+* fix time stamp increment
+* Do not use "not" as it is not defined in MSVC
+* Contributors: Berend Kupers, Błażej Sowa, Dr. Denis Štogl, Jon Binney, Jonathan Binney, JosefGst, MAHA Maia, Wolf Vollprecht, Yannic Bachmann, Yohan Belanger, berend-kupers, josegarcia
+
 2.0.7 (2023-07-31)
 ------------------
 * Escape invalid xml in laser_filters_plugins.xml
