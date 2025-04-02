@@ -368,7 +368,7 @@ public:
   bool configure() override
   {
     bool result = LaserScanPolygonFilterBase::configure();
-    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -486,7 +486,7 @@ public:
     {
       RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
-    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
