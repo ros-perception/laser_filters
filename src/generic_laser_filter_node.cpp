@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2008, Willow Garage, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the Willow Garage, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -39,7 +39,7 @@ typedef tf2_ros::TransformListener TransformListener;
 
 #define NO_TIMER
 
-#include "message_filters/subscriber.h"
+#include "message_filters/subscriber.hpp"
 #include "filters/filter_chain.hpp"
 
 using namespace std::chrono_literals;
@@ -77,7 +77,7 @@ public:
       : nh_(nh),
         tf_(buffer_),
         buffer_(nh_->get_clock()),
-        scan_sub_(nh_, "scan", rmw_qos_profile_sensor_data),
+        scan_sub_(nh_, "scan", rclcpp::SensorDataQoS()),
         tf_filter_(scan_sub_, buffer_, "base_link", 50, nh_),
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
@@ -108,7 +108,7 @@ public:
   {
     // Run the filter chain
     filter_chain_.update (*msg_in, msg_);
-    
+
     // Publish the output
     output_pub_->publish(msg_);
   }

@@ -44,7 +44,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
 {
   // Heartbeat diagnostics
   diagnostic_updater_.add(heartbeat_diagnostics_);
-  
+
   // Configure filter chain
   filter_chain_.configure(
     "",
@@ -98,18 +98,18 @@ ScanToScanFilterChain::ScanToScanFilterChain(
         if (s.current_count == 0) {
           scan_sub_.unsubscribe();
         } else if (!scan_sub_.getSubscriber()) {
-          scan_sub_.subscribe(this, "scan", rmw_qos_profile_sensor_data);
+          scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
         }
       };
     output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
       "scan_filtered", 1000, pub_options);
   } else {
     output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
-    scan_sub_.subscribe(this, "scan", rmw_qos_profile_sensor_data);
+    scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   }
   #else
   output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
-  scan_sub_.subscribe(this, "scan", rmw_qos_profile_sensor_data);
+  scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   #endif
 }
 
