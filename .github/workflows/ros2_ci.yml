@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        rosdistro: [humble, jazzy, rolling]
+        rosdistro: [kilted, rolling]
 
     runs-on: ubuntu-latest
 
