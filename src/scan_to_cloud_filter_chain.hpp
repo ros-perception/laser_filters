@@ -45,7 +45,7 @@
 #include "tf2_ros/message_filter.h"
 #include "tf2_ros/create_timer_ros.h"
 
-#include "message_filters/subscriber.h"
+#include "message_filters/subscriber.hpp"
 
 // Laser projection
 #include <laser_geometry/laser_geometry.hpp>
