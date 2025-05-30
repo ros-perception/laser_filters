@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.2.0 (2025-05-30)
+------------------
 * Updated deprecated calls to message_filters
 * Added heartbeat diagnostics
 * Window size check to prevent segfault in speckle filter
