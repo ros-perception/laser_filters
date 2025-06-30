@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.2.1 (2025-06-30)
+------------------
 * Update tf2 headers
 * Fix compilation on Windows by exporting all symbols with `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS `
 * Contributors: Silvio Traversaro, Yadunund
