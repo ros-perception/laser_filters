@@ -224,7 +224,11 @@ public:
     /*Check if range size is big enough to use the filter window */
     if (output_scan.ranges.size() <= filter_window + 1)
     {
+<<<<<<< HEAD
       RCLCPP_ERROR(logging_interface_->get_logger(), "Scan ranges size is too small for set window: size = %li, window = %i", output_scan.ranges.size(), filter_window);
+=======
+      RCLCPP_ERROR(logging_interface_->get_logger(), "Scan ranges size is too small for set window: size = %zu, window = %i", output_scan.ranges.size(), filter_window);
+>>>>>>> afb6c54 (Fix compile warning in speckle filter)
       return false;
     }
 
