@@ -2,6 +2,20 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix compile warning in speckle filter
+* Port ros1 functionalities
+* Make reconfigurable parameters writable
+* Remove rolling from ros2 branch CI Rolling is now released from the "rolling" branch.
+* Use correct footprint subscriber callback for static polygon filter
+* Added heartbeat diagnostics
+* Added window size check to prevent segfault in speckle filter
+* Added params_prefix to reconfigure callback
+* Remove use of boost from polygon_filter
+* Remove iron from ci - EOL
+* Contributors: Alejandro Hernández Cordero, Jeanine van Bruggen, Jonathan Binney, Silvio Traversaro
+
 2.0.8 (2024-11-12)
 ------------------
 * Merge pull request `#202 <https://github.com/ros-perception/laser_filters/issues/202>`_ from Oscar-Robotics/ros2
