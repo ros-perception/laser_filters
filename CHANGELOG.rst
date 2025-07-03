@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.9 (2025-07-03)
+------------------
 * Fix compile warning in speckle filter
 * Port ros1 functionalities
 * Make reconfigurable parameters writable
