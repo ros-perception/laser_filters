@@ -84,7 +84,7 @@ public:
 
     // Update the scan time and angle_min to the oldest reading which will not be overlapped by a newer one.
     filtered_scan.scan_time = input_scan.scan_time + input_scan.time_increment * angle_overlap / input_scan.angle_increment;
-    filtered_scan.time_increment = input_scan.time_increment * (num_bins_ * 2.0 * M_PI) / (input_scan.ranges.size() * input_scan.angle_increment);
+    filtered_scan.time_increment = input_scan.time_increment * input_scan.ranges.size() / num_bins_;
     filtered_scan.angle_min = fmodf(input_angle_min + angle_overlap, 2.0 * M_PI);
     filtered_scan.angle_max = filtered_scan.angle_min + 2.0 * M_PI;
 
