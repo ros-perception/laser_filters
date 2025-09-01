@@ -44,6 +44,10 @@ ScanToScanFilterChain::ScanToScanFilterChain(
 {
   // Heartbeat diagnostics
   diagnostic_updater_.add(heartbeat_diagnostics_);
+<<<<<<< HEAD
+=======
+  diagnostic_updater_.setHardwareID("laser_filters");
+>>>>>>> 09736f4 (Set hardware id)
 
   // Configure filter chain
   filter_chain_.configure(
