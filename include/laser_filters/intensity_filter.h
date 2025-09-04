@@ -55,15 +55,18 @@ public:
   double upper_threshold_ ;
   int disp_hist_ ;
   bool disp_hist_enabled_;
+  bool invert_;
+  bool filter_override_range_;
+  bool filter_override_intensity_;
 
   bool configure()
   {
-    lower_threshold_ = 8000.0;
-    upper_threshold_ = 100000.0;
-    disp_hist_ = 1;
-    getParam("lower_threshold", lower_threshold_);
-    getParam("upper_threshold", upper_threshold_) ;
-    getParam("disp_histogram",  disp_hist_) ;
+    getParam("lower_threshold", lower_threshold_, false, 8000.0);
+    getParam("upper_threshold", upper_threshold_, false, 100000.0) ;
+    getParam("disp_histogram",  disp_hist_, false, 1) ;
+    getParam("invert", invert_, false, false);
+    getParam("filter_override_range", filter_override_range_, false, true);
+    getParam("filter_override_intensity", filter_override_intensity_, false, false);
 
     disp_hist_enabled_ = (disp_hist_ == 0) ? false : true;
 
@@ -89,11 +92,31 @@ public:
     {
       // Is this reading below our lower threshold?
       // Is this reading above our upper threshold?
-      if (filtered_scan.intensities[i] <= lower_threshold_ ||
-          filtered_scan.intensities[i] >= upper_threshold_)
+      bool filter = filtered_scan.intensities[i] <= lower_threshold_ || filtered_scan.intensities[i] >= upper_threshold_;
+
+      if (invert_)
       {
-        // If so, then make it an invalid value (NaN)
-        filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+        filter = !filter;
+      }
+
+      if (filter)
+      {
+        if (filter_override_range_)
+        {
+          // If so, then make it an invalid value (NaN)
+          filtered_scan.ranges[i] = std::numeric_limits<float>::quiet_NaN();
+        }
+        if (filter_override_intensity_)
+        {
+          filtered_scan.intensities[i] = 0.0;  // Not intense
+        }
+      }
+      else
+      {
+          if (filter_override_intensity_)
+          {
+            filtered_scan.intensities[i] = 1.0;  // Intense
+          }
       }
 
       // Calculate histogram
@@ -126,7 +149,36 @@ public:
     }
     return true;
   }
+
+  rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+  {
+      auto result = rcl_interfaces::msg::SetParametersResult();
+      result.successful = true;
+
+      for (auto parameter : parameters)
+      {
+          if(logging_interface_ != nullptr)
+              RCLCPP_INFO_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+          if(parameter.get_name() == param_prefix_ + "lower_threshold"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+              lower_threshold_ = parameter.as_double();
+          else if(parameter.get_name() == param_prefix_ + "upper_threshold" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+              upper_threshold_ = parameter.as_double();
+          else if(parameter.get_name() == param_prefix_ + "disp_hist" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_INTEGER)
+              disp_hist_ = parameter.as_int();
+          else if(parameter.get_name() == param_prefix_ + "invert" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              invert_ = parameter.as_bool();
+          else if(parameter.get_name() == param_prefix_ + "filter_override_range" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              filter_override_range_ = parameter.as_bool();
+          else if(parameter.get_name() == param_prefix_ + "filter_override_intensity" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+              filter_override_intensity_ = parameter.as_bool();
+          else
+          if(logging_interface_ != nullptr) RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+      }
+
+      return result;
+  }
 };
+
 }
 
 #endif // LASER_SCAN_INTENSITY_FILTER_H
