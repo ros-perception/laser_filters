@@ -1,0 +1,8 @@
+scan_to_scan_filter_chain:
+  ros__parameters:
+    filter1:
+      name: angle
+      type: laser_filters/LaserScanBinningFilter
+      params:
+        num_bins: 360
+        

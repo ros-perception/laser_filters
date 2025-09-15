@@ -30,6 +30,7 @@
 #include "laser_filters/median_filter.h"
 #include "laser_filters/median_spatial_filter.h"
 #include "laser_filters/array_filter.h"
+#include "laser_filters/binning_filter.h"
 #include "laser_filters/intensity_filter.h"
 #include "laser_filters/range_filter.h"
 #include "laser_filters/scan_mask_filter.h"
@@ -52,6 +53,7 @@
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserMedianFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanMedianSpatialFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserArrayFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
+PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanBinningFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanIntensityFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanRangeFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
 PLUGINLIB_EXPORT_CLASS(laser_filters::LaserScanAngularBoundsFilter, filters::FilterBase<sensor_msgs::msg::LaserScan>)
