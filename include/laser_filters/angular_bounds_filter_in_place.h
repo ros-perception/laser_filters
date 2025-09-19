@@ -48,13 +48,14 @@ namespace laser_filters
       double lower_angle_;
       double upper_angle_;
       bool replace_with_nan_;
+      bool enabled_;
 
       bool configure()
       {
         lower_angle_ = 0;
         upper_angle_ = 0;
 
-        if (!getParam("lower_angle", lower_angle_) || !getParam("upper_angle", upper_angle_))
+        if (!getParam("lower_angle", lower_angle_, false) || !getParam("upper_angle", upper_angle_, false))
         {
           RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
@@ -63,7 +64,9 @@ namespace laser_filters
         //toggle to use NaN for filtering scans; defaults to false for backward compatibility.
         //https://github.com/ros-perception/laser_filters/pull/202
         replace_with_nan_ = false;
-        getParam("replace_with_nan", replace_with_nan_);
+        getParam("replace_with_nan", replace_with_nan_, false);
+
+        getParam("enabled", enabled_, false, true);
 
         return true;
       }
@@ -72,6 +75,10 @@ namespace laser_filters
 
       bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
         filtered_scan = input_scan; //copy entire message
+
+        if (!enabled_) {
+          return true;
+        }
 
         double current_angle = input_scan.angle_min;
         unsigned int count = 0;
@@ -93,6 +100,29 @@ namespace laser_filters
         return true;
 
       }
-  };
+
+      rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
+      {
+        auto result = rcl_interfaces::msg::SetParametersResult();
+        result.successful = true;
+
+        for (auto parameter : parameters)
+        {
+          std::string full_name = parameter.get_name();
+          std::string param_name = full_name.substr(full_name.find_last_of('.') + 1);
+
+          if(param_name == "enabled" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+            enabled_ = parameter.as_bool();
+          else if(param_name == "lower_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            lower_angle_ = parameter.as_double();
+          else if(param_name == "upper_angle" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_DOUBLE)
+            upper_angle_ = parameter.as_double();
+          else if(param_name == "replace_with_nan" && parameter.get_type() == rclcpp::ParameterType::PARAMETER_BOOL)
+            replace_with_nan_ = parameter.as_bool();
+        }
+
+        return result;
+      };
+    };
 };
 #endif
