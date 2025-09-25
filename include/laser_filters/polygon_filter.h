@@ -48,6 +48,7 @@
 #include <filters/filter_base.hpp>
 
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <laser_geometry/laser_geometry.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <geometry_msgs/msg/polygon.hpp>
@@ -56,8 +57,11 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
+
+#include "laser_filters/util.h"
 
 
 typedef tf2::Vector3 Point;
@@ -222,41 +226,46 @@ namespace laser_filters
 /**
  * @brief This is a filter that removes points in a laser scan inside of a polygon.
  */
-class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode {
+class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan>
+{
 public:
 
-  LaserScanPolygonFilterBase() : rclcpp_lifecycle::LifecycleNode("laser_scan_polygon_filter"), buffer_(get_clock()), tf_(buffer_){};
+  LaserScanPolygonFilterBase() {}
 
   virtual bool configure()
   {
+    node_ = getUniqueNode("polygon_filter", this);
+    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
 
     std::string polygon_string;
     if(!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("footprint_topic"), footprint_topic_, false, "base_footprint_exclude"))
     {
-      RCLCPP_WARN(logging_interface_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
+      RCLCPP_WARN(node_->get_logger(), "Footprint topic not set, assuming default: base_footprint_exclude");
     }
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon"), polygon_string))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: PolygonFilter was not given polygon.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: PolygonFilter was not given polygon.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon_frame"), polygon_frame_, false))
     {
-      RCLCPP_ERROR(logging_interface_->get_logger(), "Error: PolygonFilter was not given polygon_frame.\n");
+      RCLCPP_ERROR(node_->get_logger(), "Error: PolygonFilter was not given polygon_frame.\n");
       return false;
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("invert"), invert_filter_, false))
     {
-      RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter invert filter not set, assuming false.\n");
+      RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter invert filter not set, assuming false.\n");
     }if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("polygon_padding"), polygon_padding_, false))
     {
-      RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter polygon_padding not set, assuming 0. \n");
+      RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter polygon_padding not set, assuming 0. \n");
     }
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
     
-    polygon_pub_ = create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
+    polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
     
     return true;
@@ -266,7 +275,7 @@ public:
   {
     if(polygon->points.size() < 3)
     {
-      RCLCPP_WARN(logging_interface_->get_logger(), "Footprint needs at least three points for the robot polygon, ignoring message");
+      RCLCPP_WARN(node_->get_logger(), "Footprint needs at least three points for the robot polygon, ignoring message");
       return;
     }
     polygon_ = *polygon;
@@ -289,8 +298,9 @@ protected:
   
 
   // tf listener to transform scans into the right frame
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener tf_;
+  std::shared_ptr<rclcpp::Node> node_;
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_;
 
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   virtual rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
@@ -301,8 +311,8 @@ protected:
 
     for (auto parameter : parameters)
     {
-      if(logging_interface_ != nullptr)
-          RCLCPP_DEBUG_STREAM(logging_interface_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
+      if(node_ != nullptr)
+          RCLCPP_DEBUG_STREAM(node_->get_logger(), "Update parameter " << parameter.get_name().c_str()<< " to "<<parameter);
       if(parameter.get_name() == param_prefix_+"polygon"&& parameter.get_type() == rclcpp::ParameterType::PARAMETER_STRING){
         std::string polygon_string = parameter.as_string();
         polygon_ = makePolygonFromString(polygon_string, polygon_);
@@ -317,7 +327,7 @@ protected:
         polygon_padding_ = parameter.as_double();
       }
       else{
-        RCLCPP_WARN(logging_interface_->get_logger(), "Unknown parameter");
+        RCLCPP_WARN(node_->get_logger(), "Unknown parameter");
       }
     }
     padPolygon(polygon_, polygon_padding_);
@@ -348,7 +358,7 @@ protected:
     {
       geometry_msgs::msg::PolygonStamped polygon_stamped;
       polygon_stamped.header.frame_id = polygon_frame_;
-      polygon_stamped.header.stamp = get_clock()->now();
+      polygon_stamped.header.stamp = node_->get_clock()->now();
       polygon_stamped.polygon = polygon_;
       polygon_pub_->publish(polygon_stamped);
       is_polygon_published_ = true;
@@ -361,7 +371,7 @@ public:
   bool configure() override
   {
     bool result = LaserScanPolygonFilterBase::configure();
-    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -379,7 +389,7 @@ public:
 
     std::string error_msg;
 
-    bool success = buffer_.canTransform(
+    bool success = buffer_->canTransform(
       polygon_frame_,
       input_scan.header.frame_id,
       rclcpp::Time(input_scan.header.stamp) + std::chrono::duration<double>(input_scan.ranges.size() * input_scan.time_increment),
@@ -387,15 +397,15 @@ public:
       &error_msg
     );
     if(!success){
-      RCLCPP_WARN(logging_interface_->get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+      RCLCPP_WARN(node_->get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
       return false;
     }
 
     try{
-      projector_.transformLaserScanToPointCloud(polygon_frame_, input_scan, laser_cloud, buffer_);
+      projector_.transformLaserScanToPointCloud(polygon_frame_, input_scan, laser_cloud, *buffer_);
     }
     catch(tf2::TransformException& ex){
-      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *get_clock(), 300, "Ignoring Scan: Waiting for TF");
+      RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 300, "Ignoring Scan: Waiting for TF");
       return false;
     }
 
@@ -406,7 +416,7 @@ public:
 
     if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1)
     {
-      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *get_clock(), 300, "x, y, z and index fields are required, skipping scan");
+      RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 300, "x, y, z and index fields are required, skipping scan");
     }
 
     const int i_idx_offset = laser_cloud.fields[i_idx_c].offset;
@@ -453,7 +463,7 @@ public:
     auto end = std::chrono::high_resolution_clock::now();
     auto update_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-    RCLCPP_DEBUG(logging_interface_->get_logger(), "LaserScanPolygonFilter update took %lu microseconds", update_elapsed);
+    RCLCPP_DEBUG(node_->get_logger(), "LaserScanPolygonFilter update took %lu microseconds", update_elapsed);
 
     return true;
   }
@@ -477,9 +487,9 @@ public:
     transform_timeout_ = 5; // Default
     if (!filters::FilterBase<sensor_msgs::msg::LaserScan>::getParam(std::string("transform_timeout"), transform_timeout_))
     {
-      RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
+      RCLCPP_INFO(node_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
-    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -528,7 +538,7 @@ protected:
   bool transformPolygon(const std::string &input_scan_frame_id)
   {
     std::string error_msg;
-    RCLCPP_DEBUG(logging_interface_->get_logger(),
+    RCLCPP_DEBUG(node_->get_logger(),
       "waitForTransform %s -> %s",
       polygon_frame_.c_str(), input_scan_frame_id.c_str()
     );
@@ -536,20 +546,20 @@ protected:
     geometry_msgs::msg::TransformStamped transform;
     try
     {
-      transform = buffer_.lookupTransform(input_scan_frame_id,
+      transform = buffer_->lookupTransform(input_scan_frame_id,
         polygon_frame_,
         tf2::TimePointZero,
         tf2::durationFromSec(transform_timeout_));
     }
     catch(tf2::TransformException& ex)
     {
-      RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(),
-          *get_clock(), 1000,
+      RCLCPP_WARN_THROTTLE(node_->get_logger(),
+          *node_->get_clock(), 1000,
           "Could not get transform, ignoring laser scan! %s", ex.what());
           return false;
     }
 
-    RCLCPP_INFO(logging_interface_->get_logger(), "Obtained transform");
+    RCLCPP_INFO(node_->get_logger(), "Obtained transform");
     for (int i = 0; i < polygon_.points.size(); ++i)
     {
       geometry_msgs::msg::PointStamped point_in = createPointStamped(polygon_.points[i].x, polygon_.points[i].y, 0, transform.header.stamp, polygon_frame_);
@@ -584,7 +594,7 @@ private:
       co_sine_map_angle_min_ != scan_in.angle_min ||
       co_sine_map_angle_max_ != scan_in.angle_max
     ) {
-      RCLCPP_DEBUG(logging_interface_->get_logger(), "No precomputed map given. Computing one.");
+      RCLCPP_DEBUG(node_->get_logger(), "No precomputed map given. Computing one.");
       co_sine_map_ = Eigen::ArrayXXd(n_pts, 2);
       co_sine_map_angle_min_ = scan_in.angle_min;
       co_sine_map_angle_max_ = scan_in.angle_max;
