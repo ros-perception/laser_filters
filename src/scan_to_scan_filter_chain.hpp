@@ -65,6 +65,7 @@ protected:
   #endif
   std::string tf_message_filter_target_frame_;
   double tf_filter_tolerance_;
+  int depth_publisher_;
 
   // Diagnostic updater
   diagnostic_updater::Heartbeat heartbeat_diagnostics_;

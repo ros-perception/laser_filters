@@ -60,6 +60,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   #endif
   this->declare_parameter("tf_message_filter_target_frame", "", read_only_desc);
   this->declare_parameter("tf_message_filter_tolerance", 0.03, read_only_desc);
+  this->declare_parameter("depth_publisher", 1000);
 
   // Get parameters
   #ifdef RCLCPP_SUPPORTS_MATCHED_CALLBACKS
@@ -67,6 +68,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   #endif
   this->get_parameter("tf_message_filter_target_frame", tf_message_filter_target_frame_);
   this->get_parameter("tf_message_filter_tolerance", tf_filter_tolerance_);
+  this->get_parameter("depth_publisher", depth_publisher_);
 
   if (!tf_message_filter_target_frame_.empty()) {
     tf_.reset(new tf2_ros::TransformListener(buffer_));
@@ -103,13 +105,15 @@ ScanToScanFilterChain::ScanToScanFilterChain(
         }
       };
     output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
-      "scan_filtered", 1000, pub_options);
+      "scan_filtered", depth_publisher_, pub_options);
   } else {
-    output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
+    output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
+      "scan_filtered", depth_publisher_);
     scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   }
   #else
-  output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", 1000);
+  output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
+    "scan_filtered", depth_publisher_);
   scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   #endif
 }
