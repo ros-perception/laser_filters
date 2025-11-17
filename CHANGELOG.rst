@@ -2,6 +2,15 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Parameter for chaning history depth of filtered scan publisher
+* Binning filter
+* Fix compile warning in speckle filter
+* Added readonly = false to reconfigurable parameters
+* Run CI on kilted branch
+* Contributors: Anthony Goeckner, Griffin Tabor, Guillaume Doisy, Jeanine van Bruggen, Tatsuro Sakaguchi
+
 2.2.0 (2025-05-30)
 ------------------
 * Updated deprecated calls to message_filters
