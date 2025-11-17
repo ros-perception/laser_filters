@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.3.1 (2025-11-17)
+------------------
 * Expose filtered scan histery depth as param
 * Binning filter
 * Fix compile warning in speckle filter
