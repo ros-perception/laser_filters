@@ -2,6 +2,14 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Expose filtered scan histery depth as param
+* Binning filter
+* Fix compile warning in speckle filter
+* Added readonly = false to reconfigurable parameters
+* Contributors: Anthony Goeckner, Griffin Tabor, Guillaume Doisy, Jeanine van Bruggen, Tatsuro Sakaguchi
+
 2.2.1 (2025-06-30)
 ------------------
 * Update tf2 headers
