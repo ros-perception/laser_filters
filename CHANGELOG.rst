@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.2.3 (2025-11-17)
+------------------
 * Parameter for chaning history depth of filtered scan publisher
 * Binning filter
 * Fix compile warning in speckle filter
