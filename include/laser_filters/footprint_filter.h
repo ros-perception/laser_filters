@@ -44,8 +44,8 @@ This is useful for ground plane extraction
 #include "filters/filter_base.hpp"
 
 #include <tf2/transform_datatypes.hpp>
-#include <tf2_ros/buffer.h>
-#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.hpp>
+#include <tf2_ros/transform_listener.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp> // PointCloud2ConstIterator
@@ -61,7 +61,7 @@ class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::La
 {
 public:
   LaserScanFootprintFilter()
-      : rclcpp_lifecycle::LifecycleNode("laser_scan_footprint_filter"), 
+      : rclcpp_lifecycle::LifecycleNode("laser_scan_footprint_filter"),
         buffer_(get_clock()), tf_(buffer_), up_and_running_(false) {}
 
   bool configure()

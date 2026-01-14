@@ -75,7 +75,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
     tf_filter_.reset(
       new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(
         scan_sub_, buffer_, "",
-        50, this->get_node_logging_interface(), this->get_node_clock_interface()));
+        50, *this));
     tf_filter_->setTargetFrame(tf_message_filter_target_frame_);
     tf_filter_->setTolerance(std::chrono::duration<double>(tf_filter_tolerance_));
 

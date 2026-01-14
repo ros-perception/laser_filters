@@ -9,11 +9,11 @@
  *  modification, are permitted provided that the following conditions
  *  are met:
  *
- *   1. Redistributions of source code must retain the above 
+ *   1. Redistributions of source code must retain the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer.
  *
- *   2. Redistributions in binary form must reproduce the above 
+ *   2. Redistributions in binary form must reproduce the above
  *      copyright notice, this list of conditions and the following
  *      disclaimer in the documentation and/or other materials provided
  *      with the distribution.
@@ -32,7 +32,7 @@
  *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
  *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
@@ -50,7 +50,7 @@
 #include <filters/filter_base.hpp>
 
 #include <tf2/transform_datatypes.hpp>
-#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/transform_listener.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 typedef tf2::Vector3 Point;
@@ -168,12 +168,12 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
       sensor_msgs::PointCloud2ConstIterator<int> iter_i(laser_cloud, "index");
       sensor_msgs::PointCloud2ConstIterator<float> iter_x(laser_cloud, "x");
       sensor_msgs::PointCloud2ConstIterator<float> iter_y(laser_cloud, "y");
-      sensor_msgs::PointCloud2ConstIterator<float> iter_z(laser_cloud, "z");      
-      
+      sensor_msgs::PointCloud2ConstIterator<float> iter_z(laser_cloud, "z");
+
       if (
-        !(iter_i != iter_i.end()) || 
-        !(iter_x != iter_x.end()) || 
-        !(iter_y != iter_y.end()) || 
+        !(iter_i != iter_i.end()) ||
+        !(iter_x != iter_x.end()) ||
+        !(iter_y != iter_y.end()) ||
         !(iter_z != iter_z.end()))
       {
         RCLCPP_INFO_THROTTLE(get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");

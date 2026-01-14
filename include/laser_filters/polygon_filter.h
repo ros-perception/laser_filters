@@ -55,7 +55,7 @@
 
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <tf2_ros/buffer.h>
+#include <tf2_ros/buffer.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
 
@@ -257,10 +257,10 @@ public:
     }
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
-    
+
     polygon_pub_ = create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
-    
+
     return true;
   }
 
@@ -288,7 +288,7 @@ protected:
   bool invert_filter_;
   std::string footprint_topic_;
   bool is_polygon_published_ = false;
-  
+
 
   // tf listener to transform scans into the right frame
   tf2_ros::Buffer buffer_;
@@ -385,7 +385,7 @@ public:
       polygon_frame_,
       input_scan.header.frame_id,
       rclcpp::Time(input_scan.header.stamp) + std::chrono::duration<double>(input_scan.ranges.size() * input_scan.time_increment),
-      1.0s, 
+      1.0s,
       &error_msg
     );
     if(!success){
@@ -490,7 +490,7 @@ public:
     std::lock_guard<std::recursive_mutex> lock(own_mutex_);
     publishPolygon();
 
-    if (!is_polygon_transformed_) 
+    if (!is_polygon_transformed_)
     {
       if (!transformPolygon(input_scan.header.frame_id)) return false;
     }
@@ -525,7 +525,7 @@ public:
     is_polygon_transformed_ = false;
     LaserScanPolygonFilterBase::footprintCB(polygon);
   }
-  
+
 protected:
   bool transformPolygon(const std::string &input_scan_frame_id)
   {
@@ -534,7 +534,7 @@ protected:
       "waitForTransform %s -> %s",
       polygon_frame_.c_str(), input_scan_frame_id.c_str()
     );
-    
+
     geometry_msgs::msg::TransformStamped transform;
     try
     {
@@ -563,7 +563,7 @@ protected:
     is_polygon_transformed_ = true;
     return true;
   }
-  
+
   rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters) override
   {
     is_polygon_transformed_ = false;
@@ -599,7 +599,7 @@ private:
       }
     }
   }
-  geometry_msgs::msg::PointStamped createPointStamped(const double &x, 
+  geometry_msgs::msg::PointStamped createPointStamped(const double &x,
                                                       const double &y,
                                                       const double &z,
                                                       const builtin_interfaces::msg::Time &stamp,

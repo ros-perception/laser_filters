@@ -31,8 +31,8 @@
 #include <sensor_msgs/msg/laser_scan.hpp>
 
 // TF
-#include <tf2_ros/transform_listener.h>
-#include "tf2_ros/message_filter.h"
+#include <tf2_ros/transform_listener.hpp>
+#include <tf2_ros/message_filter.hpp>
 
 typedef tf2::TransformException TransformException;
 typedef tf2_ros::TransformListener TransformListener;
@@ -78,7 +78,7 @@ public:
         tf_(buffer_),
         buffer_(nh_->get_clock()),
         scan_sub_(nh_, "scan", rclcpp::SensorDataQoS()),
-        tf_filter_(scan_sub_, buffer_, "base_link", 50, nh_),
+        tf_filter_(scan_sub_, buffer_, "base_link", 50, *nh_),
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
     // Configure filter chain
@@ -121,11 +121,12 @@ int main(int argc, char **argv)
   GenericLaserScanFilterNode t(nh);
 
   rclcpp::WallRate loop_rate(200);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(nh);
   while (rclcpp::ok()) {
 
-    rclcpp::spin_some(nh);
+    executor.spin_some();
     loop_rate.sleep();
-
   }
 
   return 0;
