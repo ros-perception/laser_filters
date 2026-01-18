@@ -46,8 +46,7 @@ ScanToCloudFilterChain::ScanToCloudFilterChain(
   laser_max_range_(DBL_MAX),
   buffer_(this->get_clock()),
   tf_(buffer_),
-  filter_(scan_sub_, buffer_, "", 50, this->get_node_logging_interface(),
-    this->get_node_clock_interface()),
+  filter_(scan_sub_, buffer_, "", 50, *this),
   cloud_filter_chain_("sensor_msgs::msg::PointCloud2"),
   scan_filter_chain_("sensor_msgs::msg::LaserScan")
 {
