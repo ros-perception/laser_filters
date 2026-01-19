@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.3.2 (2026-01-19)
+------------------
 * Updates to handle API changes in tf2_ros and rclcpp in rolling.
 * Contributors: Alejandro Hernandez Cordero
 
