@@ -2,6 +2,11 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updates to handle API changes in tf2_ros and rclcpp in rolling.
+* Contributors: Alejandro Hernandez Cordero
+
 2.3.1 (2025-11-17)
 ------------------
 * Expose filtered scan histery depth as param
