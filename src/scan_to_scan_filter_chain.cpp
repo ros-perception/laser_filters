@@ -92,9 +92,10 @@ ScanToScanFilterChain::ScanToScanFilterChain(
         std::placeholders::_1));
   }
 
+  rclcpp::PublisherOptions pub_options;
+  pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
   #ifdef RCLCPP_SUPPORTS_MATCHED_CALLBACKS
   if (lazy_subscription_) {
-    rclcpp::PublisherOptions pub_options;
     pub_options.event_callbacks.matched_callback =
       [this](rclcpp::MatchedInfo & s)
       {
@@ -108,12 +109,12 @@ ScanToScanFilterChain::ScanToScanFilterChain(
       "scan_filtered", scan_filtered_history_depth_, pub_options);
   } else {
     output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
-      "scan_filtered", scan_filtered_history_depth_);
+      "scan_filtered", scan_filtered_history_depth_, pub_options);
     scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   }
   #else
   output_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
-    "scan_filtered", scan_filtered_history_depth_);
+    "scan_filtered", scan_filtered_history_depth_, pub_options);
   scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS());
   #endif
 }
