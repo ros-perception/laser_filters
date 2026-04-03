@@ -89,7 +89,9 @@ public:
     tf_filter_.setTolerance(0.03s);
 
     // Advertise output
-    output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("output", 1000);
+    rclcpp::PublisherOptions pub_options;
+    pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
+    output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("output", 1000, pub_options);
 
     std::function<void(const sensor_msgs::msg::LaserScan::SharedPtr)> standard_callback =
       std::bind(&GenericLaserScanFilterNode::foo, this, std::placeholders::_1);
