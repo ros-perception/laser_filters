@@ -71,7 +71,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   this->get_parameter("scan_filtered_history_depth", scan_filtered_history_depth_);
 
   if (!tf_message_filter_target_frame_.empty()) {
-    tf_.reset(new tf2_ros::TransformListener(buffer_));
+    tf_.reset(new tf2_ros::TransformListener(buffer_, this));
     tf_filter_.reset(
       new tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>(
         scan_sub_, buffer_, "",
