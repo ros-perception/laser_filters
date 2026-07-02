@@ -39,6 +39,7 @@
 
 #include <filters/filter_base.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <angles/angles.h>
 
 namespace laser_filters
 {
@@ -70,28 +71,54 @@ namespace laser_filters
 
       virtual ~LaserScanAngularBoundsFilterInPlace(){}
 
-      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan){
+      bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
+      {
         filtered_scan = input_scan; //copy entire message
 
+        //normalize upper and lower bound angles
+        const double lower_bound = angles::normalize_angle(lower_angle_);
+        const double upper_bound = angles::normalize_angle(upper_angle_);
+
+        const bool wrapped = lower_bound > upper_bound;
+        
         double current_angle = input_scan.angle_min;
         unsigned int count = 0;
+
         float replace_value = replace_with_nan_ ? std::numeric_limits<float>::quiet_NaN() : input_scan.range_max + 1.0;
+
         //loop through the scan and remove ranges at angles between lower_angle_ and upper_angle_
-        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i){
-          if((current_angle > lower_angle_) && (current_angle < upper_angle_)){
+        for(unsigned int i = 0; i < input_scan.ranges.size(); ++i)
+        {
+          double angle = angles::normalize_angle(current_angle);
+          bool inside;
+
+          if (wrapped)
+          { 
+            inside = (angle > lower_bound) || (angle < upper_bound);
+          }
+          else
+          {
+            inside = (angle > lower_bound) && (angle < upper_bound);
+          }
+
+          if(inside)
+          {
             filtered_scan.ranges[i] = replace_value;
-            if(i < filtered_scan.intensities.size()){
+            if(i < filtered_scan.intensities.size())
+            {
               filtered_scan.intensities[i] = 0.0;
             }
             count++;
           }
+
           current_angle += input_scan.angle_increment;
         }
-
+        if(logging_interface_)
+        {
         RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
+        }
 
         return true;
-
       }
   };
 };
