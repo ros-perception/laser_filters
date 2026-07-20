@@ -51,7 +51,7 @@ class LaserScanBinningFilter : public filters::FilterBase<sensor_msgs::msg::Lase
 {
 public:
 
-  uint num_bins_;
+  unsigned int num_bins_;
 
   bool configure()
   {

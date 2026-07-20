@@ -23,6 +23,11 @@ ament_auto_add_library(laser_filter_chains SHARED
                          src/scan_to_cloud_filter_chain.cpp
                          src/scan_to_scan_filter_chain.cpp)
 
+if(WIN32)
+  set_target_properties(laser_scan_filters PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  set_target_properties(laser_filter_chains PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 # The rclcpp_components_register_node macro registers an rclcpp component for the node with
 # the ament resource index AND creates a templated executable that spins the given node.
 
