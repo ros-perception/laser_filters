@@ -52,6 +52,7 @@ TEST(AngularBoundsFilterInPlace, NonWrappedRange)
     filter.lower_angle_ = -0.15;
     filter.upper_angle_ = 0.15;
     filter.replace_with_nan_ = true;
+    filter.wrap_angle_ = true;
 
     LaserScan input = makeScanMsg(-0.5f, 0.1f, 10);
     LaserScan output;
@@ -82,6 +83,7 @@ TEST(AngularBoundsFilterInPlace, WrappedRange)
     filter.lower_angle_ = 2.9;
     filter.upper_angle_ = -2.9;
     filter.replace_with_nan_ = true;
+    filter.wrap_angle_ = true;
 
     LaserScan input = makeScanMsg(-3.0f, 0.5f, 13);
     LaserScan output;
@@ -110,6 +112,7 @@ TEST(AngularBoundsFilterInPlace, NonWrappedRangeReplaceWithMax)
     filter.lower_angle_ = -0.15;
     filter.upper_angle_ = 0.15;
     filter.replace_with_nan_ = false;
+    filter.wrap_angle_ = true;
 
     LaserScan input = makeScanMsg(-0.5f, 0.1f, 10);
     LaserScan output;
@@ -132,13 +135,14 @@ TEST(AngularBoundsFilterInPlace, NonWrappedRangeReplaceWithMax)
     EXPECT_FLOAT_EQ(output.intensities[0], 5.0f);
 }
 
-TEST(AngularBoundsFilterInPlace, Boundaries)
+TEST(AngularBoundsFilterInPlace, WrapBoundaries)
 {
     laser_filters::LaserScanAngularBoundsFilterInPlace filter;
 
     filter.lower_angle_ = -0.15;
     filter.upper_angle_ = 0.15;
     filter.replace_with_nan_ = false;
+    filter.wrap_angle_ = true;
 
     LaserScan input = makeScanMsg(-0.5f, 0.1f, 10);
     LaserScan output;
@@ -161,6 +165,41 @@ TEST(AngularBoundsFilterInPlace, Boundaries)
 
     EXPECT_FLOAT_EQ(output.intensities[3], 5.0f);
     EXPECT_FLOAT_EQ(output.intensities[7], 5.0f);
+}
+
+TEST(AngularBoundsFilterInPlace, WrapAngleParamBehavior)
+{
+    LaserScan input = makeScanMsg(-3.1415f, 0.1f, 63);
+    const size_t idx = static_cast<size_t>(std::round((3.05f - (-3.1415f)) / 0.1f)); // should end up being around 63 beams
+
+    // wrapped interval (3.0 .. -3.0) should filter the sample near +3.05
+    {
+        laser_filters::LaserScanAngularBoundsFilterInPlace filter;
+        filter.lower_angle_ = 3.0;
+        filter.upper_angle_ = -3.0;
+        filter.replace_with_nan_ = true;
+        filter.wrap_angle_ = true;
+
+        LaserScan output;
+        ASSERT_TRUE(filter.update(input, output));
+        EXPECT_TRUE(std::isnan(output.ranges[idx]));
+        EXPECT_FLOAT_EQ(output.intensities[idx], 0.0f);
+    }
+
+    // legacy (non-wrap) behavior; same numeric angles not filtered
+    {
+        laser_filters::LaserScanAngularBoundsFilterInPlace filter;
+        filter.lower_angle_ = 3.0;
+        filter.upper_angle_ = -3.0;
+        filter.replace_with_nan_ = true;
+        filter.wrap_angle_ = false;
+
+        LaserScan output;
+        ASSERT_TRUE(filter.update(input, output));
+        EXPECT_FALSE(std::isnan(output.ranges[idx]));
+        EXPECT_FLOAT_EQ(output.ranges[idx], 1.0f); // original range value from makeScanMsg
+        EXPECT_FLOAT_EQ(output.intensities[idx], 5.0f);
+    }
 }
 
 int main(int argc, char **argv)

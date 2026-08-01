@@ -38,10 +38,18 @@
 #define LASER_SCAN_ANGULAR_BOUNDS_FILTER_IN_PLACE_H
 
 #include <filters/filter_base.hpp>
+#include <rclcpp/logging.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <angles/angles.h>
 
 namespace laser_filters
+/* 
+* Example:
+* say upper angle = -3.0 and lower angle = 3.0 (both in radians).
+* if wrap_angle is set to true, the beams directly behind the robot will be removed.
+* if wrap_angle was false, no beams would be removed since the upper angle is not normalized.
+*/ 
+
 {
   class LaserScanAngularBoundsFilterInPlace : public filters::FilterBase<sensor_msgs::msg::LaserScan>
   {
@@ -49,6 +57,7 @@ namespace laser_filters
       double lower_angle_;
       double upper_angle_;
       bool replace_with_nan_;
+      bool wrap_angle_;
 
       bool configure()
       {
@@ -60,11 +69,17 @@ namespace laser_filters
           RCLCPP_ERROR(logging_interface_->get_logger(), "Both the lower_angle and upper_angle parameters must be set to use this filter.");
           return false;
         }
-
         //toggle to use NaN for filtering scans; defaults to false for backward compatibility.
         //https://github.com/ros-perception/laser_filters/pull/202
         replace_with_nan_ = false;
         getParam("replace_with_nan", replace_with_nan_);
+        
+        //toggle to allow for angle wrapping; defaults to false for backward compatibility.
+        //https://github.com/ros-perception/laser_filters/pull/261
+        wrap_angle_ = false;
+        getParam("wrap_angle", wrap_angle_);
+
+        RCLCPP_DEBUG(logging_interface_->get_logger(), "Angle wrap turned %s", wrap_angle_ ? "on" : "off");
 
         return true;
       }
@@ -91,14 +106,18 @@ namespace laser_filters
         {
           double angle = angles::normalize_angle(current_angle);
           bool inside;
-
-          if (wrapped)
+       
+          if (wrapped && wrap_angle_)
           { 
             inside = (angle > lower_bound) || (angle < upper_bound);
           }
-          else
+          else if (!wrapped && wrap_angle_)
           {
             inside = (angle > lower_bound) && (angle < upper_bound);
+          }
+          else 
+          {
+           inside = (current_angle > lower_angle_) && (current_angle < upper_angle_);
           }
 
           if(inside)
@@ -113,6 +132,7 @@ namespace laser_filters
 
           current_angle += input_scan.angle_increment;
         }
+
         if(logging_interface_)
         {
         RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %u points from the laser scan.", count);
