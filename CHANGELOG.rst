@@ -2,6 +2,13 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Optional wrapping of angles in AngularBoundsFilter
+* New added LaserScanBinningFilter: places measurements into fixed number of bins.
+* Set hardware id in diagnostic messages
+* Contributors: Anthony Goeckner, Griffin Tabor, Tatsuro Sakaguchi, K Herbstzuber
+
 2.0.9 (2025-07-03)
 ------------------
 * Fix compile warning in speckle filter
