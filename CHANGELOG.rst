@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.0.10 (2026-08-13)
+-------------------
 * Optional wrapping of angles in AngularBoundsFilter
 * New added LaserScanBinningFilter: places measurements into fixed number of bins.
 * Set hardware id in diagnostic messages
