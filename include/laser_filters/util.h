@@ -1,0 +1,81 @@
+/*
+ *  Software License Agreement (BSD License)
+ *
+ *  Robot Operating System code by Eurotec B.V.
+ *  Copyright (c) 2020, Eurotec B.V.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   1. Redistributions of source code must retain the above
+ *      copyright notice, this list of conditions and the following
+ *      disclaimer.
+ *
+ *   2. Redistributions in binary form must reproduce the above
+ *      copyright notice, this list of conditions and the following
+ *      disclaimer in the documentation and/or other materials provided
+ *      with the distribution.
+ *
+ *   3. Neither the name of the copyright holder nor the names of its
+ *      contributors may be used to endorse or promote products derived
+ *      from this software without specific prior written permission.
+ *
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ *  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ *  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ *  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ *  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ *
+ *  util.h
+ */
+
+#ifndef LASER_FILTERS__UTIL_H_
+#define LASER_FILTERS__UTIL_H_
+
+#include <rclcpp/rclcpp.hpp>
+#include <filters/filter_base.hpp>
+
+namespace laser_filters
+{
+  /**
+   * \brief Create a node that is unique to this filter.
+   *
+   * The node name is pinned via an explicit "-r __node:=<name>" argument local
+   * to this node, so it stays unique even when the parent process is launched
+   * with a bare "--ros-args -r __node:=<name>" rule, which otherwise renames
+   * every node created in the process to the same name and collides with it.
+   *
+   * \param filter_name The name of the filter, used to help make the node name unique.
+   * \param filter A pointer to the filter instance, used to help make the node name unique.
+   * \return A shared pointer to a node handle in the filter's private namespace
+   */
+  template <typename T>
+  rclcpp::Node::SharedPtr getUniqueNode(const std::string &filter_name, const filters::FilterBase<T> *filter)
+  {
+    char node_name[42];
+    snprintf(
+    node_name, sizeof(node_name), "%s_%zx",
+    filter_name.c_str(), reinterpret_cast<size_t>(filter)
+    );
+
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared(
+      node_name,
+      rclcpp::NodeOptions().arguments(
+        {"--ros-args", "-r", "__node:=" + std::string(node_name)}));
+
+    return node;
+  }
+}
+
+#endif  // LASER_FILTERS__UTIL_H_

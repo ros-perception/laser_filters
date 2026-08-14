@@ -50,25 +50,27 @@ This is useful for ground plane extraction
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp> // PointCloud2ConstIterator
 #include <geometry_msgs/msg/point32.hpp>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
 
 #include "laser_geometry/laser_geometry.hpp"
+#include "laser_filters/util.h"
 
 namespace laser_filters
 {
 
-class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode
+class LaserScanFootprintFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
 public:
-  LaserScanFootprintFilter()
-      : rclcpp_lifecycle::LifecycleNode("laser_scan_footprint_filter"),
-        buffer_(get_clock()), tf_(buffer_), up_and_running_(false) {}
+  LaserScanFootprintFilter() : up_and_running_(false) {}
 
   bool configure()
   {
+    node_ = getUniqueNode("footprint_filter", this);
+    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+
     if(!getParam("inscribed_radius", inscribed_radius_))
     {
-      RCLCPP_ERROR(get_logger(), "LaserScanFootprintFilter needs inscribed_radius to be set");
+      RCLCPP_ERROR(node_->get_logger(), "LaserScanFootprintFilter needs inscribed_radius to be set");
       return false;
     }
     return true;
@@ -84,18 +86,18 @@ public:
     sensor_msgs::msg::PointCloud2 laser_cloud;
 
     try{
-      projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, buffer_);
+      projector_.transformLaserScanToPointCloud("base_link", input_scan, laser_cloud, *buffer_);
     }
     catch (tf2::TransformException &ex)
     {
       rclcpp::Clock steady_clock(RCL_STEADY_TIME);
       if (up_and_running_)
       {
-        RCLCPP_WARN_THROTTLE(get_logger(), steady_clock, 1, "Dropping Scan: Transform unavailable %s", ex.what());
+        RCLCPP_WARN_THROTTLE(node_->get_logger(), steady_clock, 1, "Dropping Scan: Transform unavailable %s", ex.what());
       }
       else
       {
-        RCLCPP_INFO_THROTTLE(get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
+        RCLCPP_INFO_THROTTLE(node_->get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
       }
       return false;
     }
@@ -107,7 +109,7 @@ public:
 
     if (!(iter_i != iter_i.end()))
     {
-      RCLCPP_ERROR(get_logger(), "We need an index channel to be able to filter out the footprint");
+      RCLCPP_ERROR(node_->get_logger(), "We need an index channel to be able to filter out the footprint");
       return false;
     }
 
@@ -142,8 +144,12 @@ public:
   }
 
 private:
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener tf_;
+  // node private to this filter, so its name stays unique even under a
+  // process-wide "-r __node:=<name>" remap (see laser_filters/util.h)
+  rclcpp::Node::SharedPtr node_;
+
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_;
   laser_geometry::LaserProjection projector_;
   double inscribed_radius_;
   bool up_and_running_;

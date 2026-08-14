@@ -53,11 +53,13 @@
 #include <geometry_msgs/msg/polygon.hpp>
 #include <geometry_msgs/msg/polygon_stamped.hpp>
 
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <tf2_ros/buffer.hpp>
+#include <tf2_ros/transform_listener.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
+
+#include "laser_filters/util.h"
 
 
 typedef tf2::Vector3 Point;
@@ -222,15 +224,19 @@ namespace laser_filters
 /**
  * @brief This is a filter that removes points in a laser scan inside of a polygon.
  */
-class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode {
+class LaserScanPolygonFilterBase : public filters::FilterBase<sensor_msgs::msg::LaserScan> {
 public:
 
-  LaserScanPolygonFilterBase() : rclcpp_lifecycle::LifecycleNode("laser_scan_polygon_filter"), buffer_(get_clock()), tf_(buffer_){};
+  LaserScanPolygonFilterBase() {};
 
   virtual bool configure()
   {
+    node_ = getUniqueNode("polygon_filter", this);
+    buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+
     // dynamic reconfigure parameters callback:
-    on_set_parameters_callback_handle_ = add_on_set_parameters_callback(
+    on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(
               std::bind(&LaserScanPolygonFilterBase::reconfigureCB, this, std::placeholders::_1));
 
     std::string polygon_string;
@@ -258,7 +264,7 @@ public:
     polygon_ = makePolygonFromString(polygon_string, polygon_);
     padPolygon(polygon_, polygon_padding_);
 
-    polygon_pub_ = create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
+    polygon_pub_ = node_->create_publisher<geometry_msgs::msg::PolygonStamped>("polygon", rclcpp::QoS(1).transient_local().keep_last(1));
     is_polygon_published_ = false;
 
     return true;
@@ -290,9 +296,13 @@ protected:
   bool is_polygon_published_ = false;
 
 
+  // node private to this filter, so its name stays unique even under a
+  // process-wide "-r __node:=<name>" remap (see laser_filters/util.h)
+  rclcpp::Node::SharedPtr node_;
+
   // tf listener to transform scans into the right frame
-  tf2_ros::Buffer buffer_;
-  tf2_ros::TransformListener tf_;
+  std::shared_ptr<tf2_ros::Buffer> buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_;
 
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr on_set_parameters_callback_handle_;
   virtual rcl_interfaces::msg::SetParametersResult reconfigureCB(std::vector<rclcpp::Parameter> parameters)
@@ -350,7 +360,7 @@ protected:
     {
       geometry_msgs::msg::PolygonStamped polygon_stamped;
       polygon_stamped.header.frame_id = polygon_frame_;
-      polygon_stamped.header.stamp = get_clock()->now();
+      polygon_stamped.header.stamp = node_->get_clock()->now();
       polygon_stamped.polygon = polygon_;
       polygon_pub_->publish(polygon_stamped);
       is_polygon_published_ = true;
@@ -363,7 +373,7 @@ public:
   bool configure() override
   {
     bool result = LaserScanPolygonFilterBase::configure();
-    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&LaserScanPolygonFilterBase::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -381,7 +391,7 @@ public:
 
     std::string error_msg;
 
-    bool success = buffer_.canTransform(
+    bool success = buffer_->canTransform(
       polygon_frame_,
       input_scan.header.frame_id,
       rclcpp::Time(input_scan.header.stamp) + std::chrono::duration<double>(input_scan.ranges.size() * input_scan.time_increment),
@@ -394,10 +404,10 @@ public:
     }
 
     try{
-      projector_.transformLaserScanToPointCloud(polygon_frame_, input_scan, laser_cloud, buffer_);
+      projector_.transformLaserScanToPointCloud(polygon_frame_, input_scan, laser_cloud, *buffer_);
     }
     catch(tf2::TransformException& ex){
-      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *get_clock(), 300, "Ignoring Scan: Waiting for TF");
+      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *node_->get_clock(), 300, "Ignoring Scan: Waiting for TF");
       return false;
     }
 
@@ -408,7 +418,7 @@ public:
 
     if (i_idx_c == -1 || x_idx_c == -1 || y_idx_c == -1 || z_idx_c == -1)
     {
-      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *get_clock(), 300, "x, y, z and index fields are required, skipping scan");
+      RCLCPP_INFO_THROTTLE(logging_interface_->get_logger(), *node_->get_clock(), 300, "x, y, z and index fields are required, skipping scan");
     }
 
     const int i_idx_offset = laser_cloud.fields[i_idx_c].offset;
@@ -481,7 +491,7 @@ public:
     {
       RCLCPP_INFO(logging_interface_->get_logger(), "Error: PolygonFilter transform_timeout not set, assuming 5. \n");
     }
-    footprint_sub_ = create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
+    footprint_sub_ = node_->create_subscription<geometry_msgs::msg::Polygon>(footprint_topic_, 1, std::bind(&StaticLaserScanPolygonFilter::footprintCB, this, std::placeholders::_1));
     return result;
   }
 
@@ -538,7 +548,7 @@ protected:
     geometry_msgs::msg::TransformStamped transform;
     try
     {
-      transform = buffer_.lookupTransform(input_scan_frame_id,
+      transform = buffer_->lookupTransform(input_scan_frame_id,
         polygon_frame_,
         tf2::TimePointZero,
         tf2::durationFromSec(transform_timeout_));
@@ -546,7 +556,7 @@ protected:
     catch(tf2::TransformException& ex)
     {
       RCLCPP_WARN_THROTTLE(logging_interface_->get_logger(),
-          *get_clock(), 1000,
+          *node_->get_clock(), 1000,
           "Could not get transform, ignoring laser scan! %s", ex.what());
           return false;
     }
