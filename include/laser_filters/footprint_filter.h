@@ -66,7 +66,7 @@ public:
   {
     node_ = getUniqueNode("footprint_filter", this);
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
-    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_, node_);
 
     if(!getParam("inscribed_radius", inscribed_radius_))
     {

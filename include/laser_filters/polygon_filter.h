@@ -233,7 +233,7 @@ public:
   {
     node_ = getUniqueNode("polygon_filter", this);
     buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
-    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+    tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_, node_);
 
     // dynamic reconfigure parameters callback:
     on_set_parameters_callback_handle_ = node_->add_on_set_parameters_callback(

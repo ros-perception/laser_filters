@@ -73,7 +73,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     {
       node_ = getUniqueNode("box_filter", this);
       buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
-      tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+      tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_, node_);
 
       up_and_running_ = true;
       double min_x, min_y, min_z, max_x, max_y, max_z;
