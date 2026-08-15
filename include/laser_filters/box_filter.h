@@ -49,27 +49,34 @@
 
 #include <filters/filter_base.hpp>
 
+#include "tf2_ros/buffer.hpp"
 #include <tf2/transform_datatypes.h>
 #include <tf2_ros/transform_listener.h>
 #include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
 
 typedef tf2::Vector3 Point;
 
 #include <laser_geometry/laser_geometry.hpp>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
+
+#include "laser_filters/util.h"
 
 namespace laser_filters
 {
 /**
  * @brief This is a filter that removes points in a laser scan inside of a cartesian box.
  */
-class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>, public rclcpp_lifecycle::LifecycleNode
+class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserScan>
 {
   public:
-    LaserScanBoxFilter() : rclcpp_lifecycle::LifecycleNode("laser_scan_box_filter"), buffer_(get_clock()), tf_(buffer_){};
+    LaserScanBoxFilter() {};
 
     bool configure()
     {
+      node_ = getUniqueNode("box_filter", this);
+      buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
+      tf_ = std::make_shared<tf2_ros::TransformListener>(*buffer_);
+
       up_and_running_ = true;
       double min_x, min_y, min_z, max_x, max_y, max_z;
       bool box_frame_set = getParam("box_frame", box_frame_);
@@ -93,31 +100,31 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
 
       if (!box_frame_set)
       {
-        RCLCPP_ERROR(get_logger(), "box_frame is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "box_frame is not set!");
       }
       if (!x_max_set)
       {
-        RCLCPP_ERROR(get_logger(), "max_x is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "max_x is not set!");
       }
       if (!y_max_set)
       {
-        RCLCPP_ERROR(get_logger(), "max_y is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "max_y is not set!");
       }
       if (!z_max_set)
       {
-        RCLCPP_ERROR(get_logger(), "max_z is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "max_z is not set!");
       }
       if (!x_min_set)
       {
-        RCLCPP_ERROR(get_logger(), "min_x is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "min_x is not set!");
       }
       if (!y_min_set)
       {
-        RCLCPP_ERROR(get_logger(), "min_y is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "min_y is not set!");
       }
       if (!z_min_set)
       {
-        RCLCPP_ERROR(get_logger(), "min_z is not set!");
+        RCLCPP_ERROR(node_->get_logger(), "min_z is not set!");
       }
 
       return box_frame_set && x_max_set && y_max_set && z_max_set &&
@@ -134,7 +141,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
 
       std::string error_msg;
 
-      bool success = buffer_.canTransform(
+      bool success = buffer_->canTransform(
           box_frame_,
           input_scan.header.frame_id,
           rclcpp::Time(input_scan.header.stamp) + std::chrono::duration<double>(input_scan.ranges.size() * input_scan.time_increment),
@@ -142,25 +149,25 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
           &error_msg);
       if (!success)
       {
-        RCLCPP_WARN(get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
+        RCLCPP_WARN(node_->get_logger(), "Could not get transform, irgnoring laser scan! %s", error_msg.c_str());
         return false;
       }
 
       rclcpp::Clock steady_clock(RCL_STEADY_TIME);
       try
       {
-        projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, buffer_);
+        projector_.transformLaserScanToPointCloud(box_frame_, input_scan, laser_cloud, *buffer_);
       }
       catch (tf2::TransformException &ex)
       {
         if (up_and_running_)
         {
-          RCLCPP_WARN_THROTTLE(get_logger(), steady_clock, 1, "Dropping Scan: Tansform unavailable %s", ex.what());
+          RCLCPP_WARN_THROTTLE(node_->get_logger(), steady_clock, 1, "Dropping Scan: Tansform unavailable %s", ex.what());
           return true;
         }
         else
         {
-          RCLCPP_INFO_THROTTLE(get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
+          RCLCPP_INFO_THROTTLE(node_->get_logger(), steady_clock, .3, "Ignoring Scan: Waiting for TF");
         }
         return false;
       }
@@ -176,7 +183,7 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
         !(iter_y != iter_y.end()) || 
         !(iter_z != iter_z.end()))
       {
-        RCLCPP_INFO_THROTTLE(get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");
+        RCLCPP_INFO_THROTTLE(node_->get_logger(), steady_clock, .3, "x, y, z and index fields are required, skipping scan");
       }
 
     for (;
@@ -210,8 +217,9 @@ class LaserScanBoxFilter : public filters::FilterBase<sensor_msgs::msg::LaserSca
     laser_geometry::LaserProjection projector_;
 
     // tf listener to transform scans into the box_frame
-    tf2_ros::Buffer buffer_;
-    tf2_ros::TransformListener tf_;
+    std::shared_ptr<rclcpp::Node> node_;
+    std::shared_ptr<tf2_ros::Buffer> buffer_;
+    std::shared_ptr<tf2_ros::TransformListener> tf_;
 
     // parameter to decide if points in box or points outside of box are removed
     bool remove_box_points_ = true;
