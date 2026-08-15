@@ -16,6 +16,10 @@ if(${rclcpp_VERSION_MAJOR} GREATER_EQUAL 20)
     add_compile_definitions(RCLCPP_SUPPORTS_MATCHED_CALLBACKS)
 endif()
 
+if(${rclcpp_VERSION_MAJOR} GREATER_EQUAL 17)
+    add_compile_definitions(RCLCPP_SUPPORTS_POST_SET_PARAMS_CALLBACK)
+endif()
+
 ament_auto_add_library(laser_scan_filters SHARED src/laser_scan_filters.cpp)
 ament_auto_add_library(laser_filter_chains SHARED
                          src/scan_to_cloud_filter_chain.cpp
