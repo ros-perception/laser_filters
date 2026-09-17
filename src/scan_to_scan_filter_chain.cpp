@@ -73,9 +73,7 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   this->get_parameter("scan_filtered_history_depth", scan_filtered_history_depth_);
 
   if (!tf_message_filter_target_frame_.empty()) {
-    auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
-      get_node_base_interface(),
-      get_node_timers_interface());
+    auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(*this);
     buffer_.setCreateTimerInterface(std::move(timer_interface));
     tf_.reset(new tf2_ros::TransformListener(buffer_));
     tf_filter_.reset(
