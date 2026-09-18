@@ -2,8 +2,8 @@
 Changelog for package laser_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+2.3.3 (2026-09-18)
+------------------
 * Fix CreateTimerROS constructor call for NodeInterfaces API and out-of-bounds vector access in RadiusOutlierWindowValidator (`#267 <https://github.com/ros-perception/laser_filters/issues/267>`_)
 * Re-use the main filter node for the tf2_ros::MessageFilter TransformListener (`#259 <https://github.com/ros-perception/laser_filters/issues/259>`_)
 * Enable QoS overriding for the output topic (`#255 <https://github.com/ros-perception/laser_filters/issues/255>`_)
