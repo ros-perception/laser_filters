@@ -83,9 +83,7 @@ ScanToCloudFilterChain::ScanToCloudFilterChain(
       std::placeholders::_1));
   filter_.setTolerance(std::chrono::duration<double>(tf_tolerance_));
 
-  auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
-    this->get_node_base_interface(),
-    this->get_node_timers_interface());
+  auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(*this);
   buffer_.setCreateTimerInterface(timer_interface);
 
   rclcpp::PublisherOptions pub_options;
