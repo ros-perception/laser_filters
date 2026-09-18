@@ -96,12 +96,12 @@ class RadiusOutlierWindowValidator : public WindowValidator
     for (int y = -(int)window; y < (int)window + 1 && num_neighbors < (int)window; y++)
     {
       int j = idx + y;
-      r2 = scan.ranges[j];
-
-      if (j < 0 || j >= static_cast<int>(scan.ranges.size()) || idx == j || std::isnan(r2))
+      if (j < 0 || j >= static_cast<int>(scan.ranges.size()) || idx == j || std::isnan(scan.ranges[j]))
       {  // Out of scan bounds or itself or infinity
         continue;
       }
+
+      r2 = scan.ranges[j];
 
       // Explanation:
       //
